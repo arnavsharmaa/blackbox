@@ -1,0 +1,10088 @@
+{
+  "schema_version": "1.0",
+  "id": "INC-2026-0731-004",
+  "robot_id": "W-058",
+  "robot_model": "Fetchbot AMR-600",
+  "facility": "Warehouse 3 \u2014 Fremont",
+  "task_name": "Transfer tote to Outbound Staging",
+  "task_goal": "Carry tote TOTE-90412 to Outbound Staging (20.00, 3.00)",
+  "start_time": "2026-07-31T16:22:09Z",
+  "end_time": "2026-07-31T16:23:19Z",
+  "outcome": "failed",
+  "severity": "error",
+  "software_version": "nav-stack 2.14.1",
+  "map_version": "warehouse3-2026.07.12",
+  "environment": "Indoor warehouse, main transit lane",
+  "summary": "Robot W-058's front lidar stopped publishing for 22 s mid-transit. The planner dropped to degraded mode, capped speed, and safely stopped the task when obstacle data could not be trusted.",
+  "events": [
+    {
+      "timestamp": "2026-07-31T16:22:09Z",
+      "event_type": "task_started",
+      "subsystem": "task_manager",
+      "severity": "info",
+      "message": "Task 'Transfer tote to Outbound Staging' started",
+      "payload": {
+        "task": "transfer_tote",
+        "tote_id": "TOTE-90412"
+      },
+      "correlation_id": "TASK-5177",
+      "evidence_tags": []
+    },
+    {
+      "timestamp": "2026-07-31T16:22:09.600000Z",
+      "event_type": "nav_goal_issued",
+      "subsystem": "navigation",
+      "severity": "info",
+      "message": "Navigation goal issued: Outbound Staging (20.00, 3.00)",
+      "payload": {
+        "goal_x": 20.0,
+        "goal_y": 3.0,
+        "frame": "map"
+      },
+      "correlation_id": "TASK-5177",
+      "evidence_tags": []
+    },
+    {
+      "timestamp": "2026-07-31T16:22:10.200000Z",
+      "event_type": "planner_state_changed",
+      "subsystem": "planner",
+      "severity": "info",
+      "message": "Planner state: executing",
+      "payload": {
+        "state": "executing"
+      },
+      "correlation_id": "TASK-5177",
+      "evidence_tags": []
+    },
+    {
+      "timestamp": "2026-07-31T16:22:11Z",
+      "event_type": "velocity_command",
+      "subsystem": "controller",
+      "severity": "info",
+      "message": "cmd_vel linear=0.30 m/s",
+      "payload": {
+        "linear": 0.3,
+        "angular": 0.0
+      },
+      "correlation_id": "TASK-5177",
+      "evidence_tags": []
+    },
+    {
+      "timestamp": "2026-07-31T16:22:14Z",
+      "event_type": "velocity_command",
+      "subsystem": "controller",
+      "severity": "info",
+      "message": "cmd_vel linear=0.30 m/s",
+      "payload": {
+        "linear": 0.3,
+        "angular": 0.0
+      },
+      "correlation_id": "TASK-5177",
+      "evidence_tags": []
+    },
+    {
+      "timestamp": "2026-07-31T16:22:17Z",
+      "event_type": "velocity_command",
+      "subsystem": "controller",
+      "severity": "info",
+      "message": "cmd_vel linear=0.30 m/s",
+      "payload": {
+        "linear": 0.3,
+        "angular": 0.0
+      },
+      "correlation_id": "TASK-5177",
+      "evidence_tags": []
+    },
+    {
+      "timestamp": "2026-07-31T16:22:20Z",
+      "event_type": "velocity_command",
+      "subsystem": "controller",
+      "severity": "info",
+      "message": "cmd_vel linear=0.30 m/s",
+      "payload": {
+        "linear": 0.3,
+        "angular": 0.0
+      },
+      "correlation_id": "TASK-5177",
+      "evidence_tags": []
+    },
+    {
+      "timestamp": "2026-07-31T16:22:23Z",
+      "event_type": "velocity_command",
+      "subsystem": "controller",
+      "severity": "info",
+      "message": "cmd_vel linear=0.30 m/s",
+      "payload": {
+        "linear": 0.3,
+        "angular": 0.0
+      },
+      "correlation_id": "TASK-5177",
+      "evidence_tags": []
+    },
+    {
+      "timestamp": "2026-07-31T16:22:26Z",
+      "event_type": "velocity_command",
+      "subsystem": "controller",
+      "severity": "info",
+      "message": "cmd_vel linear=0.30 m/s",
+      "payload": {
+        "linear": 0.3,
+        "angular": 0.0
+      },
+      "correlation_id": "TASK-5177",
+      "evidence_tags": []
+    },
+    {
+      "timestamp": "2026-07-31T16:22:29Z",
+      "event_type": "velocity_command",
+      "subsystem": "controller",
+      "severity": "info",
+      "message": "cmd_vel linear=0.30 m/s",
+      "payload": {
+        "linear": 0.3,
+        "angular": 0.0
+      },
+      "correlation_id": "TASK-5177",
+      "evidence_tags": []
+    },
+    {
+      "timestamp": "2026-07-31T16:22:32Z",
+      "event_type": "velocity_command",
+      "subsystem": "controller",
+      "severity": "info",
+      "message": "cmd_vel linear=0.30 m/s",
+      "payload": {
+        "linear": 0.3,
+        "angular": 0.0
+      },
+      "correlation_id": "TASK-5177",
+      "evidence_tags": []
+    },
+    {
+      "timestamp": "2026-07-31T16:22:35Z",
+      "event_type": "velocity_command",
+      "subsystem": "controller",
+      "severity": "info",
+      "message": "cmd_vel linear=0.30 m/s",
+      "payload": {
+        "linear": 0.3,
+        "angular": 0.0
+      },
+      "correlation_id": "TASK-5177",
+      "evidence_tags": []
+    },
+    {
+      "timestamp": "2026-07-31T16:22:38Z",
+      "event_type": "velocity_command",
+      "subsystem": "controller",
+      "severity": "info",
+      "message": "cmd_vel linear=0.30 m/s",
+      "payload": {
+        "linear": 0.3,
+        "angular": 0.0
+      },
+      "correlation_id": "TASK-5177",
+      "evidence_tags": []
+    },
+    {
+      "timestamp": "2026-07-31T16:22:14Z",
+      "event_type": "pose_updated",
+      "subsystem": "localization",
+      "severity": "info",
+      "message": "Pose (5.50, 3.00)",
+      "payload": {
+        "x": 5.5,
+        "y": 3.0,
+        "heading": 0.0
+      },
+      "correlation_id": "TASK-5177",
+      "evidence_tags": []
+    },
+    {
+      "timestamp": "2026-07-31T16:22:19Z",
+      "event_type": "pose_updated",
+      "subsystem": "localization",
+      "severity": "info",
+      "message": "Pose (7.00, 3.00)",
+      "payload": {
+        "x": 7.0,
+        "y": 3.0,
+        "heading": 0.0
+      },
+      "correlation_id": "TASK-5177",
+      "evidence_tags": []
+    },
+    {
+      "timestamp": "2026-07-31T16:22:24Z",
+      "event_type": "pose_updated",
+      "subsystem": "localization",
+      "severity": "info",
+      "message": "Pose (8.50, 3.00)",
+      "payload": {
+        "x": 8.5,
+        "y": 3.0,
+        "heading": 0.0
+      },
+      "correlation_id": "TASK-5177",
+      "evidence_tags": []
+    },
+    {
+      "timestamp": "2026-07-31T16:22:29Z",
+      "event_type": "pose_updated",
+      "subsystem": "localization",
+      "severity": "info",
+      "message": "Pose (10.00, 3.00)",
+      "payload": {
+        "x": 10.0,
+        "y": 3.0,
+        "heading": 0.0
+      },
+      "correlation_id": "TASK-5177",
+      "evidence_tags": []
+    },
+    {
+      "timestamp": "2026-07-31T16:22:34Z",
+      "event_type": "pose_updated",
+      "subsystem": "localization",
+      "severity": "info",
+      "message": "Pose (11.50, 3.00)",
+      "payload": {
+        "x": 11.5,
+        "y": 3.0,
+        "heading": 0.0
+      },
+      "correlation_id": "TASK-5177",
+      "evidence_tags": []
+    },
+    {
+      "timestamp": "2026-07-31T16:22:39Z",
+      "event_type": "pose_updated",
+      "subsystem": "localization",
+      "severity": "info",
+      "message": "Pose (13.00, 3.00)",
+      "payload": {
+        "x": 13.0,
+        "y": 3.0,
+        "heading": 0.0
+      },
+      "correlation_id": "TASK-5177",
+      "evidence_tags": []
+    },
+    {
+      "timestamp": "2026-07-31T16:22:44Z",
+      "event_type": "pose_updated",
+      "subsystem": "localization",
+      "severity": "info",
+      "message": "Pose (13.70, 3.00)",
+      "payload": {
+        "x": 13.7,
+        "y": 3.0,
+        "heading": 0.0
+      },
+      "correlation_id": "TASK-5177",
+      "evidence_tags": []
+    },
+    {
+      "timestamp": "2026-07-31T16:22:49Z",
+      "event_type": "pose_updated",
+      "subsystem": "localization",
+      "severity": "info",
+      "message": "Pose (14.20, 3.00)",
+      "payload": {
+        "x": 14.2,
+        "y": 3.0,
+        "heading": 0.0
+      },
+      "correlation_id": "TASK-5177",
+      "evidence_tags": []
+    },
+    {
+      "timestamp": "2026-07-31T16:22:54Z",
+      "event_type": "pose_updated",
+      "subsystem": "localization",
+      "severity": "info",
+      "message": "Pose (14.70, 3.00)",
+      "payload": {
+        "x": 14.7,
+        "y": 3.0,
+        "heading": 0.0
+      },
+      "correlation_id": "TASK-5177",
+      "evidence_tags": []
+    },
+    {
+      "timestamp": "2026-07-31T16:22:59Z",
+      "event_type": "pose_updated",
+      "subsystem": "localization",
+      "severity": "info",
+      "message": "Pose (15.20, 3.00)",
+      "payload": {
+        "x": 15.2,
+        "y": 3.0,
+        "heading": 0.0
+      },
+      "correlation_id": "TASK-5177",
+      "evidence_tags": []
+    },
+    {
+      "timestamp": "2026-07-31T16:23:04Z",
+      "event_type": "pose_updated",
+      "subsystem": "localization",
+      "severity": "info",
+      "message": "Pose (15.70, 3.00)",
+      "payload": {
+        "x": 15.7,
+        "y": 3.0,
+        "heading": 0.0
+      },
+      "correlation_id": "TASK-5177",
+      "evidence_tags": []
+    },
+    {
+      "timestamp": "2026-07-31T16:23:09Z",
+      "event_type": "pose_updated",
+      "subsystem": "localization",
+      "severity": "info",
+      "message": "Pose (16.05, 3.00)",
+      "payload": {
+        "x": 16.05,
+        "y": 3.0,
+        "heading": 0.0
+      },
+      "correlation_id": "TASK-5177",
+      "evidence_tags": []
+    },
+    {
+      "timestamp": "2026-07-31T16:23:14Z",
+      "event_type": "pose_updated",
+      "subsystem": "localization",
+      "severity": "info",
+      "message": "Pose (16.10, 3.00)",
+      "payload": {
+        "x": 16.1,
+        "y": 3.0,
+        "heading": 0.0
+      },
+      "correlation_id": "TASK-5177",
+      "evidence_tags": []
+    },
+    {
+      "timestamp": "2026-07-31T16:22:11Z",
+      "event_type": "obstacle_distance_updated",
+      "subsystem": "perception",
+      "severity": "info",
+      "message": "Nearest obstacle 3.81 m",
+      "payload": {
+        "distance_m": 3.81,
+        "source": "lidar_front"
+      },
+      "correlation_id": "TASK-5177",
+      "evidence_tags": []
+    },
+    {
+      "timestamp": "2026-07-31T16:22:15Z",
+      "event_type": "obstacle_distance_updated",
+      "subsystem": "perception",
+      "severity": "info",
+      "message": "Nearest obstacle 3.64 m",
+      "payload": {
+        "distance_m": 3.635,
+        "source": "lidar_front"
+      },
+      "correlation_id": "TASK-5177",
+      "evidence_tags": []
+    },
+    {
+      "timestamp": "2026-07-31T16:22:19Z",
+      "event_type": "obstacle_distance_updated",
+      "subsystem": "perception",
+      "severity": "info",
+      "message": "Nearest obstacle 3.36 m",
+      "payload": {
+        "distance_m": 3.36,
+        "source": "lidar_front"
+      },
+      "correlation_id": "TASK-5177",
+      "evidence_tags": []
+    },
+    {
+      "timestamp": "2026-07-31T16:22:23Z",
+      "event_type": "obstacle_distance_updated",
+      "subsystem": "perception",
+      "severity": "info",
+      "message": "Nearest obstacle 3.76 m",
+      "payload": {
+        "distance_m": 3.764,
+        "source": "lidar_front"
+      },
+      "correlation_id": "TASK-5177",
+      "evidence_tags": []
+    },
+    {
+      "timestamp": "2026-07-31T16:22:27Z",
+      "event_type": "obstacle_distance_updated",
+      "subsystem": "perception",
+      "severity": "info",
+      "message": "Nearest obstacle 3.70 m",
+      "payload": {
+        "distance_m": 3.703,
+        "source": "lidar_front"
+      },
+      "correlation_id": "TASK-5177",
+      "evidence_tags": []
+    },
+    {
+      "timestamp": "2026-07-31T16:22:31Z",
+      "event_type": "obstacle_distance_updated",
+      "subsystem": "perception",
+      "severity": "info",
+      "message": "Nearest obstacle 3.35 m",
+      "payload": {
+        "distance_m": 3.35,
+        "source": "lidar_front"
+      },
+      "correlation_id": "TASK-5177",
+      "evidence_tags": []
+    },
+    {
+      "timestamp": "2026-07-31T16:22:35Z",
+      "event_type": "obstacle_distance_updated",
+      "subsystem": "perception",
+      "severity": "info",
+      "message": "Nearest obstacle 3.71 m",
+      "payload": {
+        "distance_m": 3.705,
+        "source": "lidar_front"
+      },
+      "correlation_id": "TASK-5177",
+      "evidence_tags": []
+    },
+    {
+      "timestamp": "2026-07-31T16:22:39Z",
+      "event_type": "obstacle_distance_updated",
+      "subsystem": "perception",
+      "severity": "info",
+      "message": "Nearest obstacle 3.76 m",
+      "payload": {
+        "distance_m": 3.763,
+        "source": "lidar_front"
+      },
+      "correlation_id": "TASK-5177",
+      "evidence_tags": []
+    },
+    {
+      "timestamp": "2026-07-31T16:22:42Z",
+      "event_type": "warning_raised",
+      "subsystem": "perception",
+      "severity": "warning",
+      "message": "Lidar scan timestamps stale: last scan 3.1 s old",
+      "payload": {
+        "last_scan_age_s": 3.1,
+        "topic": "/scan"
+      },
+      "correlation_id": "TASK-5177",
+      "evidence_tags": [
+        "sensor",
+        "stale"
+      ]
+    },
+    {
+      "timestamp": "2026-07-31T16:22:43Z",
+      "event_type": "planner_state_changed",
+      "subsystem": "planner",
+      "severity": "warning",
+      "message": "Planner state: degraded \u2014 reducing speed, no obstacle data",
+      "payload": {
+        "state": "degraded"
+      },
+      "correlation_id": "TASK-5177",
+      "evidence_tags": [
+        "planner",
+        "degraded"
+      ]
+    },
+    {
+      "timestamp": "2026-07-31T16:22:45Z",
+      "event_type": "velocity_command",
+      "subsystem": "controller",
+      "severity": "info",
+      "message": "cmd_vel linear=0.20 m/s (degraded mode speed cap)",
+      "payload": {
+        "linear": 0.2,
+        "angular": 0.0
+      },
+      "correlation_id": "TASK-5177",
+      "evidence_tags": []
+    },
+    {
+      "timestamp": "2026-07-31T16:22:54Z",
+      "event_type": "error_raised",
+      "subsystem": "perception",
+      "severity": "error",
+      "message": "Obstacle sensor timeout: no scan received for 15 s",
+      "payload": {
+        "gap_s": 15.0,
+        "topic": "/scan",
+        "driver": "sick_tim781"
+      },
+      "correlation_id": "TASK-5177",
+      "evidence_tags": [
+        "sensor",
+        "stale"
+      ]
+    },
+    {
+      "timestamp": "2026-07-31T16:22:55Z",
+      "event_type": "velocity_command",
+      "subsystem": "controller",
+      "severity": "info",
+      "message": "cmd_vel linear=0.12 m/s (degraded mode)",
+      "payload": {
+        "linear": 0.12,
+        "angular": 0.0
+      },
+      "correlation_id": "TASK-5177",
+      "evidence_tags": []
+    },
+    {
+      "timestamp": "2026-07-31T16:23:01Z",
+      "event_type": "obstacle_distance_updated",
+      "subsystem": "perception",
+      "severity": "warning",
+      "message": "Lidar scans resumed after driver restart (gap 22.0 s)",
+      "payload": {
+        "distance_m": 3.42,
+        "gap_s": 22.0,
+        "source": "lidar_front"
+      },
+      "correlation_id": "TASK-5177",
+      "evidence_tags": [
+        "sensor"
+      ]
+    },
+    {
+      "timestamp": "2026-07-31T16:23:07Z",
+      "event_type": "warning_raised",
+      "subsystem": "system",
+      "severity": "warning",
+      "message": "Sensor health check failed twice in one task; flagging unit for maintenance",
+      "payload": {
+        "component": "lidar_front",
+        "failures": 2
+      },
+      "correlation_id": "TASK-5177",
+      "evidence_tags": [
+        "sensor"
+      ]
+    },
+    {
+      "timestamp": "2026-07-31T16:23:09Z",
+      "event_type": "error_raised",
+      "subsystem": "navigation",
+      "severity": "error",
+      "message": "Cannot guarantee safe motion: obstacle data unreliable",
+      "payload": {
+        "reason": "sensor_unreliable"
+      },
+      "correlation_id": "TASK-5177",
+      "evidence_tags": [
+        "sensor"
+      ]
+    },
+    {
+      "timestamp": "2026-07-31T16:23:11Z",
+      "event_type": "velocity_command",
+      "subsystem": "controller",
+      "severity": "info",
+      "message": "cmd_vel linear=0.00 m/s angular=0.00 rad/s (safe stop)",
+      "payload": {
+        "linear": 0.0,
+        "angular": 0.0
+      },
+      "correlation_id": "TASK-5177",
+      "evidence_tags": []
+    },
+    {
+      "timestamp": "2026-07-31T16:23:13Z",
+      "event_type": "task_failed",
+      "subsystem": "task_manager",
+      "severity": "error",
+      "message": "Task 'Transfer tote to Outbound Staging' failed: obstacle sensor dropout",
+      "payload": {
+        "reason": "sensor_dropout"
+      },
+      "correlation_id": "TASK-5177",
+      "evidence_tags": [
+        "sensor"
+      ]
+    }
+  ],
+  "telemetry": [
+    {
+      "channel": "pos_x",
+      "unit": "m",
+      "samples": [
+        {
+          "t": 0.0,
+          "value": 4.0
+        },
+        {
+          "t": 0.25,
+          "value": 4.075
+        },
+        {
+          "t": 0.5,
+          "value": 4.15
+        },
+        {
+          "t": 0.75,
+          "value": 4.225
+        },
+        {
+          "t": 1.0,
+          "value": 4.3
+        },
+        {
+          "t": 1.25,
+          "value": 4.375
+        },
+        {
+          "t": 1.5,
+          "value": 4.45
+        },
+        {
+          "t": 1.75,
+          "value": 4.525
+        },
+        {
+          "t": 2.0,
+          "value": 4.6
+        },
+        {
+          "t": 2.25,
+          "value": 4.675
+        },
+        {
+          "t": 2.5,
+          "value": 4.75
+        },
+        {
+          "t": 2.75,
+          "value": 4.825
+        },
+        {
+          "t": 3.0,
+          "value": 4.9
+        },
+        {
+          "t": 3.25,
+          "value": 4.975
+        },
+        {
+          "t": 3.5,
+          "value": 5.05
+        },
+        {
+          "t": 3.75,
+          "value": 5.125
+        },
+        {
+          "t": 4.0,
+          "value": 5.2
+        },
+        {
+          "t": 4.25,
+          "value": 5.275
+        },
+        {
+          "t": 4.5,
+          "value": 5.35
+        },
+        {
+          "t": 4.75,
+          "value": 5.425
+        },
+        {
+          "t": 5.0,
+          "value": 5.5
+        },
+        {
+          "t": 5.25,
+          "value": 5.575
+        },
+        {
+          "t": 5.5,
+          "value": 5.65
+        },
+        {
+          "t": 5.75,
+          "value": 5.725
+        },
+        {
+          "t": 6.0,
+          "value": 5.8
+        },
+        {
+          "t": 6.25,
+          "value": 5.875
+        },
+        {
+          "t": 6.5,
+          "value": 5.95
+        },
+        {
+          "t": 6.75,
+          "value": 6.025
+        },
+        {
+          "t": 7.0,
+          "value": 6.1
+        },
+        {
+          "t": 7.25,
+          "value": 6.175
+        },
+        {
+          "t": 7.5,
+          "value": 6.25
+        },
+        {
+          "t": 7.75,
+          "value": 6.325
+        },
+        {
+          "t": 8.0,
+          "value": 6.4
+        },
+        {
+          "t": 8.25,
+          "value": 6.475
+        },
+        {
+          "t": 8.5,
+          "value": 6.55
+        },
+        {
+          "t": 8.75,
+          "value": 6.625
+        },
+        {
+          "t": 9.0,
+          "value": 6.7
+        },
+        {
+          "t": 9.25,
+          "value": 6.775
+        },
+        {
+          "t": 9.5,
+          "value": 6.85
+        },
+        {
+          "t": 9.75,
+          "value": 6.925
+        },
+        {
+          "t": 10.0,
+          "value": 7.0
+        },
+        {
+          "t": 10.25,
+          "value": 7.075
+        },
+        {
+          "t": 10.5,
+          "value": 7.15
+        },
+        {
+          "t": 10.75,
+          "value": 7.225
+        },
+        {
+          "t": 11.0,
+          "value": 7.3
+        },
+        {
+          "t": 11.25,
+          "value": 7.375
+        },
+        {
+          "t": 11.5,
+          "value": 7.45
+        },
+        {
+          "t": 11.75,
+          "value": 7.525
+        },
+        {
+          "t": 12.0,
+          "value": 7.6
+        },
+        {
+          "t": 12.25,
+          "value": 7.675
+        },
+        {
+          "t": 12.5,
+          "value": 7.75
+        },
+        {
+          "t": 12.75,
+          "value": 7.825
+        },
+        {
+          "t": 13.0,
+          "value": 7.9
+        },
+        {
+          "t": 13.25,
+          "value": 7.975
+        },
+        {
+          "t": 13.5,
+          "value": 8.05
+        },
+        {
+          "t": 13.75,
+          "value": 8.125
+        },
+        {
+          "t": 14.0,
+          "value": 8.2
+        },
+        {
+          "t": 14.25,
+          "value": 8.275
+        },
+        {
+          "t": 14.5,
+          "value": 8.35
+        },
+        {
+          "t": 14.75,
+          "value": 8.425
+        },
+        {
+          "t": 15.0,
+          "value": 8.5
+        },
+        {
+          "t": 15.25,
+          "value": 8.575
+        },
+        {
+          "t": 15.5,
+          "value": 8.65
+        },
+        {
+          "t": 15.75,
+          "value": 8.725
+        },
+        {
+          "t": 16.0,
+          "value": 8.8
+        },
+        {
+          "t": 16.25,
+          "value": 8.875
+        },
+        {
+          "t": 16.5,
+          "value": 8.95
+        },
+        {
+          "t": 16.75,
+          "value": 9.025
+        },
+        {
+          "t": 17.0,
+          "value": 9.1
+        },
+        {
+          "t": 17.25,
+          "value": 9.175
+        },
+        {
+          "t": 17.5,
+          "value": 9.25
+        },
+        {
+          "t": 17.75,
+          "value": 9.325
+        },
+        {
+          "t": 18.0,
+          "value": 9.4
+        },
+        {
+          "t": 18.25,
+          "value": 9.475
+        },
+        {
+          "t": 18.5,
+          "value": 9.55
+        },
+        {
+          "t": 18.75,
+          "value": 9.625
+        },
+        {
+          "t": 19.0,
+          "value": 9.7
+        },
+        {
+          "t": 19.25,
+          "value": 9.775
+        },
+        {
+          "t": 19.5,
+          "value": 9.85
+        },
+        {
+          "t": 19.75,
+          "value": 9.925
+        },
+        {
+          "t": 20.0,
+          "value": 10.0
+        },
+        {
+          "t": 20.25,
+          "value": 10.075
+        },
+        {
+          "t": 20.5,
+          "value": 10.15
+        },
+        {
+          "t": 20.75,
+          "value": 10.225
+        },
+        {
+          "t": 21.0,
+          "value": 10.3
+        },
+        {
+          "t": 21.25,
+          "value": 10.375
+        },
+        {
+          "t": 21.5,
+          "value": 10.45
+        },
+        {
+          "t": 21.75,
+          "value": 10.525
+        },
+        {
+          "t": 22.0,
+          "value": 10.6
+        },
+        {
+          "t": 22.25,
+          "value": 10.675
+        },
+        {
+          "t": 22.5,
+          "value": 10.75
+        },
+        {
+          "t": 22.75,
+          "value": 10.825
+        },
+        {
+          "t": 23.0,
+          "value": 10.9
+        },
+        {
+          "t": 23.25,
+          "value": 10.975
+        },
+        {
+          "t": 23.5,
+          "value": 11.05
+        },
+        {
+          "t": 23.75,
+          "value": 11.125
+        },
+        {
+          "t": 24.0,
+          "value": 11.2
+        },
+        {
+          "t": 24.25,
+          "value": 11.275
+        },
+        {
+          "t": 24.5,
+          "value": 11.35
+        },
+        {
+          "t": 24.75,
+          "value": 11.425
+        },
+        {
+          "t": 25.0,
+          "value": 11.5
+        },
+        {
+          "t": 25.25,
+          "value": 11.575
+        },
+        {
+          "t": 25.5,
+          "value": 11.65
+        },
+        {
+          "t": 25.75,
+          "value": 11.725
+        },
+        {
+          "t": 26.0,
+          "value": 11.8
+        },
+        {
+          "t": 26.25,
+          "value": 11.875
+        },
+        {
+          "t": 26.5,
+          "value": 11.95
+        },
+        {
+          "t": 26.75,
+          "value": 12.025
+        },
+        {
+          "t": 27.0,
+          "value": 12.1
+        },
+        {
+          "t": 27.25,
+          "value": 12.175
+        },
+        {
+          "t": 27.5,
+          "value": 12.25
+        },
+        {
+          "t": 27.75,
+          "value": 12.325
+        },
+        {
+          "t": 28.0,
+          "value": 12.4
+        },
+        {
+          "t": 28.25,
+          "value": 12.475
+        },
+        {
+          "t": 28.5,
+          "value": 12.55
+        },
+        {
+          "t": 28.75,
+          "value": 12.625
+        },
+        {
+          "t": 29.0,
+          "value": 12.7
+        },
+        {
+          "t": 29.25,
+          "value": 12.775
+        },
+        {
+          "t": 29.5,
+          "value": 12.85
+        },
+        {
+          "t": 29.75,
+          "value": 12.925
+        },
+        {
+          "t": 30.0,
+          "value": 13.0
+        },
+        {
+          "t": 30.25,
+          "value": 13.0375
+        },
+        {
+          "t": 30.5,
+          "value": 13.075
+        },
+        {
+          "t": 30.75,
+          "value": 13.1125
+        },
+        {
+          "t": 31.0,
+          "value": 13.15
+        },
+        {
+          "t": 31.25,
+          "value": 13.1875
+        },
+        {
+          "t": 31.5,
+          "value": 13.225
+        },
+        {
+          "t": 31.75,
+          "value": 13.2625
+        },
+        {
+          "t": 32.0,
+          "value": 13.3
+        },
+        {
+          "t": 32.25,
+          "value": 13.3375
+        },
+        {
+          "t": 32.5,
+          "value": 13.375
+        },
+        {
+          "t": 32.75,
+          "value": 13.4125
+        },
+        {
+          "t": 33.0,
+          "value": 13.45
+        },
+        {
+          "t": 33.25,
+          "value": 13.4875
+        },
+        {
+          "t": 33.5,
+          "value": 13.525
+        },
+        {
+          "t": 33.75,
+          "value": 13.5625
+        },
+        {
+          "t": 34.0,
+          "value": 13.6
+        },
+        {
+          "t": 34.25,
+          "value": 13.625
+        },
+        {
+          "t": 34.5,
+          "value": 13.65
+        },
+        {
+          "t": 34.75,
+          "value": 13.675
+        },
+        {
+          "t": 35.0,
+          "value": 13.7
+        },
+        {
+          "t": 35.25,
+          "value": 13.725
+        },
+        {
+          "t": 35.5,
+          "value": 13.75
+        },
+        {
+          "t": 35.75,
+          "value": 13.775
+        },
+        {
+          "t": 36.0,
+          "value": 13.8
+        },
+        {
+          "t": 36.25,
+          "value": 13.825
+        },
+        {
+          "t": 36.5,
+          "value": 13.85
+        },
+        {
+          "t": 36.75,
+          "value": 13.875
+        },
+        {
+          "t": 37.0,
+          "value": 13.9
+        },
+        {
+          "t": 37.25,
+          "value": 13.925
+        },
+        {
+          "t": 37.5,
+          "value": 13.95
+        },
+        {
+          "t": 37.75,
+          "value": 13.975
+        },
+        {
+          "t": 38.0,
+          "value": 14.0
+        },
+        {
+          "t": 38.25,
+          "value": 14.025
+        },
+        {
+          "t": 38.5,
+          "value": 14.05
+        },
+        {
+          "t": 38.75,
+          "value": 14.075
+        },
+        {
+          "t": 39.0,
+          "value": 14.1
+        },
+        {
+          "t": 39.25,
+          "value": 14.125
+        },
+        {
+          "t": 39.5,
+          "value": 14.15
+        },
+        {
+          "t": 39.75,
+          "value": 14.175
+        },
+        {
+          "t": 40.0,
+          "value": 14.2
+        },
+        {
+          "t": 40.25,
+          "value": 14.225
+        },
+        {
+          "t": 40.5,
+          "value": 14.25
+        },
+        {
+          "t": 40.75,
+          "value": 14.275
+        },
+        {
+          "t": 41.0,
+          "value": 14.3
+        },
+        {
+          "t": 41.25,
+          "value": 14.325
+        },
+        {
+          "t": 41.5,
+          "value": 14.35
+        },
+        {
+          "t": 41.75,
+          "value": 14.375
+        },
+        {
+          "t": 42.0,
+          "value": 14.4
+        },
+        {
+          "t": 42.25,
+          "value": 14.425
+        },
+        {
+          "t": 42.5,
+          "value": 14.45
+        },
+        {
+          "t": 42.75,
+          "value": 14.475
+        },
+        {
+          "t": 43.0,
+          "value": 14.5
+        },
+        {
+          "t": 43.25,
+          "value": 14.525
+        },
+        {
+          "t": 43.5,
+          "value": 14.55
+        },
+        {
+          "t": 43.75,
+          "value": 14.575
+        },
+        {
+          "t": 44.0,
+          "value": 14.6
+        },
+        {
+          "t": 44.25,
+          "value": 14.625
+        },
+        {
+          "t": 44.5,
+          "value": 14.65
+        },
+        {
+          "t": 44.75,
+          "value": 14.675
+        },
+        {
+          "t": 45.0,
+          "value": 14.7
+        },
+        {
+          "t": 45.25,
+          "value": 14.725
+        },
+        {
+          "t": 45.5,
+          "value": 14.75
+        },
+        {
+          "t": 45.75,
+          "value": 14.775
+        },
+        {
+          "t": 46.0,
+          "value": 14.8
+        },
+        {
+          "t": 46.25,
+          "value": 14.825
+        },
+        {
+          "t": 46.5,
+          "value": 14.85
+        },
+        {
+          "t": 46.75,
+          "value": 14.875
+        },
+        {
+          "t": 47.0,
+          "value": 14.9
+        },
+        {
+          "t": 47.25,
+          "value": 14.925
+        },
+        {
+          "t": 47.5,
+          "value": 14.95
+        },
+        {
+          "t": 47.75,
+          "value": 14.975
+        },
+        {
+          "t": 48.0,
+          "value": 15.0
+        },
+        {
+          "t": 48.25,
+          "value": 15.025
+        },
+        {
+          "t": 48.5,
+          "value": 15.05
+        },
+        {
+          "t": 48.75,
+          "value": 15.075
+        },
+        {
+          "t": 49.0,
+          "value": 15.1
+        },
+        {
+          "t": 49.25,
+          "value": 15.125
+        },
+        {
+          "t": 49.5,
+          "value": 15.15
+        },
+        {
+          "t": 49.75,
+          "value": 15.175
+        },
+        {
+          "t": 50.0,
+          "value": 15.2
+        },
+        {
+          "t": 50.25,
+          "value": 15.225
+        },
+        {
+          "t": 50.5,
+          "value": 15.25
+        },
+        {
+          "t": 50.75,
+          "value": 15.275
+        },
+        {
+          "t": 51.0,
+          "value": 15.3
+        },
+        {
+          "t": 51.25,
+          "value": 15.325
+        },
+        {
+          "t": 51.5,
+          "value": 15.35
+        },
+        {
+          "t": 51.75,
+          "value": 15.375
+        },
+        {
+          "t": 52.0,
+          "value": 15.4
+        },
+        {
+          "t": 52.25,
+          "value": 15.425
+        },
+        {
+          "t": 52.5,
+          "value": 15.45
+        },
+        {
+          "t": 52.75,
+          "value": 15.475
+        },
+        {
+          "t": 53.0,
+          "value": 15.5
+        },
+        {
+          "t": 53.25,
+          "value": 15.525
+        },
+        {
+          "t": 53.5,
+          "value": 15.55
+        },
+        {
+          "t": 53.75,
+          "value": 15.575
+        },
+        {
+          "t": 54.0,
+          "value": 15.6
+        },
+        {
+          "t": 54.25,
+          "value": 15.625
+        },
+        {
+          "t": 54.5,
+          "value": 15.65
+        },
+        {
+          "t": 54.75,
+          "value": 15.675
+        },
+        {
+          "t": 55.0,
+          "value": 15.7
+        },
+        {
+          "t": 55.25,
+          "value": 15.725
+        },
+        {
+          "t": 55.5,
+          "value": 15.75
+        },
+        {
+          "t": 55.75,
+          "value": 15.775
+        },
+        {
+          "t": 56.0,
+          "value": 15.8
+        },
+        {
+          "t": 56.25,
+          "value": 15.825
+        },
+        {
+          "t": 56.5,
+          "value": 15.85
+        },
+        {
+          "t": 56.75,
+          "value": 15.875
+        },
+        {
+          "t": 57.0,
+          "value": 15.9
+        },
+        {
+          "t": 57.25,
+          "value": 15.925
+        },
+        {
+          "t": 57.5,
+          "value": 15.95
+        },
+        {
+          "t": 57.75,
+          "value": 15.975
+        },
+        {
+          "t": 58.0,
+          "value": 16.0
+        },
+        {
+          "t": 58.25,
+          "value": 16.0063
+        },
+        {
+          "t": 58.5,
+          "value": 16.0125
+        },
+        {
+          "t": 58.75,
+          "value": 16.0188
+        },
+        {
+          "t": 59.0,
+          "value": 16.025
+        },
+        {
+          "t": 59.25,
+          "value": 16.0312
+        },
+        {
+          "t": 59.5,
+          "value": 16.0375
+        },
+        {
+          "t": 59.75,
+          "value": 16.0437
+        },
+        {
+          "t": 60.0,
+          "value": 16.05
+        },
+        {
+          "t": 60.25,
+          "value": 16.0563
+        },
+        {
+          "t": 60.5,
+          "value": 16.0625
+        },
+        {
+          "t": 60.75,
+          "value": 16.0688
+        },
+        {
+          "t": 61.0,
+          "value": 16.075
+        },
+        {
+          "t": 61.25,
+          "value": 16.0813
+        },
+        {
+          "t": 61.5,
+          "value": 16.0875
+        },
+        {
+          "t": 61.75,
+          "value": 16.0938
+        },
+        {
+          "t": 62.0,
+          "value": 16.1
+        },
+        {
+          "t": 62.25,
+          "value": 16.1
+        },
+        {
+          "t": 62.5,
+          "value": 16.1
+        },
+        {
+          "t": 62.75,
+          "value": 16.1
+        },
+        {
+          "t": 63.0,
+          "value": 16.1
+        },
+        {
+          "t": 63.25,
+          "value": 16.1
+        },
+        {
+          "t": 63.5,
+          "value": 16.1
+        },
+        {
+          "t": 63.75,
+          "value": 16.1
+        },
+        {
+          "t": 64.0,
+          "value": 16.1
+        },
+        {
+          "t": 64.25,
+          "value": 16.1
+        },
+        {
+          "t": 64.5,
+          "value": 16.1
+        },
+        {
+          "t": 64.75,
+          "value": 16.1
+        },
+        {
+          "t": 65.0,
+          "value": 16.1
+        },
+        {
+          "t": 65.25,
+          "value": 16.1
+        },
+        {
+          "t": 65.5,
+          "value": 16.1
+        },
+        {
+          "t": 65.75,
+          "value": 16.1
+        },
+        {
+          "t": 66.0,
+          "value": 16.1
+        },
+        {
+          "t": 66.25,
+          "value": 16.1
+        },
+        {
+          "t": 66.5,
+          "value": 16.1
+        },
+        {
+          "t": 66.75,
+          "value": 16.1
+        },
+        {
+          "t": 67.0,
+          "value": 16.1
+        },
+        {
+          "t": 67.25,
+          "value": 16.1
+        },
+        {
+          "t": 67.5,
+          "value": 16.1
+        },
+        {
+          "t": 67.75,
+          "value": 16.1
+        },
+        {
+          "t": 68.0,
+          "value": 16.1
+        },
+        {
+          "t": 68.25,
+          "value": 16.1
+        },
+        {
+          "t": 68.5,
+          "value": 16.1
+        },
+        {
+          "t": 68.75,
+          "value": 16.1
+        },
+        {
+          "t": 69.0,
+          "value": 16.1
+        },
+        {
+          "t": 69.25,
+          "value": 16.1
+        },
+        {
+          "t": 69.5,
+          "value": 16.1
+        },
+        {
+          "t": 69.75,
+          "value": 16.1
+        },
+        {
+          "t": 70.0,
+          "value": 16.1
+        }
+      ]
+    },
+    {
+      "channel": "pos_y",
+      "unit": "m",
+      "samples": [
+        {
+          "t": 0.0,
+          "value": 3.0
+        },
+        {
+          "t": 0.25,
+          "value": 3.0
+        },
+        {
+          "t": 0.5,
+          "value": 3.0
+        },
+        {
+          "t": 0.75,
+          "value": 3.0
+        },
+        {
+          "t": 1.0,
+          "value": 3.0
+        },
+        {
+          "t": 1.25,
+          "value": 3.0
+        },
+        {
+          "t": 1.5,
+          "value": 3.0
+        },
+        {
+          "t": 1.75,
+          "value": 3.0
+        },
+        {
+          "t": 2.0,
+          "value": 3.0
+        },
+        {
+          "t": 2.25,
+          "value": 3.0
+        },
+        {
+          "t": 2.5,
+          "value": 3.0
+        },
+        {
+          "t": 2.75,
+          "value": 3.0
+        },
+        {
+          "t": 3.0,
+          "value": 3.0
+        },
+        {
+          "t": 3.25,
+          "value": 3.0
+        },
+        {
+          "t": 3.5,
+          "value": 3.0
+        },
+        {
+          "t": 3.75,
+          "value": 3.0
+        },
+        {
+          "t": 4.0,
+          "value": 3.0
+        },
+        {
+          "t": 4.25,
+          "value": 3.0
+        },
+        {
+          "t": 4.5,
+          "value": 3.0
+        },
+        {
+          "t": 4.75,
+          "value": 3.0
+        },
+        {
+          "t": 5.0,
+          "value": 3.0
+        },
+        {
+          "t": 5.25,
+          "value": 3.0
+        },
+        {
+          "t": 5.5,
+          "value": 3.0
+        },
+        {
+          "t": 5.75,
+          "value": 3.0
+        },
+        {
+          "t": 6.0,
+          "value": 3.0
+        },
+        {
+          "t": 6.25,
+          "value": 3.0
+        },
+        {
+          "t": 6.5,
+          "value": 3.0
+        },
+        {
+          "t": 6.75,
+          "value": 3.0
+        },
+        {
+          "t": 7.0,
+          "value": 3.0
+        },
+        {
+          "t": 7.25,
+          "value": 3.0
+        },
+        {
+          "t": 7.5,
+          "value": 3.0
+        },
+        {
+          "t": 7.75,
+          "value": 3.0
+        },
+        {
+          "t": 8.0,
+          "value": 3.0
+        },
+        {
+          "t": 8.25,
+          "value": 3.0
+        },
+        {
+          "t": 8.5,
+          "value": 3.0
+        },
+        {
+          "t": 8.75,
+          "value": 3.0
+        },
+        {
+          "t": 9.0,
+          "value": 3.0
+        },
+        {
+          "t": 9.25,
+          "value": 3.0
+        },
+        {
+          "t": 9.5,
+          "value": 3.0
+        },
+        {
+          "t": 9.75,
+          "value": 3.0
+        },
+        {
+          "t": 10.0,
+          "value": 3.0
+        },
+        {
+          "t": 10.25,
+          "value": 3.0
+        },
+        {
+          "t": 10.5,
+          "value": 3.0
+        },
+        {
+          "t": 10.75,
+          "value": 3.0
+        },
+        {
+          "t": 11.0,
+          "value": 3.0
+        },
+        {
+          "t": 11.25,
+          "value": 3.0
+        },
+        {
+          "t": 11.5,
+          "value": 3.0
+        },
+        {
+          "t": 11.75,
+          "value": 3.0
+        },
+        {
+          "t": 12.0,
+          "value": 3.0
+        },
+        {
+          "t": 12.25,
+          "value": 3.0
+        },
+        {
+          "t": 12.5,
+          "value": 3.0
+        },
+        {
+          "t": 12.75,
+          "value": 3.0
+        },
+        {
+          "t": 13.0,
+          "value": 3.0
+        },
+        {
+          "t": 13.25,
+          "value": 3.0
+        },
+        {
+          "t": 13.5,
+          "value": 3.0
+        },
+        {
+          "t": 13.75,
+          "value": 3.0
+        },
+        {
+          "t": 14.0,
+          "value": 3.0
+        },
+        {
+          "t": 14.25,
+          "value": 3.0
+        },
+        {
+          "t": 14.5,
+          "value": 3.0
+        },
+        {
+          "t": 14.75,
+          "value": 3.0
+        },
+        {
+          "t": 15.0,
+          "value": 3.0
+        },
+        {
+          "t": 15.25,
+          "value": 3.0
+        },
+        {
+          "t": 15.5,
+          "value": 3.0
+        },
+        {
+          "t": 15.75,
+          "value": 3.0
+        },
+        {
+          "t": 16.0,
+          "value": 3.0
+        },
+        {
+          "t": 16.25,
+          "value": 3.0
+        },
+        {
+          "t": 16.5,
+          "value": 3.0
+        },
+        {
+          "t": 16.75,
+          "value": 3.0
+        },
+        {
+          "t": 17.0,
+          "value": 3.0
+        },
+        {
+          "t": 17.25,
+          "value": 3.0
+        },
+        {
+          "t": 17.5,
+          "value": 3.0
+        },
+        {
+          "t": 17.75,
+          "value": 3.0
+        },
+        {
+          "t": 18.0,
+          "value": 3.0
+        },
+        {
+          "t": 18.25,
+          "value": 3.0
+        },
+        {
+          "t": 18.5,
+          "value": 3.0
+        },
+        {
+          "t": 18.75,
+          "value": 3.0
+        },
+        {
+          "t": 19.0,
+          "value": 3.0
+        },
+        {
+          "t": 19.25,
+          "value": 3.0
+        },
+        {
+          "t": 19.5,
+          "value": 3.0
+        },
+        {
+          "t": 19.75,
+          "value": 3.0
+        },
+        {
+          "t": 20.0,
+          "value": 3.0
+        },
+        {
+          "t": 20.25,
+          "value": 3.0
+        },
+        {
+          "t": 20.5,
+          "value": 3.0
+        },
+        {
+          "t": 20.75,
+          "value": 3.0
+        },
+        {
+          "t": 21.0,
+          "value": 3.0
+        },
+        {
+          "t": 21.25,
+          "value": 3.0
+        },
+        {
+          "t": 21.5,
+          "value": 3.0
+        },
+        {
+          "t": 21.75,
+          "value": 3.0
+        },
+        {
+          "t": 22.0,
+          "value": 3.0
+        },
+        {
+          "t": 22.25,
+          "value": 3.0
+        },
+        {
+          "t": 22.5,
+          "value": 3.0
+        },
+        {
+          "t": 22.75,
+          "value": 3.0
+        },
+        {
+          "t": 23.0,
+          "value": 3.0
+        },
+        {
+          "t": 23.25,
+          "value": 3.0
+        },
+        {
+          "t": 23.5,
+          "value": 3.0
+        },
+        {
+          "t": 23.75,
+          "value": 3.0
+        },
+        {
+          "t": 24.0,
+          "value": 3.0
+        },
+        {
+          "t": 24.25,
+          "value": 3.0
+        },
+        {
+          "t": 24.5,
+          "value": 3.0
+        },
+        {
+          "t": 24.75,
+          "value": 3.0
+        },
+        {
+          "t": 25.0,
+          "value": 3.0
+        },
+        {
+          "t": 25.25,
+          "value": 3.0
+        },
+        {
+          "t": 25.5,
+          "value": 3.0
+        },
+        {
+          "t": 25.75,
+          "value": 3.0
+        },
+        {
+          "t": 26.0,
+          "value": 3.0
+        },
+        {
+          "t": 26.25,
+          "value": 3.0
+        },
+        {
+          "t": 26.5,
+          "value": 3.0
+        },
+        {
+          "t": 26.75,
+          "value": 3.0
+        },
+        {
+          "t": 27.0,
+          "value": 3.0
+        },
+        {
+          "t": 27.25,
+          "value": 3.0
+        },
+        {
+          "t": 27.5,
+          "value": 3.0
+        },
+        {
+          "t": 27.75,
+          "value": 3.0
+        },
+        {
+          "t": 28.0,
+          "value": 3.0
+        },
+        {
+          "t": 28.25,
+          "value": 3.0
+        },
+        {
+          "t": 28.5,
+          "value": 3.0
+        },
+        {
+          "t": 28.75,
+          "value": 3.0
+        },
+        {
+          "t": 29.0,
+          "value": 3.0
+        },
+        {
+          "t": 29.25,
+          "value": 3.0
+        },
+        {
+          "t": 29.5,
+          "value": 3.0
+        },
+        {
+          "t": 29.75,
+          "value": 3.0
+        },
+        {
+          "t": 30.0,
+          "value": 3.0
+        },
+        {
+          "t": 30.25,
+          "value": 3.0
+        },
+        {
+          "t": 30.5,
+          "value": 3.0
+        },
+        {
+          "t": 30.75,
+          "value": 3.0
+        },
+        {
+          "t": 31.0,
+          "value": 3.0
+        },
+        {
+          "t": 31.25,
+          "value": 3.0
+        },
+        {
+          "t": 31.5,
+          "value": 3.0
+        },
+        {
+          "t": 31.75,
+          "value": 3.0
+        },
+        {
+          "t": 32.0,
+          "value": 3.0
+        },
+        {
+          "t": 32.25,
+          "value": 3.0
+        },
+        {
+          "t": 32.5,
+          "value": 3.0
+        },
+        {
+          "t": 32.75,
+          "value": 3.0
+        },
+        {
+          "t": 33.0,
+          "value": 3.0
+        },
+        {
+          "t": 33.25,
+          "value": 3.0
+        },
+        {
+          "t": 33.5,
+          "value": 3.0
+        },
+        {
+          "t": 33.75,
+          "value": 3.0
+        },
+        {
+          "t": 34.0,
+          "value": 3.0
+        },
+        {
+          "t": 34.25,
+          "value": 3.0
+        },
+        {
+          "t": 34.5,
+          "value": 3.0
+        },
+        {
+          "t": 34.75,
+          "value": 3.0
+        },
+        {
+          "t": 35.0,
+          "value": 3.0
+        },
+        {
+          "t": 35.25,
+          "value": 3.0
+        },
+        {
+          "t": 35.5,
+          "value": 3.0
+        },
+        {
+          "t": 35.75,
+          "value": 3.0
+        },
+        {
+          "t": 36.0,
+          "value": 3.0
+        },
+        {
+          "t": 36.25,
+          "value": 3.0
+        },
+        {
+          "t": 36.5,
+          "value": 3.0
+        },
+        {
+          "t": 36.75,
+          "value": 3.0
+        },
+        {
+          "t": 37.0,
+          "value": 3.0
+        },
+        {
+          "t": 37.25,
+          "value": 3.0
+        },
+        {
+          "t": 37.5,
+          "value": 3.0
+        },
+        {
+          "t": 37.75,
+          "value": 3.0
+        },
+        {
+          "t": 38.0,
+          "value": 3.0
+        },
+        {
+          "t": 38.25,
+          "value": 3.0
+        },
+        {
+          "t": 38.5,
+          "value": 3.0
+        },
+        {
+          "t": 38.75,
+          "value": 3.0
+        },
+        {
+          "t": 39.0,
+          "value": 3.0
+        },
+        {
+          "t": 39.25,
+          "value": 3.0
+        },
+        {
+          "t": 39.5,
+          "value": 3.0
+        },
+        {
+          "t": 39.75,
+          "value": 3.0
+        },
+        {
+          "t": 40.0,
+          "value": 3.0
+        },
+        {
+          "t": 40.25,
+          "value": 3.0
+        },
+        {
+          "t": 40.5,
+          "value": 3.0
+        },
+        {
+          "t": 40.75,
+          "value": 3.0
+        },
+        {
+          "t": 41.0,
+          "value": 3.0
+        },
+        {
+          "t": 41.25,
+          "value": 3.0
+        },
+        {
+          "t": 41.5,
+          "value": 3.0
+        },
+        {
+          "t": 41.75,
+          "value": 3.0
+        },
+        {
+          "t": 42.0,
+          "value": 3.0
+        },
+        {
+          "t": 42.25,
+          "value": 3.0
+        },
+        {
+          "t": 42.5,
+          "value": 3.0
+        },
+        {
+          "t": 42.75,
+          "value": 3.0
+        },
+        {
+          "t": 43.0,
+          "value": 3.0
+        },
+        {
+          "t": 43.25,
+          "value": 3.0
+        },
+        {
+          "t": 43.5,
+          "value": 3.0
+        },
+        {
+          "t": 43.75,
+          "value": 3.0
+        },
+        {
+          "t": 44.0,
+          "value": 3.0
+        },
+        {
+          "t": 44.25,
+          "value": 3.0
+        },
+        {
+          "t": 44.5,
+          "value": 3.0
+        },
+        {
+          "t": 44.75,
+          "value": 3.0
+        },
+        {
+          "t": 45.0,
+          "value": 3.0
+        },
+        {
+          "t": 45.25,
+          "value": 3.0
+        },
+        {
+          "t": 45.5,
+          "value": 3.0
+        },
+        {
+          "t": 45.75,
+          "value": 3.0
+        },
+        {
+          "t": 46.0,
+          "value": 3.0
+        },
+        {
+          "t": 46.25,
+          "value": 3.0
+        },
+        {
+          "t": 46.5,
+          "value": 3.0
+        },
+        {
+          "t": 46.75,
+          "value": 3.0
+        },
+        {
+          "t": 47.0,
+          "value": 3.0
+        },
+        {
+          "t": 47.25,
+          "value": 3.0
+        },
+        {
+          "t": 47.5,
+          "value": 3.0
+        },
+        {
+          "t": 47.75,
+          "value": 3.0
+        },
+        {
+          "t": 48.0,
+          "value": 3.0
+        },
+        {
+          "t": 48.25,
+          "value": 3.0
+        },
+        {
+          "t": 48.5,
+          "value": 3.0
+        },
+        {
+          "t": 48.75,
+          "value": 3.0
+        },
+        {
+          "t": 49.0,
+          "value": 3.0
+        },
+        {
+          "t": 49.25,
+          "value": 3.0
+        },
+        {
+          "t": 49.5,
+          "value": 3.0
+        },
+        {
+          "t": 49.75,
+          "value": 3.0
+        },
+        {
+          "t": 50.0,
+          "value": 3.0
+        },
+        {
+          "t": 50.25,
+          "value": 3.0
+        },
+        {
+          "t": 50.5,
+          "value": 3.0
+        },
+        {
+          "t": 50.75,
+          "value": 3.0
+        },
+        {
+          "t": 51.0,
+          "value": 3.0
+        },
+        {
+          "t": 51.25,
+          "value": 3.0
+        },
+        {
+          "t": 51.5,
+          "value": 3.0
+        },
+        {
+          "t": 51.75,
+          "value": 3.0
+        },
+        {
+          "t": 52.0,
+          "value": 3.0
+        },
+        {
+          "t": 52.25,
+          "value": 3.0
+        },
+        {
+          "t": 52.5,
+          "value": 3.0
+        },
+        {
+          "t": 52.75,
+          "value": 3.0
+        },
+        {
+          "t": 53.0,
+          "value": 3.0
+        },
+        {
+          "t": 53.25,
+          "value": 3.0
+        },
+        {
+          "t": 53.5,
+          "value": 3.0
+        },
+        {
+          "t": 53.75,
+          "value": 3.0
+        },
+        {
+          "t": 54.0,
+          "value": 3.0
+        },
+        {
+          "t": 54.25,
+          "value": 3.0
+        },
+        {
+          "t": 54.5,
+          "value": 3.0
+        },
+        {
+          "t": 54.75,
+          "value": 3.0
+        },
+        {
+          "t": 55.0,
+          "value": 3.0
+        },
+        {
+          "t": 55.25,
+          "value": 3.0
+        },
+        {
+          "t": 55.5,
+          "value": 3.0
+        },
+        {
+          "t": 55.75,
+          "value": 3.0
+        },
+        {
+          "t": 56.0,
+          "value": 3.0
+        },
+        {
+          "t": 56.25,
+          "value": 3.0
+        },
+        {
+          "t": 56.5,
+          "value": 3.0
+        },
+        {
+          "t": 56.75,
+          "value": 3.0
+        },
+        {
+          "t": 57.0,
+          "value": 3.0
+        },
+        {
+          "t": 57.25,
+          "value": 3.0
+        },
+        {
+          "t": 57.5,
+          "value": 3.0
+        },
+        {
+          "t": 57.75,
+          "value": 3.0
+        },
+        {
+          "t": 58.0,
+          "value": 3.0
+        },
+        {
+          "t": 58.25,
+          "value": 3.0
+        },
+        {
+          "t": 58.5,
+          "value": 3.0
+        },
+        {
+          "t": 58.75,
+          "value": 3.0
+        },
+        {
+          "t": 59.0,
+          "value": 3.0
+        },
+        {
+          "t": 59.25,
+          "value": 3.0
+        },
+        {
+          "t": 59.5,
+          "value": 3.0
+        },
+        {
+          "t": 59.75,
+          "value": 3.0
+        },
+        {
+          "t": 60.0,
+          "value": 3.0
+        },
+        {
+          "t": 60.25,
+          "value": 3.0
+        },
+        {
+          "t": 60.5,
+          "value": 3.0
+        },
+        {
+          "t": 60.75,
+          "value": 3.0
+        },
+        {
+          "t": 61.0,
+          "value": 3.0
+        },
+        {
+          "t": 61.25,
+          "value": 3.0
+        },
+        {
+          "t": 61.5,
+          "value": 3.0
+        },
+        {
+          "t": 61.75,
+          "value": 3.0
+        },
+        {
+          "t": 62.0,
+          "value": 3.0
+        },
+        {
+          "t": 62.25,
+          "value": 3.0
+        },
+        {
+          "t": 62.5,
+          "value": 3.0
+        },
+        {
+          "t": 62.75,
+          "value": 3.0
+        },
+        {
+          "t": 63.0,
+          "value": 3.0
+        },
+        {
+          "t": 63.25,
+          "value": 3.0
+        },
+        {
+          "t": 63.5,
+          "value": 3.0
+        },
+        {
+          "t": 63.75,
+          "value": 3.0
+        },
+        {
+          "t": 64.0,
+          "value": 3.0
+        },
+        {
+          "t": 64.25,
+          "value": 3.0
+        },
+        {
+          "t": 64.5,
+          "value": 3.0
+        },
+        {
+          "t": 64.75,
+          "value": 3.0
+        },
+        {
+          "t": 65.0,
+          "value": 3.0
+        },
+        {
+          "t": 65.25,
+          "value": 3.0
+        },
+        {
+          "t": 65.5,
+          "value": 3.0
+        },
+        {
+          "t": 65.75,
+          "value": 3.0
+        },
+        {
+          "t": 66.0,
+          "value": 3.0
+        },
+        {
+          "t": 66.25,
+          "value": 3.0
+        },
+        {
+          "t": 66.5,
+          "value": 3.0
+        },
+        {
+          "t": 66.75,
+          "value": 3.0
+        },
+        {
+          "t": 67.0,
+          "value": 3.0
+        },
+        {
+          "t": 67.25,
+          "value": 3.0
+        },
+        {
+          "t": 67.5,
+          "value": 3.0
+        },
+        {
+          "t": 67.75,
+          "value": 3.0
+        },
+        {
+          "t": 68.0,
+          "value": 3.0
+        },
+        {
+          "t": 68.25,
+          "value": 3.0
+        },
+        {
+          "t": 68.5,
+          "value": 3.0
+        },
+        {
+          "t": 68.75,
+          "value": 3.0
+        },
+        {
+          "t": 69.0,
+          "value": 3.0
+        },
+        {
+          "t": 69.25,
+          "value": 3.0
+        },
+        {
+          "t": 69.5,
+          "value": 3.0
+        },
+        {
+          "t": 69.75,
+          "value": 3.0
+        },
+        {
+          "t": 70.0,
+          "value": 3.0
+        }
+      ]
+    },
+    {
+      "channel": "heading",
+      "unit": "rad",
+      "samples": [
+        {
+          "t": 0.0,
+          "value": 0.0
+        },
+        {
+          "t": 0.25,
+          "value": 0.0
+        },
+        {
+          "t": 0.5,
+          "value": 0.0
+        },
+        {
+          "t": 0.75,
+          "value": 0.0
+        },
+        {
+          "t": 1.0,
+          "value": 0.0
+        },
+        {
+          "t": 1.25,
+          "value": 0.0
+        },
+        {
+          "t": 1.5,
+          "value": 0.0
+        },
+        {
+          "t": 1.75,
+          "value": 0.0
+        },
+        {
+          "t": 2.0,
+          "value": 0.0
+        },
+        {
+          "t": 2.25,
+          "value": 0.0
+        },
+        {
+          "t": 2.5,
+          "value": 0.0
+        },
+        {
+          "t": 2.75,
+          "value": 0.0
+        },
+        {
+          "t": 3.0,
+          "value": 0.0
+        },
+        {
+          "t": 3.25,
+          "value": 0.0
+        },
+        {
+          "t": 3.5,
+          "value": 0.0
+        },
+        {
+          "t": 3.75,
+          "value": 0.0
+        },
+        {
+          "t": 4.0,
+          "value": 0.0
+        },
+        {
+          "t": 4.25,
+          "value": 0.0
+        },
+        {
+          "t": 4.5,
+          "value": 0.0
+        },
+        {
+          "t": 4.75,
+          "value": 0.0
+        },
+        {
+          "t": 5.0,
+          "value": 0.0
+        },
+        {
+          "t": 5.25,
+          "value": 0.0
+        },
+        {
+          "t": 5.5,
+          "value": 0.0
+        },
+        {
+          "t": 5.75,
+          "value": 0.0
+        },
+        {
+          "t": 6.0,
+          "value": 0.0
+        },
+        {
+          "t": 6.25,
+          "value": 0.0
+        },
+        {
+          "t": 6.5,
+          "value": 0.0
+        },
+        {
+          "t": 6.75,
+          "value": 0.0
+        },
+        {
+          "t": 7.0,
+          "value": 0.0
+        },
+        {
+          "t": 7.25,
+          "value": 0.0
+        },
+        {
+          "t": 7.5,
+          "value": 0.0
+        },
+        {
+          "t": 7.75,
+          "value": 0.0
+        },
+        {
+          "t": 8.0,
+          "value": 0.0
+        },
+        {
+          "t": 8.25,
+          "value": 0.0
+        },
+        {
+          "t": 8.5,
+          "value": 0.0
+        },
+        {
+          "t": 8.75,
+          "value": 0.0
+        },
+        {
+          "t": 9.0,
+          "value": 0.0
+        },
+        {
+          "t": 9.25,
+          "value": 0.0
+        },
+        {
+          "t": 9.5,
+          "value": 0.0
+        },
+        {
+          "t": 9.75,
+          "value": 0.0
+        },
+        {
+          "t": 10.0,
+          "value": 0.0
+        },
+        {
+          "t": 10.25,
+          "value": 0.0
+        },
+        {
+          "t": 10.5,
+          "value": 0.0
+        },
+        {
+          "t": 10.75,
+          "value": 0.0
+        },
+        {
+          "t": 11.0,
+          "value": 0.0
+        },
+        {
+          "t": 11.25,
+          "value": 0.0
+        },
+        {
+          "t": 11.5,
+          "value": 0.0
+        },
+        {
+          "t": 11.75,
+          "value": 0.0
+        },
+        {
+          "t": 12.0,
+          "value": 0.0
+        },
+        {
+          "t": 12.25,
+          "value": 0.0
+        },
+        {
+          "t": 12.5,
+          "value": 0.0
+        },
+        {
+          "t": 12.75,
+          "value": 0.0
+        },
+        {
+          "t": 13.0,
+          "value": 0.0
+        },
+        {
+          "t": 13.25,
+          "value": 0.0
+        },
+        {
+          "t": 13.5,
+          "value": 0.0
+        },
+        {
+          "t": 13.75,
+          "value": 0.0
+        },
+        {
+          "t": 14.0,
+          "value": 0.0
+        },
+        {
+          "t": 14.25,
+          "value": 0.0
+        },
+        {
+          "t": 14.5,
+          "value": 0.0
+        },
+        {
+          "t": 14.75,
+          "value": 0.0
+        },
+        {
+          "t": 15.0,
+          "value": 0.0
+        },
+        {
+          "t": 15.25,
+          "value": 0.0
+        },
+        {
+          "t": 15.5,
+          "value": 0.0
+        },
+        {
+          "t": 15.75,
+          "value": 0.0
+        },
+        {
+          "t": 16.0,
+          "value": 0.0
+        },
+        {
+          "t": 16.25,
+          "value": 0.0
+        },
+        {
+          "t": 16.5,
+          "value": 0.0
+        },
+        {
+          "t": 16.75,
+          "value": 0.0
+        },
+        {
+          "t": 17.0,
+          "value": 0.0
+        },
+        {
+          "t": 17.25,
+          "value": 0.0
+        },
+        {
+          "t": 17.5,
+          "value": 0.0
+        },
+        {
+          "t": 17.75,
+          "value": 0.0
+        },
+        {
+          "t": 18.0,
+          "value": 0.0
+        },
+        {
+          "t": 18.25,
+          "value": 0.0
+        },
+        {
+          "t": 18.5,
+          "value": 0.0
+        },
+        {
+          "t": 18.75,
+          "value": 0.0
+        },
+        {
+          "t": 19.0,
+          "value": 0.0
+        },
+        {
+          "t": 19.25,
+          "value": 0.0
+        },
+        {
+          "t": 19.5,
+          "value": 0.0
+        },
+        {
+          "t": 19.75,
+          "value": 0.0
+        },
+        {
+          "t": 20.0,
+          "value": 0.0
+        },
+        {
+          "t": 20.25,
+          "value": 0.0
+        },
+        {
+          "t": 20.5,
+          "value": 0.0
+        },
+        {
+          "t": 20.75,
+          "value": 0.0
+        },
+        {
+          "t": 21.0,
+          "value": 0.0
+        },
+        {
+          "t": 21.25,
+          "value": 0.0
+        },
+        {
+          "t": 21.5,
+          "value": 0.0
+        },
+        {
+          "t": 21.75,
+          "value": 0.0
+        },
+        {
+          "t": 22.0,
+          "value": 0.0
+        },
+        {
+          "t": 22.25,
+          "value": 0.0
+        },
+        {
+          "t": 22.5,
+          "value": 0.0
+        },
+        {
+          "t": 22.75,
+          "value": 0.0
+        },
+        {
+          "t": 23.0,
+          "value": 0.0
+        },
+        {
+          "t": 23.25,
+          "value": 0.0
+        },
+        {
+          "t": 23.5,
+          "value": 0.0
+        },
+        {
+          "t": 23.75,
+          "value": 0.0
+        },
+        {
+          "t": 24.0,
+          "value": 0.0
+        },
+        {
+          "t": 24.25,
+          "value": 0.0
+        },
+        {
+          "t": 24.5,
+          "value": 0.0
+        },
+        {
+          "t": 24.75,
+          "value": 0.0
+        },
+        {
+          "t": 25.0,
+          "value": 0.0
+        },
+        {
+          "t": 25.25,
+          "value": 0.0
+        },
+        {
+          "t": 25.5,
+          "value": 0.0
+        },
+        {
+          "t": 25.75,
+          "value": 0.0
+        },
+        {
+          "t": 26.0,
+          "value": 0.0
+        },
+        {
+          "t": 26.25,
+          "value": 0.0
+        },
+        {
+          "t": 26.5,
+          "value": 0.0
+        },
+        {
+          "t": 26.75,
+          "value": 0.0
+        },
+        {
+          "t": 27.0,
+          "value": 0.0
+        },
+        {
+          "t": 27.25,
+          "value": 0.0
+        },
+        {
+          "t": 27.5,
+          "value": 0.0
+        },
+        {
+          "t": 27.75,
+          "value": 0.0
+        },
+        {
+          "t": 28.0,
+          "value": 0.0
+        },
+        {
+          "t": 28.25,
+          "value": 0.0
+        },
+        {
+          "t": 28.5,
+          "value": 0.0
+        },
+        {
+          "t": 28.75,
+          "value": 0.0
+        },
+        {
+          "t": 29.0,
+          "value": 0.0
+        },
+        {
+          "t": 29.25,
+          "value": 0.0
+        },
+        {
+          "t": 29.5,
+          "value": 0.0
+        },
+        {
+          "t": 29.75,
+          "value": 0.0
+        },
+        {
+          "t": 30.0,
+          "value": 0.0
+        },
+        {
+          "t": 30.25,
+          "value": 0.0
+        },
+        {
+          "t": 30.5,
+          "value": 0.0
+        },
+        {
+          "t": 30.75,
+          "value": 0.0
+        },
+        {
+          "t": 31.0,
+          "value": 0.0
+        },
+        {
+          "t": 31.25,
+          "value": 0.0
+        },
+        {
+          "t": 31.5,
+          "value": 0.0
+        },
+        {
+          "t": 31.75,
+          "value": 0.0
+        },
+        {
+          "t": 32.0,
+          "value": 0.0
+        },
+        {
+          "t": 32.25,
+          "value": 0.0
+        },
+        {
+          "t": 32.5,
+          "value": 0.0
+        },
+        {
+          "t": 32.75,
+          "value": 0.0
+        },
+        {
+          "t": 33.0,
+          "value": 0.0
+        },
+        {
+          "t": 33.25,
+          "value": 0.0
+        },
+        {
+          "t": 33.5,
+          "value": 0.0
+        },
+        {
+          "t": 33.75,
+          "value": 0.0
+        },
+        {
+          "t": 34.0,
+          "value": 0.0
+        },
+        {
+          "t": 34.25,
+          "value": 0.0
+        },
+        {
+          "t": 34.5,
+          "value": 0.0
+        },
+        {
+          "t": 34.75,
+          "value": 0.0
+        },
+        {
+          "t": 35.0,
+          "value": 0.0
+        },
+        {
+          "t": 35.25,
+          "value": 0.0
+        },
+        {
+          "t": 35.5,
+          "value": 0.0
+        },
+        {
+          "t": 35.75,
+          "value": 0.0
+        },
+        {
+          "t": 36.0,
+          "value": 0.0
+        },
+        {
+          "t": 36.25,
+          "value": 0.0
+        },
+        {
+          "t": 36.5,
+          "value": 0.0
+        },
+        {
+          "t": 36.75,
+          "value": 0.0
+        },
+        {
+          "t": 37.0,
+          "value": 0.0
+        },
+        {
+          "t": 37.25,
+          "value": 0.0
+        },
+        {
+          "t": 37.5,
+          "value": 0.0
+        },
+        {
+          "t": 37.75,
+          "value": 0.0
+        },
+        {
+          "t": 38.0,
+          "value": 0.0
+        },
+        {
+          "t": 38.25,
+          "value": 0.0
+        },
+        {
+          "t": 38.5,
+          "value": 0.0
+        },
+        {
+          "t": 38.75,
+          "value": 0.0
+        },
+        {
+          "t": 39.0,
+          "value": 0.0
+        },
+        {
+          "t": 39.25,
+          "value": 0.0
+        },
+        {
+          "t": 39.5,
+          "value": 0.0
+        },
+        {
+          "t": 39.75,
+          "value": 0.0
+        },
+        {
+          "t": 40.0,
+          "value": 0.0
+        },
+        {
+          "t": 40.25,
+          "value": 0.0
+        },
+        {
+          "t": 40.5,
+          "value": 0.0
+        },
+        {
+          "t": 40.75,
+          "value": 0.0
+        },
+        {
+          "t": 41.0,
+          "value": 0.0
+        },
+        {
+          "t": 41.25,
+          "value": 0.0
+        },
+        {
+          "t": 41.5,
+          "value": 0.0
+        },
+        {
+          "t": 41.75,
+          "value": 0.0
+        },
+        {
+          "t": 42.0,
+          "value": 0.0
+        },
+        {
+          "t": 42.25,
+          "value": 0.0
+        },
+        {
+          "t": 42.5,
+          "value": 0.0
+        },
+        {
+          "t": 42.75,
+          "value": 0.0
+        },
+        {
+          "t": 43.0,
+          "value": 0.0
+        },
+        {
+          "t": 43.25,
+          "value": 0.0
+        },
+        {
+          "t": 43.5,
+          "value": 0.0
+        },
+        {
+          "t": 43.75,
+          "value": 0.0
+        },
+        {
+          "t": 44.0,
+          "value": 0.0
+        },
+        {
+          "t": 44.25,
+          "value": 0.0
+        },
+        {
+          "t": 44.5,
+          "value": 0.0
+        },
+        {
+          "t": 44.75,
+          "value": 0.0
+        },
+        {
+          "t": 45.0,
+          "value": 0.0
+        },
+        {
+          "t": 45.25,
+          "value": 0.0
+        },
+        {
+          "t": 45.5,
+          "value": 0.0
+        },
+        {
+          "t": 45.75,
+          "value": 0.0
+        },
+        {
+          "t": 46.0,
+          "value": 0.0
+        },
+        {
+          "t": 46.25,
+          "value": 0.0
+        },
+        {
+          "t": 46.5,
+          "value": 0.0
+        },
+        {
+          "t": 46.75,
+          "value": 0.0
+        },
+        {
+          "t": 47.0,
+          "value": 0.0
+        },
+        {
+          "t": 47.25,
+          "value": 0.0
+        },
+        {
+          "t": 47.5,
+          "value": 0.0
+        },
+        {
+          "t": 47.75,
+          "value": 0.0
+        },
+        {
+          "t": 48.0,
+          "value": 0.0
+        },
+        {
+          "t": 48.25,
+          "value": 0.0
+        },
+        {
+          "t": 48.5,
+          "value": 0.0
+        },
+        {
+          "t": 48.75,
+          "value": 0.0
+        },
+        {
+          "t": 49.0,
+          "value": 0.0
+        },
+        {
+          "t": 49.25,
+          "value": 0.0
+        },
+        {
+          "t": 49.5,
+          "value": 0.0
+        },
+        {
+          "t": 49.75,
+          "value": 0.0
+        },
+        {
+          "t": 50.0,
+          "value": 0.0
+        },
+        {
+          "t": 50.25,
+          "value": 0.0
+        },
+        {
+          "t": 50.5,
+          "value": 0.0
+        },
+        {
+          "t": 50.75,
+          "value": 0.0
+        },
+        {
+          "t": 51.0,
+          "value": 0.0
+        },
+        {
+          "t": 51.25,
+          "value": 0.0
+        },
+        {
+          "t": 51.5,
+          "value": 0.0
+        },
+        {
+          "t": 51.75,
+          "value": 0.0
+        },
+        {
+          "t": 52.0,
+          "value": 0.0
+        },
+        {
+          "t": 52.25,
+          "value": 0.0
+        },
+        {
+          "t": 52.5,
+          "value": 0.0
+        },
+        {
+          "t": 52.75,
+          "value": 0.0
+        },
+        {
+          "t": 53.0,
+          "value": 0.0
+        },
+        {
+          "t": 53.25,
+          "value": 0.0
+        },
+        {
+          "t": 53.5,
+          "value": 0.0
+        },
+        {
+          "t": 53.75,
+          "value": 0.0
+        },
+        {
+          "t": 54.0,
+          "value": 0.0
+        },
+        {
+          "t": 54.25,
+          "value": 0.0
+        },
+        {
+          "t": 54.5,
+          "value": 0.0
+        },
+        {
+          "t": 54.75,
+          "value": 0.0
+        },
+        {
+          "t": 55.0,
+          "value": 0.0
+        },
+        {
+          "t": 55.25,
+          "value": 0.0
+        },
+        {
+          "t": 55.5,
+          "value": 0.0
+        },
+        {
+          "t": 55.75,
+          "value": 0.0
+        },
+        {
+          "t": 56.0,
+          "value": 0.0
+        },
+        {
+          "t": 56.25,
+          "value": 0.0
+        },
+        {
+          "t": 56.5,
+          "value": 0.0
+        },
+        {
+          "t": 56.75,
+          "value": 0.0
+        },
+        {
+          "t": 57.0,
+          "value": 0.0
+        },
+        {
+          "t": 57.25,
+          "value": 0.0
+        },
+        {
+          "t": 57.5,
+          "value": 0.0
+        },
+        {
+          "t": 57.75,
+          "value": 0.0
+        },
+        {
+          "t": 58.0,
+          "value": 0.0
+        },
+        {
+          "t": 58.25,
+          "value": 0.0
+        },
+        {
+          "t": 58.5,
+          "value": 0.0
+        },
+        {
+          "t": 58.75,
+          "value": 0.0
+        },
+        {
+          "t": 59.0,
+          "value": 0.0
+        },
+        {
+          "t": 59.25,
+          "value": 0.0
+        },
+        {
+          "t": 59.5,
+          "value": 0.0
+        },
+        {
+          "t": 59.75,
+          "value": 0.0
+        },
+        {
+          "t": 60.0,
+          "value": 0.0
+        },
+        {
+          "t": 60.25,
+          "value": 0.0
+        },
+        {
+          "t": 60.5,
+          "value": 0.0
+        },
+        {
+          "t": 60.75,
+          "value": 0.0
+        },
+        {
+          "t": 61.0,
+          "value": 0.0
+        },
+        {
+          "t": 61.25,
+          "value": 0.0
+        },
+        {
+          "t": 61.5,
+          "value": 0.0
+        },
+        {
+          "t": 61.75,
+          "value": 0.0
+        },
+        {
+          "t": 62.0,
+          "value": 0.0
+        },
+        {
+          "t": 62.25,
+          "value": 0.0
+        },
+        {
+          "t": 62.5,
+          "value": 0.0
+        },
+        {
+          "t": 62.75,
+          "value": 0.0
+        },
+        {
+          "t": 63.0,
+          "value": 0.0
+        },
+        {
+          "t": 63.25,
+          "value": 0.0
+        },
+        {
+          "t": 63.5,
+          "value": 0.0
+        },
+        {
+          "t": 63.75,
+          "value": 0.0
+        },
+        {
+          "t": 64.0,
+          "value": 0.0
+        },
+        {
+          "t": 64.25,
+          "value": 0.0
+        },
+        {
+          "t": 64.5,
+          "value": 0.0
+        },
+        {
+          "t": 64.75,
+          "value": 0.0
+        },
+        {
+          "t": 65.0,
+          "value": 0.0
+        },
+        {
+          "t": 65.25,
+          "value": 0.0
+        },
+        {
+          "t": 65.5,
+          "value": 0.0
+        },
+        {
+          "t": 65.75,
+          "value": 0.0
+        },
+        {
+          "t": 66.0,
+          "value": 0.0
+        },
+        {
+          "t": 66.25,
+          "value": 0.0
+        },
+        {
+          "t": 66.5,
+          "value": 0.0
+        },
+        {
+          "t": 66.75,
+          "value": 0.0
+        },
+        {
+          "t": 67.0,
+          "value": 0.0
+        },
+        {
+          "t": 67.25,
+          "value": 0.0
+        },
+        {
+          "t": 67.5,
+          "value": 0.0
+        },
+        {
+          "t": 67.75,
+          "value": 0.0
+        },
+        {
+          "t": 68.0,
+          "value": 0.0
+        },
+        {
+          "t": 68.25,
+          "value": 0.0
+        },
+        {
+          "t": 68.5,
+          "value": 0.0
+        },
+        {
+          "t": 68.75,
+          "value": 0.0
+        },
+        {
+          "t": 69.0,
+          "value": 0.0
+        },
+        {
+          "t": 69.25,
+          "value": 0.0
+        },
+        {
+          "t": 69.5,
+          "value": 0.0
+        },
+        {
+          "t": 69.75,
+          "value": 0.0
+        },
+        {
+          "t": 70.0,
+          "value": 0.0
+        }
+      ]
+    },
+    {
+      "channel": "linear_velocity",
+      "unit": "m/s",
+      "samples": [
+        {
+          "t": 0.0,
+          "value": 0.0
+        },
+        {
+          "t": 0.25,
+          "value": 0.3
+        },
+        {
+          "t": 0.5,
+          "value": 0.3
+        },
+        {
+          "t": 0.75,
+          "value": 0.3
+        },
+        {
+          "t": 1.0,
+          "value": 0.3
+        },
+        {
+          "t": 1.25,
+          "value": 0.3
+        },
+        {
+          "t": 1.5,
+          "value": 0.3
+        },
+        {
+          "t": 1.75,
+          "value": 0.3
+        },
+        {
+          "t": 2.0,
+          "value": 0.3
+        },
+        {
+          "t": 2.25,
+          "value": 0.3
+        },
+        {
+          "t": 2.5,
+          "value": 0.3
+        },
+        {
+          "t": 2.75,
+          "value": 0.3
+        },
+        {
+          "t": 3.0,
+          "value": 0.3
+        },
+        {
+          "t": 3.25,
+          "value": 0.3
+        },
+        {
+          "t": 3.5,
+          "value": 0.3
+        },
+        {
+          "t": 3.75,
+          "value": 0.3
+        },
+        {
+          "t": 4.0,
+          "value": 0.3
+        },
+        {
+          "t": 4.25,
+          "value": 0.3
+        },
+        {
+          "t": 4.5,
+          "value": 0.3
+        },
+        {
+          "t": 4.75,
+          "value": 0.3
+        },
+        {
+          "t": 5.0,
+          "value": 0.3
+        },
+        {
+          "t": 5.25,
+          "value": 0.3
+        },
+        {
+          "t": 5.5,
+          "value": 0.3
+        },
+        {
+          "t": 5.75,
+          "value": 0.3
+        },
+        {
+          "t": 6.0,
+          "value": 0.3
+        },
+        {
+          "t": 6.25,
+          "value": 0.3
+        },
+        {
+          "t": 6.5,
+          "value": 0.3
+        },
+        {
+          "t": 6.75,
+          "value": 0.3
+        },
+        {
+          "t": 7.0,
+          "value": 0.3
+        },
+        {
+          "t": 7.25,
+          "value": 0.3
+        },
+        {
+          "t": 7.5,
+          "value": 0.3
+        },
+        {
+          "t": 7.75,
+          "value": 0.3
+        },
+        {
+          "t": 8.0,
+          "value": 0.3
+        },
+        {
+          "t": 8.25,
+          "value": 0.3
+        },
+        {
+          "t": 8.5,
+          "value": 0.3
+        },
+        {
+          "t": 8.75,
+          "value": 0.3
+        },
+        {
+          "t": 9.0,
+          "value": 0.3
+        },
+        {
+          "t": 9.25,
+          "value": 0.3
+        },
+        {
+          "t": 9.5,
+          "value": 0.3
+        },
+        {
+          "t": 9.75,
+          "value": 0.3
+        },
+        {
+          "t": 10.0,
+          "value": 0.3
+        },
+        {
+          "t": 10.25,
+          "value": 0.3
+        },
+        {
+          "t": 10.5,
+          "value": 0.3
+        },
+        {
+          "t": 10.75,
+          "value": 0.3
+        },
+        {
+          "t": 11.0,
+          "value": 0.3
+        },
+        {
+          "t": 11.25,
+          "value": 0.3
+        },
+        {
+          "t": 11.5,
+          "value": 0.3
+        },
+        {
+          "t": 11.75,
+          "value": 0.3
+        },
+        {
+          "t": 12.0,
+          "value": 0.3
+        },
+        {
+          "t": 12.25,
+          "value": 0.3
+        },
+        {
+          "t": 12.5,
+          "value": 0.3
+        },
+        {
+          "t": 12.75,
+          "value": 0.3
+        },
+        {
+          "t": 13.0,
+          "value": 0.3
+        },
+        {
+          "t": 13.25,
+          "value": 0.3
+        },
+        {
+          "t": 13.5,
+          "value": 0.3
+        },
+        {
+          "t": 13.75,
+          "value": 0.3
+        },
+        {
+          "t": 14.0,
+          "value": 0.3
+        },
+        {
+          "t": 14.25,
+          "value": 0.3
+        },
+        {
+          "t": 14.5,
+          "value": 0.3
+        },
+        {
+          "t": 14.75,
+          "value": 0.3
+        },
+        {
+          "t": 15.0,
+          "value": 0.3
+        },
+        {
+          "t": 15.25,
+          "value": 0.3
+        },
+        {
+          "t": 15.5,
+          "value": 0.3
+        },
+        {
+          "t": 15.75,
+          "value": 0.3
+        },
+        {
+          "t": 16.0,
+          "value": 0.3
+        },
+        {
+          "t": 16.25,
+          "value": 0.3
+        },
+        {
+          "t": 16.5,
+          "value": 0.3
+        },
+        {
+          "t": 16.75,
+          "value": 0.3
+        },
+        {
+          "t": 17.0,
+          "value": 0.3
+        },
+        {
+          "t": 17.25,
+          "value": 0.3
+        },
+        {
+          "t": 17.5,
+          "value": 0.3
+        },
+        {
+          "t": 17.75,
+          "value": 0.3
+        },
+        {
+          "t": 18.0,
+          "value": 0.3
+        },
+        {
+          "t": 18.25,
+          "value": 0.3
+        },
+        {
+          "t": 18.5,
+          "value": 0.3
+        },
+        {
+          "t": 18.75,
+          "value": 0.3
+        },
+        {
+          "t": 19.0,
+          "value": 0.3
+        },
+        {
+          "t": 19.25,
+          "value": 0.3
+        },
+        {
+          "t": 19.5,
+          "value": 0.3
+        },
+        {
+          "t": 19.75,
+          "value": 0.3
+        },
+        {
+          "t": 20.0,
+          "value": 0.3
+        },
+        {
+          "t": 20.25,
+          "value": 0.3
+        },
+        {
+          "t": 20.5,
+          "value": 0.3
+        },
+        {
+          "t": 20.75,
+          "value": 0.3
+        },
+        {
+          "t": 21.0,
+          "value": 0.3
+        },
+        {
+          "t": 21.25,
+          "value": 0.3
+        },
+        {
+          "t": 21.5,
+          "value": 0.3
+        },
+        {
+          "t": 21.75,
+          "value": 0.3
+        },
+        {
+          "t": 22.0,
+          "value": 0.3
+        },
+        {
+          "t": 22.25,
+          "value": 0.3
+        },
+        {
+          "t": 22.5,
+          "value": 0.3
+        },
+        {
+          "t": 22.75,
+          "value": 0.3
+        },
+        {
+          "t": 23.0,
+          "value": 0.3
+        },
+        {
+          "t": 23.25,
+          "value": 0.3
+        },
+        {
+          "t": 23.5,
+          "value": 0.3
+        },
+        {
+          "t": 23.75,
+          "value": 0.3
+        },
+        {
+          "t": 24.0,
+          "value": 0.3
+        },
+        {
+          "t": 24.25,
+          "value": 0.3
+        },
+        {
+          "t": 24.5,
+          "value": 0.3
+        },
+        {
+          "t": 24.75,
+          "value": 0.3
+        },
+        {
+          "t": 25.0,
+          "value": 0.3
+        },
+        {
+          "t": 25.25,
+          "value": 0.3
+        },
+        {
+          "t": 25.5,
+          "value": 0.3
+        },
+        {
+          "t": 25.75,
+          "value": 0.3
+        },
+        {
+          "t": 26.0,
+          "value": 0.3
+        },
+        {
+          "t": 26.25,
+          "value": 0.3
+        },
+        {
+          "t": 26.5,
+          "value": 0.3
+        },
+        {
+          "t": 26.75,
+          "value": 0.3
+        },
+        {
+          "t": 27.0,
+          "value": 0.3
+        },
+        {
+          "t": 27.25,
+          "value": 0.3
+        },
+        {
+          "t": 27.5,
+          "value": 0.3
+        },
+        {
+          "t": 27.75,
+          "value": 0.3
+        },
+        {
+          "t": 28.0,
+          "value": 0.3
+        },
+        {
+          "t": 28.25,
+          "value": 0.3
+        },
+        {
+          "t": 28.5,
+          "value": 0.3
+        },
+        {
+          "t": 28.75,
+          "value": 0.3
+        },
+        {
+          "t": 29.0,
+          "value": 0.3
+        },
+        {
+          "t": 29.25,
+          "value": 0.3
+        },
+        {
+          "t": 29.5,
+          "value": 0.3
+        },
+        {
+          "t": 29.75,
+          "value": 0.3
+        },
+        {
+          "t": 30.0,
+          "value": 0.3
+        },
+        {
+          "t": 30.25,
+          "value": 0.15
+        },
+        {
+          "t": 30.5,
+          "value": 0.15
+        },
+        {
+          "t": 30.75,
+          "value": 0.15
+        },
+        {
+          "t": 31.0,
+          "value": 0.15
+        },
+        {
+          "t": 31.25,
+          "value": 0.15
+        },
+        {
+          "t": 31.5,
+          "value": 0.15
+        },
+        {
+          "t": 31.75,
+          "value": 0.15
+        },
+        {
+          "t": 32.0,
+          "value": 0.15
+        },
+        {
+          "t": 32.25,
+          "value": 0.15
+        },
+        {
+          "t": 32.5,
+          "value": 0.15
+        },
+        {
+          "t": 32.75,
+          "value": 0.15
+        },
+        {
+          "t": 33.0,
+          "value": 0.15
+        },
+        {
+          "t": 33.25,
+          "value": 0.15
+        },
+        {
+          "t": 33.5,
+          "value": 0.15
+        },
+        {
+          "t": 33.75,
+          "value": 0.15
+        },
+        {
+          "t": 34.0,
+          "value": 0.15
+        },
+        {
+          "t": 34.25,
+          "value": 0.1
+        },
+        {
+          "t": 34.5,
+          "value": 0.1
+        },
+        {
+          "t": 34.75,
+          "value": 0.1
+        },
+        {
+          "t": 35.0,
+          "value": 0.1
+        },
+        {
+          "t": 35.25,
+          "value": 0.1
+        },
+        {
+          "t": 35.5,
+          "value": 0.1
+        },
+        {
+          "t": 35.75,
+          "value": 0.1
+        },
+        {
+          "t": 36.0,
+          "value": 0.1
+        },
+        {
+          "t": 36.25,
+          "value": 0.1
+        },
+        {
+          "t": 36.5,
+          "value": 0.1
+        },
+        {
+          "t": 36.75,
+          "value": 0.1
+        },
+        {
+          "t": 37.0,
+          "value": 0.1
+        },
+        {
+          "t": 37.25,
+          "value": 0.1
+        },
+        {
+          "t": 37.5,
+          "value": 0.1
+        },
+        {
+          "t": 37.75,
+          "value": 0.1
+        },
+        {
+          "t": 38.0,
+          "value": 0.1
+        },
+        {
+          "t": 38.25,
+          "value": 0.1
+        },
+        {
+          "t": 38.5,
+          "value": 0.1
+        },
+        {
+          "t": 38.75,
+          "value": 0.1
+        },
+        {
+          "t": 39.0,
+          "value": 0.1
+        },
+        {
+          "t": 39.25,
+          "value": 0.1
+        },
+        {
+          "t": 39.5,
+          "value": 0.1
+        },
+        {
+          "t": 39.75,
+          "value": 0.1
+        },
+        {
+          "t": 40.0,
+          "value": 0.1
+        },
+        {
+          "t": 40.25,
+          "value": 0.1
+        },
+        {
+          "t": 40.5,
+          "value": 0.1
+        },
+        {
+          "t": 40.75,
+          "value": 0.1
+        },
+        {
+          "t": 41.0,
+          "value": 0.1
+        },
+        {
+          "t": 41.25,
+          "value": 0.1
+        },
+        {
+          "t": 41.5,
+          "value": 0.1
+        },
+        {
+          "t": 41.75,
+          "value": 0.1
+        },
+        {
+          "t": 42.0,
+          "value": 0.1
+        },
+        {
+          "t": 42.25,
+          "value": 0.1
+        },
+        {
+          "t": 42.5,
+          "value": 0.1
+        },
+        {
+          "t": 42.75,
+          "value": 0.1
+        },
+        {
+          "t": 43.0,
+          "value": 0.1
+        },
+        {
+          "t": 43.25,
+          "value": 0.1
+        },
+        {
+          "t": 43.5,
+          "value": 0.1
+        },
+        {
+          "t": 43.75,
+          "value": 0.1
+        },
+        {
+          "t": 44.0,
+          "value": 0.1
+        },
+        {
+          "t": 44.25,
+          "value": 0.1
+        },
+        {
+          "t": 44.5,
+          "value": 0.1
+        },
+        {
+          "t": 44.75,
+          "value": 0.1
+        },
+        {
+          "t": 45.0,
+          "value": 0.1
+        },
+        {
+          "t": 45.25,
+          "value": 0.1
+        },
+        {
+          "t": 45.5,
+          "value": 0.1
+        },
+        {
+          "t": 45.75,
+          "value": 0.1
+        },
+        {
+          "t": 46.0,
+          "value": 0.1
+        },
+        {
+          "t": 46.25,
+          "value": 0.1
+        },
+        {
+          "t": 46.5,
+          "value": 0.1
+        },
+        {
+          "t": 46.75,
+          "value": 0.1
+        },
+        {
+          "t": 47.0,
+          "value": 0.1
+        },
+        {
+          "t": 47.25,
+          "value": 0.1
+        },
+        {
+          "t": 47.5,
+          "value": 0.1
+        },
+        {
+          "t": 47.75,
+          "value": 0.1
+        },
+        {
+          "t": 48.0,
+          "value": 0.1
+        },
+        {
+          "t": 48.25,
+          "value": 0.1
+        },
+        {
+          "t": 48.5,
+          "value": 0.1
+        },
+        {
+          "t": 48.75,
+          "value": 0.1
+        },
+        {
+          "t": 49.0,
+          "value": 0.1
+        },
+        {
+          "t": 49.25,
+          "value": 0.1
+        },
+        {
+          "t": 49.5,
+          "value": 0.1
+        },
+        {
+          "t": 49.75,
+          "value": 0.1
+        },
+        {
+          "t": 50.0,
+          "value": 0.1
+        },
+        {
+          "t": 50.25,
+          "value": 0.1
+        },
+        {
+          "t": 50.5,
+          "value": 0.1
+        },
+        {
+          "t": 50.75,
+          "value": 0.1
+        },
+        {
+          "t": 51.0,
+          "value": 0.1
+        },
+        {
+          "t": 51.25,
+          "value": 0.1
+        },
+        {
+          "t": 51.5,
+          "value": 0.1
+        },
+        {
+          "t": 51.75,
+          "value": 0.1
+        },
+        {
+          "t": 52.0,
+          "value": 0.1
+        },
+        {
+          "t": 52.25,
+          "value": 0.1
+        },
+        {
+          "t": 52.5,
+          "value": 0.1
+        },
+        {
+          "t": 52.75,
+          "value": 0.1
+        },
+        {
+          "t": 53.0,
+          "value": 0.1
+        },
+        {
+          "t": 53.25,
+          "value": 0.1
+        },
+        {
+          "t": 53.5,
+          "value": 0.1
+        },
+        {
+          "t": 53.75,
+          "value": 0.1
+        },
+        {
+          "t": 54.0,
+          "value": 0.1
+        },
+        {
+          "t": 54.25,
+          "value": 0.1
+        },
+        {
+          "t": 54.5,
+          "value": 0.1
+        },
+        {
+          "t": 54.75,
+          "value": 0.1
+        },
+        {
+          "t": 55.0,
+          "value": 0.1
+        },
+        {
+          "t": 55.25,
+          "value": 0.1
+        },
+        {
+          "t": 55.5,
+          "value": 0.1
+        },
+        {
+          "t": 55.75,
+          "value": 0.1
+        },
+        {
+          "t": 56.0,
+          "value": 0.1
+        },
+        {
+          "t": 56.25,
+          "value": 0.1
+        },
+        {
+          "t": 56.5,
+          "value": 0.1
+        },
+        {
+          "t": 56.75,
+          "value": 0.1
+        },
+        {
+          "t": 57.0,
+          "value": 0.1
+        },
+        {
+          "t": 57.25,
+          "value": 0.1
+        },
+        {
+          "t": 57.5,
+          "value": 0.1
+        },
+        {
+          "t": 57.75,
+          "value": 0.1
+        },
+        {
+          "t": 58.0,
+          "value": 0.1
+        },
+        {
+          "t": 58.25,
+          "value": 0.025
+        },
+        {
+          "t": 58.5,
+          "value": 0.025
+        },
+        {
+          "t": 58.75,
+          "value": 0.025
+        },
+        {
+          "t": 59.0,
+          "value": 0.025
+        },
+        {
+          "t": 59.25,
+          "value": 0.025
+        },
+        {
+          "t": 59.5,
+          "value": 0.025
+        },
+        {
+          "t": 59.75,
+          "value": 0.025
+        },
+        {
+          "t": 60.0,
+          "value": 0.025
+        },
+        {
+          "t": 60.25,
+          "value": 0.025
+        },
+        {
+          "t": 60.5,
+          "value": 0.025
+        },
+        {
+          "t": 60.75,
+          "value": 0.025
+        },
+        {
+          "t": 61.0,
+          "value": 0.025
+        },
+        {
+          "t": 61.25,
+          "value": 0.025
+        },
+        {
+          "t": 61.5,
+          "value": 0.025
+        },
+        {
+          "t": 61.75,
+          "value": 0.025
+        },
+        {
+          "t": 62.0,
+          "value": 0.025
+        },
+        {
+          "t": 62.25,
+          "value": 0.0
+        },
+        {
+          "t": 62.5,
+          "value": 0.0
+        },
+        {
+          "t": 62.75,
+          "value": 0.0
+        },
+        {
+          "t": 63.0,
+          "value": 0.0
+        },
+        {
+          "t": 63.25,
+          "value": 0.0
+        },
+        {
+          "t": 63.5,
+          "value": 0.0
+        },
+        {
+          "t": 63.75,
+          "value": 0.0
+        },
+        {
+          "t": 64.0,
+          "value": 0.0
+        },
+        {
+          "t": 64.25,
+          "value": 0.0
+        },
+        {
+          "t": 64.5,
+          "value": 0.0
+        },
+        {
+          "t": 64.75,
+          "value": 0.0
+        },
+        {
+          "t": 65.0,
+          "value": 0.0
+        },
+        {
+          "t": 65.25,
+          "value": 0.0
+        },
+        {
+          "t": 65.5,
+          "value": 0.0
+        },
+        {
+          "t": 65.75,
+          "value": 0.0
+        },
+        {
+          "t": 66.0,
+          "value": 0.0
+        },
+        {
+          "t": 66.25,
+          "value": 0.0
+        },
+        {
+          "t": 66.5,
+          "value": 0.0
+        },
+        {
+          "t": 66.75,
+          "value": 0.0
+        },
+        {
+          "t": 67.0,
+          "value": 0.0
+        },
+        {
+          "t": 67.25,
+          "value": 0.0
+        },
+        {
+          "t": 67.5,
+          "value": 0.0
+        },
+        {
+          "t": 67.75,
+          "value": 0.0
+        },
+        {
+          "t": 68.0,
+          "value": 0.0
+        },
+        {
+          "t": 68.25,
+          "value": 0.0
+        },
+        {
+          "t": 68.5,
+          "value": 0.0
+        },
+        {
+          "t": 68.75,
+          "value": 0.0
+        },
+        {
+          "t": 69.0,
+          "value": 0.0
+        },
+        {
+          "t": 69.25,
+          "value": 0.0
+        },
+        {
+          "t": 69.5,
+          "value": 0.0
+        },
+        {
+          "t": 69.75,
+          "value": 0.0
+        },
+        {
+          "t": 70.0,
+          "value": 0.0
+        }
+      ]
+    },
+    {
+      "channel": "angular_velocity",
+      "unit": "rad/s",
+      "samples": [
+        {
+          "t": 0.0,
+          "value": 0.0
+        },
+        {
+          "t": 0.25,
+          "value": 0.0
+        },
+        {
+          "t": 0.5,
+          "value": 0.0
+        },
+        {
+          "t": 0.75,
+          "value": 0.0
+        },
+        {
+          "t": 1.0,
+          "value": 0.0
+        },
+        {
+          "t": 1.25,
+          "value": 0.0
+        },
+        {
+          "t": 1.5,
+          "value": 0.0
+        },
+        {
+          "t": 1.75,
+          "value": 0.0
+        },
+        {
+          "t": 2.0,
+          "value": 0.0
+        },
+        {
+          "t": 2.25,
+          "value": 0.0
+        },
+        {
+          "t": 2.5,
+          "value": 0.0
+        },
+        {
+          "t": 2.75,
+          "value": 0.0
+        },
+        {
+          "t": 3.0,
+          "value": 0.0
+        },
+        {
+          "t": 3.25,
+          "value": 0.0
+        },
+        {
+          "t": 3.5,
+          "value": 0.0
+        },
+        {
+          "t": 3.75,
+          "value": 0.0
+        },
+        {
+          "t": 4.0,
+          "value": 0.0
+        },
+        {
+          "t": 4.25,
+          "value": 0.0
+        },
+        {
+          "t": 4.5,
+          "value": 0.0
+        },
+        {
+          "t": 4.75,
+          "value": 0.0
+        },
+        {
+          "t": 5.0,
+          "value": 0.0
+        },
+        {
+          "t": 5.25,
+          "value": 0.0
+        },
+        {
+          "t": 5.5,
+          "value": 0.0
+        },
+        {
+          "t": 5.75,
+          "value": 0.0
+        },
+        {
+          "t": 6.0,
+          "value": 0.0
+        },
+        {
+          "t": 6.25,
+          "value": 0.0
+        },
+        {
+          "t": 6.5,
+          "value": 0.0
+        },
+        {
+          "t": 6.75,
+          "value": 0.0
+        },
+        {
+          "t": 7.0,
+          "value": 0.0
+        },
+        {
+          "t": 7.25,
+          "value": 0.0
+        },
+        {
+          "t": 7.5,
+          "value": 0.0
+        },
+        {
+          "t": 7.75,
+          "value": 0.0
+        },
+        {
+          "t": 8.0,
+          "value": 0.0
+        },
+        {
+          "t": 8.25,
+          "value": 0.0
+        },
+        {
+          "t": 8.5,
+          "value": 0.0
+        },
+        {
+          "t": 8.75,
+          "value": 0.0
+        },
+        {
+          "t": 9.0,
+          "value": 0.0
+        },
+        {
+          "t": 9.25,
+          "value": 0.0
+        },
+        {
+          "t": 9.5,
+          "value": 0.0
+        },
+        {
+          "t": 9.75,
+          "value": 0.0
+        },
+        {
+          "t": 10.0,
+          "value": 0.0
+        },
+        {
+          "t": 10.25,
+          "value": 0.0
+        },
+        {
+          "t": 10.5,
+          "value": 0.0
+        },
+        {
+          "t": 10.75,
+          "value": 0.0
+        },
+        {
+          "t": 11.0,
+          "value": 0.0
+        },
+        {
+          "t": 11.25,
+          "value": 0.0
+        },
+        {
+          "t": 11.5,
+          "value": 0.0
+        },
+        {
+          "t": 11.75,
+          "value": 0.0
+        },
+        {
+          "t": 12.0,
+          "value": 0.0
+        },
+        {
+          "t": 12.25,
+          "value": 0.0
+        },
+        {
+          "t": 12.5,
+          "value": 0.0
+        },
+        {
+          "t": 12.75,
+          "value": 0.0
+        },
+        {
+          "t": 13.0,
+          "value": 0.0
+        },
+        {
+          "t": 13.25,
+          "value": 0.0
+        },
+        {
+          "t": 13.5,
+          "value": 0.0
+        },
+        {
+          "t": 13.75,
+          "value": 0.0
+        },
+        {
+          "t": 14.0,
+          "value": 0.0
+        },
+        {
+          "t": 14.25,
+          "value": 0.0
+        },
+        {
+          "t": 14.5,
+          "value": 0.0
+        },
+        {
+          "t": 14.75,
+          "value": 0.0
+        },
+        {
+          "t": 15.0,
+          "value": 0.0
+        },
+        {
+          "t": 15.25,
+          "value": 0.0
+        },
+        {
+          "t": 15.5,
+          "value": 0.0
+        },
+        {
+          "t": 15.75,
+          "value": 0.0
+        },
+        {
+          "t": 16.0,
+          "value": 0.0
+        },
+        {
+          "t": 16.25,
+          "value": 0.0
+        },
+        {
+          "t": 16.5,
+          "value": 0.0
+        },
+        {
+          "t": 16.75,
+          "value": 0.0
+        },
+        {
+          "t": 17.0,
+          "value": 0.0
+        },
+        {
+          "t": 17.25,
+          "value": 0.0
+        },
+        {
+          "t": 17.5,
+          "value": 0.0
+        },
+        {
+          "t": 17.75,
+          "value": 0.0
+        },
+        {
+          "t": 18.0,
+          "value": 0.0
+        },
+        {
+          "t": 18.25,
+          "value": 0.0
+        },
+        {
+          "t": 18.5,
+          "value": 0.0
+        },
+        {
+          "t": 18.75,
+          "value": 0.0
+        },
+        {
+          "t": 19.0,
+          "value": 0.0
+        },
+        {
+          "t": 19.25,
+          "value": 0.0
+        },
+        {
+          "t": 19.5,
+          "value": 0.0
+        },
+        {
+          "t": 19.75,
+          "value": 0.0
+        },
+        {
+          "t": 20.0,
+          "value": 0.0
+        },
+        {
+          "t": 20.25,
+          "value": 0.0
+        },
+        {
+          "t": 20.5,
+          "value": 0.0
+        },
+        {
+          "t": 20.75,
+          "value": 0.0
+        },
+        {
+          "t": 21.0,
+          "value": 0.0
+        },
+        {
+          "t": 21.25,
+          "value": 0.0
+        },
+        {
+          "t": 21.5,
+          "value": 0.0
+        },
+        {
+          "t": 21.75,
+          "value": 0.0
+        },
+        {
+          "t": 22.0,
+          "value": 0.0
+        },
+        {
+          "t": 22.25,
+          "value": 0.0
+        },
+        {
+          "t": 22.5,
+          "value": 0.0
+        },
+        {
+          "t": 22.75,
+          "value": 0.0
+        },
+        {
+          "t": 23.0,
+          "value": 0.0
+        },
+        {
+          "t": 23.25,
+          "value": 0.0
+        },
+        {
+          "t": 23.5,
+          "value": 0.0
+        },
+        {
+          "t": 23.75,
+          "value": 0.0
+        },
+        {
+          "t": 24.0,
+          "value": 0.0
+        },
+        {
+          "t": 24.25,
+          "value": 0.0
+        },
+        {
+          "t": 24.5,
+          "value": 0.0
+        },
+        {
+          "t": 24.75,
+          "value": 0.0
+        },
+        {
+          "t": 25.0,
+          "value": 0.0
+        },
+        {
+          "t": 25.25,
+          "value": 0.0
+        },
+        {
+          "t": 25.5,
+          "value": 0.0
+        },
+        {
+          "t": 25.75,
+          "value": 0.0
+        },
+        {
+          "t": 26.0,
+          "value": 0.0
+        },
+        {
+          "t": 26.25,
+          "value": 0.0
+        },
+        {
+          "t": 26.5,
+          "value": 0.0
+        },
+        {
+          "t": 26.75,
+          "value": 0.0
+        },
+        {
+          "t": 27.0,
+          "value": 0.0
+        },
+        {
+          "t": 27.25,
+          "value": 0.0
+        },
+        {
+          "t": 27.5,
+          "value": 0.0
+        },
+        {
+          "t": 27.75,
+          "value": 0.0
+        },
+        {
+          "t": 28.0,
+          "value": 0.0
+        },
+        {
+          "t": 28.25,
+          "value": 0.0
+        },
+        {
+          "t": 28.5,
+          "value": 0.0
+        },
+        {
+          "t": 28.75,
+          "value": 0.0
+        },
+        {
+          "t": 29.0,
+          "value": 0.0
+        },
+        {
+          "t": 29.25,
+          "value": 0.0
+        },
+        {
+          "t": 29.5,
+          "value": 0.0
+        },
+        {
+          "t": 29.75,
+          "value": 0.0
+        },
+        {
+          "t": 30.0,
+          "value": 0.0
+        },
+        {
+          "t": 30.25,
+          "value": 0.0
+        },
+        {
+          "t": 30.5,
+          "value": 0.0
+        },
+        {
+          "t": 30.75,
+          "value": 0.0
+        },
+        {
+          "t": 31.0,
+          "value": 0.0
+        },
+        {
+          "t": 31.25,
+          "value": 0.0
+        },
+        {
+          "t": 31.5,
+          "value": 0.0
+        },
+        {
+          "t": 31.75,
+          "value": 0.0
+        },
+        {
+          "t": 32.0,
+          "value": 0.0
+        },
+        {
+          "t": 32.25,
+          "value": 0.0
+        },
+        {
+          "t": 32.5,
+          "value": 0.0
+        },
+        {
+          "t": 32.75,
+          "value": 0.0
+        },
+        {
+          "t": 33.0,
+          "value": 0.0
+        },
+        {
+          "t": 33.25,
+          "value": 0.0
+        },
+        {
+          "t": 33.5,
+          "value": 0.0
+        },
+        {
+          "t": 33.75,
+          "value": 0.0
+        },
+        {
+          "t": 34.0,
+          "value": 0.0
+        },
+        {
+          "t": 34.25,
+          "value": 0.0
+        },
+        {
+          "t": 34.5,
+          "value": 0.0
+        },
+        {
+          "t": 34.75,
+          "value": 0.0
+        },
+        {
+          "t": 35.0,
+          "value": 0.0
+        },
+        {
+          "t": 35.25,
+          "value": 0.0
+        },
+        {
+          "t": 35.5,
+          "value": 0.0
+        },
+        {
+          "t": 35.75,
+          "value": 0.0
+        },
+        {
+          "t": 36.0,
+          "value": 0.0
+        },
+        {
+          "t": 36.25,
+          "value": 0.0
+        },
+        {
+          "t": 36.5,
+          "value": 0.0
+        },
+        {
+          "t": 36.75,
+          "value": 0.0
+        },
+        {
+          "t": 37.0,
+          "value": 0.0
+        },
+        {
+          "t": 37.25,
+          "value": 0.0
+        },
+        {
+          "t": 37.5,
+          "value": 0.0
+        },
+        {
+          "t": 37.75,
+          "value": 0.0
+        },
+        {
+          "t": 38.0,
+          "value": 0.0
+        },
+        {
+          "t": 38.25,
+          "value": 0.0
+        },
+        {
+          "t": 38.5,
+          "value": 0.0
+        },
+        {
+          "t": 38.75,
+          "value": 0.0
+        },
+        {
+          "t": 39.0,
+          "value": 0.0
+        },
+        {
+          "t": 39.25,
+          "value": 0.0
+        },
+        {
+          "t": 39.5,
+          "value": 0.0
+        },
+        {
+          "t": 39.75,
+          "value": 0.0
+        },
+        {
+          "t": 40.0,
+          "value": 0.0
+        },
+        {
+          "t": 40.25,
+          "value": 0.0
+        },
+        {
+          "t": 40.5,
+          "value": 0.0
+        },
+        {
+          "t": 40.75,
+          "value": 0.0
+        },
+        {
+          "t": 41.0,
+          "value": 0.0
+        },
+        {
+          "t": 41.25,
+          "value": 0.0
+        },
+        {
+          "t": 41.5,
+          "value": 0.0
+        },
+        {
+          "t": 41.75,
+          "value": 0.0
+        },
+        {
+          "t": 42.0,
+          "value": 0.0
+        },
+        {
+          "t": 42.25,
+          "value": 0.0
+        },
+        {
+          "t": 42.5,
+          "value": 0.0
+        },
+        {
+          "t": 42.75,
+          "value": 0.0
+        },
+        {
+          "t": 43.0,
+          "value": 0.0
+        },
+        {
+          "t": 43.25,
+          "value": 0.0
+        },
+        {
+          "t": 43.5,
+          "value": 0.0
+        },
+        {
+          "t": 43.75,
+          "value": 0.0
+        },
+        {
+          "t": 44.0,
+          "value": 0.0
+        },
+        {
+          "t": 44.25,
+          "value": 0.0
+        },
+        {
+          "t": 44.5,
+          "value": 0.0
+        },
+        {
+          "t": 44.75,
+          "value": 0.0
+        },
+        {
+          "t": 45.0,
+          "value": 0.0
+        },
+        {
+          "t": 45.25,
+          "value": 0.0
+        },
+        {
+          "t": 45.5,
+          "value": 0.0
+        },
+        {
+          "t": 45.75,
+          "value": 0.0
+        },
+        {
+          "t": 46.0,
+          "value": 0.0
+        },
+        {
+          "t": 46.25,
+          "value": 0.0
+        },
+        {
+          "t": 46.5,
+          "value": 0.0
+        },
+        {
+          "t": 46.75,
+          "value": 0.0
+        },
+        {
+          "t": 47.0,
+          "value": 0.0
+        },
+        {
+          "t": 47.25,
+          "value": 0.0
+        },
+        {
+          "t": 47.5,
+          "value": 0.0
+        },
+        {
+          "t": 47.75,
+          "value": 0.0
+        },
+        {
+          "t": 48.0,
+          "value": 0.0
+        },
+        {
+          "t": 48.25,
+          "value": 0.0
+        },
+        {
+          "t": 48.5,
+          "value": 0.0
+        },
+        {
+          "t": 48.75,
+          "value": 0.0
+        },
+        {
+          "t": 49.0,
+          "value": 0.0
+        },
+        {
+          "t": 49.25,
+          "value": 0.0
+        },
+        {
+          "t": 49.5,
+          "value": 0.0
+        },
+        {
+          "t": 49.75,
+          "value": 0.0
+        },
+        {
+          "t": 50.0,
+          "value": 0.0
+        },
+        {
+          "t": 50.25,
+          "value": 0.0
+        },
+        {
+          "t": 50.5,
+          "value": 0.0
+        },
+        {
+          "t": 50.75,
+          "value": 0.0
+        },
+        {
+          "t": 51.0,
+          "value": 0.0
+        },
+        {
+          "t": 51.25,
+          "value": 0.0
+        },
+        {
+          "t": 51.5,
+          "value": 0.0
+        },
+        {
+          "t": 51.75,
+          "value": 0.0
+        },
+        {
+          "t": 52.0,
+          "value": 0.0
+        },
+        {
+          "t": 52.25,
+          "value": 0.0
+        },
+        {
+          "t": 52.5,
+          "value": 0.0
+        },
+        {
+          "t": 52.75,
+          "value": 0.0
+        },
+        {
+          "t": 53.0,
+          "value": 0.0
+        },
+        {
+          "t": 53.25,
+          "value": 0.0
+        },
+        {
+          "t": 53.5,
+          "value": 0.0
+        },
+        {
+          "t": 53.75,
+          "value": 0.0
+        },
+        {
+          "t": 54.0,
+          "value": 0.0
+        },
+        {
+          "t": 54.25,
+          "value": 0.0
+        },
+        {
+          "t": 54.5,
+          "value": 0.0
+        },
+        {
+          "t": 54.75,
+          "value": 0.0
+        },
+        {
+          "t": 55.0,
+          "value": 0.0
+        },
+        {
+          "t": 55.25,
+          "value": 0.0
+        },
+        {
+          "t": 55.5,
+          "value": 0.0
+        },
+        {
+          "t": 55.75,
+          "value": 0.0
+        },
+        {
+          "t": 56.0,
+          "value": 0.0
+        },
+        {
+          "t": 56.25,
+          "value": 0.0
+        },
+        {
+          "t": 56.5,
+          "value": 0.0
+        },
+        {
+          "t": 56.75,
+          "value": 0.0
+        },
+        {
+          "t": 57.0,
+          "value": 0.0
+        },
+        {
+          "t": 57.25,
+          "value": 0.0
+        },
+        {
+          "t": 57.5,
+          "value": 0.0
+        },
+        {
+          "t": 57.75,
+          "value": 0.0
+        },
+        {
+          "t": 58.0,
+          "value": 0.0
+        },
+        {
+          "t": 58.25,
+          "value": 0.0
+        },
+        {
+          "t": 58.5,
+          "value": 0.0
+        },
+        {
+          "t": 58.75,
+          "value": 0.0
+        },
+        {
+          "t": 59.0,
+          "value": 0.0
+        },
+        {
+          "t": 59.25,
+          "value": 0.0
+        },
+        {
+          "t": 59.5,
+          "value": 0.0
+        },
+        {
+          "t": 59.75,
+          "value": 0.0
+        },
+        {
+          "t": 60.0,
+          "value": 0.0
+        },
+        {
+          "t": 60.25,
+          "value": 0.0
+        },
+        {
+          "t": 60.5,
+          "value": 0.0
+        },
+        {
+          "t": 60.75,
+          "value": 0.0
+        },
+        {
+          "t": 61.0,
+          "value": 0.0
+        },
+        {
+          "t": 61.25,
+          "value": 0.0
+        },
+        {
+          "t": 61.5,
+          "value": 0.0
+        },
+        {
+          "t": 61.75,
+          "value": 0.0
+        },
+        {
+          "t": 62.0,
+          "value": 0.0
+        },
+        {
+          "t": 62.25,
+          "value": 0.0
+        },
+        {
+          "t": 62.5,
+          "value": 0.0
+        },
+        {
+          "t": 62.75,
+          "value": 0.0
+        },
+        {
+          "t": 63.0,
+          "value": 0.0
+        },
+        {
+          "t": 63.25,
+          "value": 0.0
+        },
+        {
+          "t": 63.5,
+          "value": 0.0
+        },
+        {
+          "t": 63.75,
+          "value": 0.0
+        },
+        {
+          "t": 64.0,
+          "value": 0.0
+        },
+        {
+          "t": 64.25,
+          "value": 0.0
+        },
+        {
+          "t": 64.5,
+          "value": 0.0
+        },
+        {
+          "t": 64.75,
+          "value": 0.0
+        },
+        {
+          "t": 65.0,
+          "value": 0.0
+        },
+        {
+          "t": 65.25,
+          "value": 0.0
+        },
+        {
+          "t": 65.5,
+          "value": 0.0
+        },
+        {
+          "t": 65.75,
+          "value": 0.0
+        },
+        {
+          "t": 66.0,
+          "value": 0.0
+        },
+        {
+          "t": 66.25,
+          "value": 0.0
+        },
+        {
+          "t": 66.5,
+          "value": 0.0
+        },
+        {
+          "t": 66.75,
+          "value": 0.0
+        },
+        {
+          "t": 67.0,
+          "value": 0.0
+        },
+        {
+          "t": 67.25,
+          "value": 0.0
+        },
+        {
+          "t": 67.5,
+          "value": 0.0
+        },
+        {
+          "t": 67.75,
+          "value": 0.0
+        },
+        {
+          "t": 68.0,
+          "value": 0.0
+        },
+        {
+          "t": 68.25,
+          "value": 0.0
+        },
+        {
+          "t": 68.5,
+          "value": 0.0
+        },
+        {
+          "t": 68.75,
+          "value": 0.0
+        },
+        {
+          "t": 69.0,
+          "value": 0.0
+        },
+        {
+          "t": 69.25,
+          "value": 0.0
+        },
+        {
+          "t": 69.5,
+          "value": 0.0
+        },
+        {
+          "t": 69.75,
+          "value": 0.0
+        },
+        {
+          "t": 70.0,
+          "value": 0.0
+        }
+      ]
+    },
+    {
+      "channel": "obstacle_distance",
+      "unit": "m",
+      "samples": [
+        {
+          "t": 0.0,
+          "value": 3.6
+        },
+        {
+          "t": 0.5,
+          "value": 3.662
+        },
+        {
+          "t": 1.0,
+          "value": 3.72
+        },
+        {
+          "t": 1.5,
+          "value": 3.77
+        },
+        {
+          "t": 2.0,
+          "value": 3.81
+        },
+        {
+          "t": 2.5,
+          "value": 3.837
+        },
+        {
+          "t": 3.0,
+          "value": 3.849
+        },
+        {
+          "t": 3.5,
+          "value": 3.846
+        },
+        {
+          "t": 4.0,
+          "value": 3.827
+        },
+        {
+          "t": 4.5,
+          "value": 3.795
+        },
+        {
+          "t": 5.0,
+          "value": 3.75
+        },
+        {
+          "t": 5.5,
+          "value": 3.695
+        },
+        {
+          "t": 6.0,
+          "value": 3.635
+        },
+        {
+          "t": 6.5,
+          "value": 3.573
+        },
+        {
+          "t": 7.0,
+          "value": 3.512
+        },
+        {
+          "t": 7.5,
+          "value": 3.457
+        },
+        {
+          "t": 8.0,
+          "value": 3.411
+        },
+        {
+          "t": 8.5,
+          "value": 3.376
+        },
+        {
+          "t": 9.0,
+          "value": 3.356
+        },
+        {
+          "t": 9.5,
+          "value": 3.35
+        },
+        {
+          "t": 10.0,
+          "value": 3.36
+        },
+        {
+          "t": 10.5,
+          "value": 3.385
+        },
+        {
+          "t": 11.0,
+          "value": 3.424
+        },
+        {
+          "t": 11.5,
+          "value": 3.473
+        },
+        {
+          "t": 12.0,
+          "value": 3.53
+        },
+        {
+          "t": 12.5,
+          "value": 3.592
+        },
+        {
+          "t": 13.0,
+          "value": 3.654
+        },
+        {
+          "t": 13.5,
+          "value": 3.713
+        },
+        {
+          "t": 14.0,
+          "value": 3.764
+        },
+        {
+          "t": 14.5,
+          "value": 3.806
+        },
+        {
+          "t": 15.0,
+          "value": 3.834
+        },
+        {
+          "t": 15.5,
+          "value": 3.849
+        },
+        {
+          "t": 16.0,
+          "value": 3.847
+        },
+        {
+          "t": 16.5,
+          "value": 3.831
+        },
+        {
+          "t": 17.0,
+          "value": 3.8
+        },
+        {
+          "t": 17.5,
+          "value": 3.756
+        },
+        {
+          "t": 18.0,
+          "value": 3.703
+        },
+        {
+          "t": 18.5,
+          "value": 3.643
+        },
+        {
+          "t": 19.0,
+          "value": 3.581
+        },
+        {
+          "t": 19.5,
+          "value": 3.52
+        },
+        {
+          "t": 20.0,
+          "value": 3.464
+        },
+        {
+          "t": 20.5,
+          "value": 3.416
+        },
+        {
+          "t": 21.0,
+          "value": 3.38
+        },
+        {
+          "t": 21.5,
+          "value": 3.358
+        },
+        {
+          "t": 22.0,
+          "value": 3.35
+        },
+        {
+          "t": 22.5,
+          "value": 3.358
+        },
+        {
+          "t": 23.0,
+          "value": 3.381
+        },
+        {
+          "t": 23.5,
+          "value": 3.418
+        },
+        {
+          "t": 24.0,
+          "value": 3.466
+        },
+        {
+          "t": 24.5,
+          "value": 3.522
+        },
+        {
+          "t": 25.0,
+          "value": 3.583
+        },
+        {
+          "t": 25.5,
+          "value": 3.646
+        },
+        {
+          "t": 26.0,
+          "value": 3.705
+        },
+        {
+          "t": 26.5,
+          "value": 3.758
+        },
+        {
+          "t": 27.0,
+          "value": 3.801
+        },
+        {
+          "t": 27.5,
+          "value": 3.831
+        },
+        {
+          "t": 28.0,
+          "value": 3.848
+        },
+        {
+          "t": 28.5,
+          "value": 3.848
+        },
+        {
+          "t": 29.0,
+          "value": 3.834
+        },
+        {
+          "t": 29.5,
+          "value": 3.805
+        },
+        {
+          "t": 30.0,
+          "value": 3.763
+        },
+        {
+          "t": 52.0,
+          "value": 3.791
+        },
+        {
+          "t": 52.5,
+          "value": 3.825
+        },
+        {
+          "t": 53.0,
+          "value": 3.845
+        },
+        {
+          "t": 53.5,
+          "value": 3.85
+        },
+        {
+          "t": 54.0,
+          "value": 3.839
+        },
+        {
+          "t": 54.5,
+          "value": 3.814
+        },
+        {
+          "t": 55.0,
+          "value": 3.775
+        },
+        {
+          "t": 55.5,
+          "value": 3.725
+        },
+        {
+          "t": 56.0,
+          "value": 3.668
+        },
+        {
+          "t": 56.5,
+          "value": 3.606
+        },
+        {
+          "t": 57.0,
+          "value": 3.544
+        },
+        {
+          "t": 57.5,
+          "value": 3.486
+        },
+        {
+          "t": 58.0,
+          "value": 3.434
+        },
+        {
+          "t": 58.5,
+          "value": 3.393
+        },
+        {
+          "t": 59.0,
+          "value": 3.365
+        },
+        {
+          "t": 59.5,
+          "value": 3.351
+        },
+        {
+          "t": 60.0,
+          "value": 3.353
+        },
+        {
+          "t": 60.5,
+          "value": 3.37
+        },
+        {
+          "t": 61.0,
+          "value": 3.402
+        },
+        {
+          "t": 61.5,
+          "value": 3.446
+        },
+        {
+          "t": 62.0,
+          "value": 3.499
+        },
+        {
+          "t": 62.5,
+          "value": 3.559
+        },
+        {
+          "t": 63.0,
+          "value": 3.621
+        },
+        {
+          "t": 63.5,
+          "value": 3.682
+        },
+        {
+          "t": 64.0,
+          "value": 3.738
+        },
+        {
+          "t": 64.5,
+          "value": 3.785
+        },
+        {
+          "t": 65.0,
+          "value": 3.821
+        },
+        {
+          "t": 65.5,
+          "value": 3.843
+        },
+        {
+          "t": 66.0,
+          "value": 3.85
+        },
+        {
+          "t": 66.5,
+          "value": 3.841
+        },
+        {
+          "t": 67.0,
+          "value": 3.818
+        },
+        {
+          "t": 67.5,
+          "value": 3.781
+        },
+        {
+          "t": 68.0,
+          "value": 3.732
+        },
+        {
+          "t": 68.5,
+          "value": 3.676
+        },
+        {
+          "t": 69.0,
+          "value": 3.614
+        },
+        {
+          "t": 69.5,
+          "value": 3.552
+        },
+        {
+          "t": 70.0,
+          "value": 3.493
+        }
+      ]
+    },
+    {
+      "channel": "goal_distance",
+      "unit": "m",
+      "samples": [
+        {
+          "t": 0.0,
+          "value": 16.0
+        },
+        {
+          "t": 0.25,
+          "value": 15.925
+        },
+        {
+          "t": 0.5,
+          "value": 15.85
+        },
+        {
+          "t": 0.75,
+          "value": 15.775
+        },
+        {
+          "t": 1.0,
+          "value": 15.7
+        },
+        {
+          "t": 1.25,
+          "value": 15.625
+        },
+        {
+          "t": 1.5,
+          "value": 15.55
+        },
+        {
+          "t": 1.75,
+          "value": 15.475
+        },
+        {
+          "t": 2.0,
+          "value": 15.4
+        },
+        {
+          "t": 2.25,
+          "value": 15.325
+        },
+        {
+          "t": 2.5,
+          "value": 15.25
+        },
+        {
+          "t": 2.75,
+          "value": 15.175
+        },
+        {
+          "t": 3.0,
+          "value": 15.1
+        },
+        {
+          "t": 3.25,
+          "value": 15.025
+        },
+        {
+          "t": 3.5,
+          "value": 14.95
+        },
+        {
+          "t": 3.75,
+          "value": 14.875
+        },
+        {
+          "t": 4.0,
+          "value": 14.8
+        },
+        {
+          "t": 4.25,
+          "value": 14.725
+        },
+        {
+          "t": 4.5,
+          "value": 14.65
+        },
+        {
+          "t": 4.75,
+          "value": 14.575
+        },
+        {
+          "t": 5.0,
+          "value": 14.5
+        },
+        {
+          "t": 5.25,
+          "value": 14.425
+        },
+        {
+          "t": 5.5,
+          "value": 14.35
+        },
+        {
+          "t": 5.75,
+          "value": 14.275
+        },
+        {
+          "t": 6.0,
+          "value": 14.2
+        },
+        {
+          "t": 6.25,
+          "value": 14.125
+        },
+        {
+          "t": 6.5,
+          "value": 14.05
+        },
+        {
+          "t": 6.75,
+          "value": 13.975
+        },
+        {
+          "t": 7.0,
+          "value": 13.9
+        },
+        {
+          "t": 7.25,
+          "value": 13.825
+        },
+        {
+          "t": 7.5,
+          "value": 13.75
+        },
+        {
+          "t": 7.75,
+          "value": 13.675
+        },
+        {
+          "t": 8.0,
+          "value": 13.6
+        },
+        {
+          "t": 8.25,
+          "value": 13.525
+        },
+        {
+          "t": 8.5,
+          "value": 13.45
+        },
+        {
+          "t": 8.75,
+          "value": 13.375
+        },
+        {
+          "t": 9.0,
+          "value": 13.3
+        },
+        {
+          "t": 9.25,
+          "value": 13.225
+        },
+        {
+          "t": 9.5,
+          "value": 13.15
+        },
+        {
+          "t": 9.75,
+          "value": 13.075
+        },
+        {
+          "t": 10.0,
+          "value": 13.0
+        },
+        {
+          "t": 10.25,
+          "value": 12.925
+        },
+        {
+          "t": 10.5,
+          "value": 12.85
+        },
+        {
+          "t": 10.75,
+          "value": 12.775
+        },
+        {
+          "t": 11.0,
+          "value": 12.7
+        },
+        {
+          "t": 11.25,
+          "value": 12.625
+        },
+        {
+          "t": 11.5,
+          "value": 12.55
+        },
+        {
+          "t": 11.75,
+          "value": 12.475
+        },
+        {
+          "t": 12.0,
+          "value": 12.4
+        },
+        {
+          "t": 12.25,
+          "value": 12.325
+        },
+        {
+          "t": 12.5,
+          "value": 12.25
+        },
+        {
+          "t": 12.75,
+          "value": 12.175
+        },
+        {
+          "t": 13.0,
+          "value": 12.1
+        },
+        {
+          "t": 13.25,
+          "value": 12.025
+        },
+        {
+          "t": 13.5,
+          "value": 11.95
+        },
+        {
+          "t": 13.75,
+          "value": 11.875
+        },
+        {
+          "t": 14.0,
+          "value": 11.8
+        },
+        {
+          "t": 14.25,
+          "value": 11.725
+        },
+        {
+          "t": 14.5,
+          "value": 11.65
+        },
+        {
+          "t": 14.75,
+          "value": 11.575
+        },
+        {
+          "t": 15.0,
+          "value": 11.5
+        },
+        {
+          "t": 15.25,
+          "value": 11.425
+        },
+        {
+          "t": 15.5,
+          "value": 11.35
+        },
+        {
+          "t": 15.75,
+          "value": 11.275
+        },
+        {
+          "t": 16.0,
+          "value": 11.2
+        },
+        {
+          "t": 16.25,
+          "value": 11.125
+        },
+        {
+          "t": 16.5,
+          "value": 11.05
+        },
+        {
+          "t": 16.75,
+          "value": 10.975
+        },
+        {
+          "t": 17.0,
+          "value": 10.9
+        },
+        {
+          "t": 17.25,
+          "value": 10.825
+        },
+        {
+          "t": 17.5,
+          "value": 10.75
+        },
+        {
+          "t": 17.75,
+          "value": 10.675
+        },
+        {
+          "t": 18.0,
+          "value": 10.6
+        },
+        {
+          "t": 18.25,
+          "value": 10.525
+        },
+        {
+          "t": 18.5,
+          "value": 10.45
+        },
+        {
+          "t": 18.75,
+          "value": 10.375
+        },
+        {
+          "t": 19.0,
+          "value": 10.3
+        },
+        {
+          "t": 19.25,
+          "value": 10.225
+        },
+        {
+          "t": 19.5,
+          "value": 10.15
+        },
+        {
+          "t": 19.75,
+          "value": 10.075
+        },
+        {
+          "t": 20.0,
+          "value": 10.0
+        },
+        {
+          "t": 20.25,
+          "value": 9.925
+        },
+        {
+          "t": 20.5,
+          "value": 9.85
+        },
+        {
+          "t": 20.75,
+          "value": 9.775
+        },
+        {
+          "t": 21.0,
+          "value": 9.7
+        },
+        {
+          "t": 21.25,
+          "value": 9.625
+        },
+        {
+          "t": 21.5,
+          "value": 9.55
+        },
+        {
+          "t": 21.75,
+          "value": 9.475
+        },
+        {
+          "t": 22.0,
+          "value": 9.4
+        },
+        {
+          "t": 22.25,
+          "value": 9.325
+        },
+        {
+          "t": 22.5,
+          "value": 9.25
+        },
+        {
+          "t": 22.75,
+          "value": 9.175
+        },
+        {
+          "t": 23.0,
+          "value": 9.1
+        },
+        {
+          "t": 23.25,
+          "value": 9.025
+        },
+        {
+          "t": 23.5,
+          "value": 8.95
+        },
+        {
+          "t": 23.75,
+          "value": 8.875
+        },
+        {
+          "t": 24.0,
+          "value": 8.8
+        },
+        {
+          "t": 24.25,
+          "value": 8.725
+        },
+        {
+          "t": 24.5,
+          "value": 8.65
+        },
+        {
+          "t": 24.75,
+          "value": 8.575
+        },
+        {
+          "t": 25.0,
+          "value": 8.5
+        },
+        {
+          "t": 25.25,
+          "value": 8.425
+        },
+        {
+          "t": 25.5,
+          "value": 8.35
+        },
+        {
+          "t": 25.75,
+          "value": 8.275
+        },
+        {
+          "t": 26.0,
+          "value": 8.2
+        },
+        {
+          "t": 26.25,
+          "value": 8.125
+        },
+        {
+          "t": 26.5,
+          "value": 8.05
+        },
+        {
+          "t": 26.75,
+          "value": 7.975
+        },
+        {
+          "t": 27.0,
+          "value": 7.9
+        },
+        {
+          "t": 27.25,
+          "value": 7.825
+        },
+        {
+          "t": 27.5,
+          "value": 7.75
+        },
+        {
+          "t": 27.75,
+          "value": 7.675
+        },
+        {
+          "t": 28.0,
+          "value": 7.6
+        },
+        {
+          "t": 28.25,
+          "value": 7.525
+        },
+        {
+          "t": 28.5,
+          "value": 7.45
+        },
+        {
+          "t": 28.75,
+          "value": 7.375
+        },
+        {
+          "t": 29.0,
+          "value": 7.3
+        },
+        {
+          "t": 29.25,
+          "value": 7.225
+        },
+        {
+          "t": 29.5,
+          "value": 7.15
+        },
+        {
+          "t": 29.75,
+          "value": 7.075
+        },
+        {
+          "t": 30.0,
+          "value": 7.0
+        },
+        {
+          "t": 30.25,
+          "value": 6.963
+        },
+        {
+          "t": 30.5,
+          "value": 6.925
+        },
+        {
+          "t": 30.75,
+          "value": 6.887
+        },
+        {
+          "t": 31.0,
+          "value": 6.85
+        },
+        {
+          "t": 31.25,
+          "value": 6.812
+        },
+        {
+          "t": 31.5,
+          "value": 6.775
+        },
+        {
+          "t": 31.75,
+          "value": 6.738
+        },
+        {
+          "t": 32.0,
+          "value": 6.7
+        },
+        {
+          "t": 32.25,
+          "value": 6.662
+        },
+        {
+          "t": 32.5,
+          "value": 6.625
+        },
+        {
+          "t": 32.75,
+          "value": 6.588
+        },
+        {
+          "t": 33.0,
+          "value": 6.55
+        },
+        {
+          "t": 33.25,
+          "value": 6.513
+        },
+        {
+          "t": 33.5,
+          "value": 6.475
+        },
+        {
+          "t": 33.75,
+          "value": 6.438
+        },
+        {
+          "t": 34.0,
+          "value": 6.4
+        },
+        {
+          "t": 34.25,
+          "value": 6.375
+        },
+        {
+          "t": 34.5,
+          "value": 6.35
+        },
+        {
+          "t": 34.75,
+          "value": 6.325
+        },
+        {
+          "t": 35.0,
+          "value": 6.3
+        },
+        {
+          "t": 35.25,
+          "value": 6.275
+        },
+        {
+          "t": 35.5,
+          "value": 6.25
+        },
+        {
+          "t": 35.75,
+          "value": 6.225
+        },
+        {
+          "t": 36.0,
+          "value": 6.2
+        },
+        {
+          "t": 36.25,
+          "value": 6.175
+        },
+        {
+          "t": 36.5,
+          "value": 6.15
+        },
+        {
+          "t": 36.75,
+          "value": 6.125
+        },
+        {
+          "t": 37.0,
+          "value": 6.1
+        },
+        {
+          "t": 37.25,
+          "value": 6.075
+        },
+        {
+          "t": 37.5,
+          "value": 6.05
+        },
+        {
+          "t": 37.75,
+          "value": 6.025
+        },
+        {
+          "t": 38.0,
+          "value": 6.0
+        },
+        {
+          "t": 38.25,
+          "value": 5.975
+        },
+        {
+          "t": 38.5,
+          "value": 5.95
+        },
+        {
+          "t": 38.75,
+          "value": 5.925
+        },
+        {
+          "t": 39.0,
+          "value": 5.9
+        },
+        {
+          "t": 39.25,
+          "value": 5.875
+        },
+        {
+          "t": 39.5,
+          "value": 5.85
+        },
+        {
+          "t": 39.75,
+          "value": 5.825
+        },
+        {
+          "t": 40.0,
+          "value": 5.8
+        },
+        {
+          "t": 40.25,
+          "value": 5.775
+        },
+        {
+          "t": 40.5,
+          "value": 5.75
+        },
+        {
+          "t": 40.75,
+          "value": 5.725
+        },
+        {
+          "t": 41.0,
+          "value": 5.7
+        },
+        {
+          "t": 41.25,
+          "value": 5.675
+        },
+        {
+          "t": 41.5,
+          "value": 5.65
+        },
+        {
+          "t": 41.75,
+          "value": 5.625
+        },
+        {
+          "t": 42.0,
+          "value": 5.6
+        },
+        {
+          "t": 42.25,
+          "value": 5.575
+        },
+        {
+          "t": 42.5,
+          "value": 5.55
+        },
+        {
+          "t": 42.75,
+          "value": 5.525
+        },
+        {
+          "t": 43.0,
+          "value": 5.5
+        },
+        {
+          "t": 43.25,
+          "value": 5.475
+        },
+        {
+          "t": 43.5,
+          "value": 5.45
+        },
+        {
+          "t": 43.75,
+          "value": 5.425
+        },
+        {
+          "t": 44.0,
+          "value": 5.4
+        },
+        {
+          "t": 44.25,
+          "value": 5.375
+        },
+        {
+          "t": 44.5,
+          "value": 5.35
+        },
+        {
+          "t": 44.75,
+          "value": 5.325
+        },
+        {
+          "t": 45.0,
+          "value": 5.3
+        },
+        {
+          "t": 45.25,
+          "value": 5.275
+        },
+        {
+          "t": 45.5,
+          "value": 5.25
+        },
+        {
+          "t": 45.75,
+          "value": 5.225
+        },
+        {
+          "t": 46.0,
+          "value": 5.2
+        },
+        {
+          "t": 46.25,
+          "value": 5.175
+        },
+        {
+          "t": 46.5,
+          "value": 5.15
+        },
+        {
+          "t": 46.75,
+          "value": 5.125
+        },
+        {
+          "t": 47.0,
+          "value": 5.1
+        },
+        {
+          "t": 47.25,
+          "value": 5.075
+        },
+        {
+          "t": 47.5,
+          "value": 5.05
+        },
+        {
+          "t": 47.75,
+          "value": 5.025
+        },
+        {
+          "t": 48.0,
+          "value": 5.0
+        },
+        {
+          "t": 48.25,
+          "value": 4.975
+        },
+        {
+          "t": 48.5,
+          "value": 4.95
+        },
+        {
+          "t": 48.75,
+          "value": 4.925
+        },
+        {
+          "t": 49.0,
+          "value": 4.9
+        },
+        {
+          "t": 49.25,
+          "value": 4.875
+        },
+        {
+          "t": 49.5,
+          "value": 4.85
+        },
+        {
+          "t": 49.75,
+          "value": 4.825
+        },
+        {
+          "t": 50.0,
+          "value": 4.8
+        },
+        {
+          "t": 50.25,
+          "value": 4.775
+        },
+        {
+          "t": 50.5,
+          "value": 4.75
+        },
+        {
+          "t": 50.75,
+          "value": 4.725
+        },
+        {
+          "t": 51.0,
+          "value": 4.7
+        },
+        {
+          "t": 51.25,
+          "value": 4.675
+        },
+        {
+          "t": 51.5,
+          "value": 4.65
+        },
+        {
+          "t": 51.75,
+          "value": 4.625
+        },
+        {
+          "t": 52.0,
+          "value": 4.6
+        },
+        {
+          "t": 52.25,
+          "value": 4.575
+        },
+        {
+          "t": 52.5,
+          "value": 4.55
+        },
+        {
+          "t": 52.75,
+          "value": 4.525
+        },
+        {
+          "t": 53.0,
+          "value": 4.5
+        },
+        {
+          "t": 53.25,
+          "value": 4.475
+        },
+        {
+          "t": 53.5,
+          "value": 4.45
+        },
+        {
+          "t": 53.75,
+          "value": 4.425
+        },
+        {
+          "t": 54.0,
+          "value": 4.4
+        },
+        {
+          "t": 54.25,
+          "value": 4.375
+        },
+        {
+          "t": 54.5,
+          "value": 4.35
+        },
+        {
+          "t": 54.75,
+          "value": 4.325
+        },
+        {
+          "t": 55.0,
+          "value": 4.3
+        },
+        {
+          "t": 55.25,
+          "value": 4.275
+        },
+        {
+          "t": 55.5,
+          "value": 4.25
+        },
+        {
+          "t": 55.75,
+          "value": 4.225
+        },
+        {
+          "t": 56.0,
+          "value": 4.2
+        },
+        {
+          "t": 56.25,
+          "value": 4.175
+        },
+        {
+          "t": 56.5,
+          "value": 4.15
+        },
+        {
+          "t": 56.75,
+          "value": 4.125
+        },
+        {
+          "t": 57.0,
+          "value": 4.1
+        },
+        {
+          "t": 57.25,
+          "value": 4.075
+        },
+        {
+          "t": 57.5,
+          "value": 4.05
+        },
+        {
+          "t": 57.75,
+          "value": 4.025
+        },
+        {
+          "t": 58.0,
+          "value": 4.0
+        },
+        {
+          "t": 58.25,
+          "value": 3.994
+        },
+        {
+          "t": 58.5,
+          "value": 3.988
+        },
+        {
+          "t": 58.75,
+          "value": 3.981
+        },
+        {
+          "t": 59.0,
+          "value": 3.975
+        },
+        {
+          "t": 59.25,
+          "value": 3.969
+        },
+        {
+          "t": 59.5,
+          "value": 3.962
+        },
+        {
+          "t": 59.75,
+          "value": 3.956
+        },
+        {
+          "t": 60.0,
+          "value": 3.95
+        },
+        {
+          "t": 60.25,
+          "value": 3.944
+        },
+        {
+          "t": 60.5,
+          "value": 3.938
+        },
+        {
+          "t": 60.75,
+          "value": 3.931
+        },
+        {
+          "t": 61.0,
+          "value": 3.925
+        },
+        {
+          "t": 61.25,
+          "value": 3.919
+        },
+        {
+          "t": 61.5,
+          "value": 3.912
+        },
+        {
+          "t": 61.75,
+          "value": 3.906
+        },
+        {
+          "t": 62.0,
+          "value": 3.9
+        },
+        {
+          "t": 62.25,
+          "value": 3.9
+        },
+        {
+          "t": 62.5,
+          "value": 3.9
+        },
+        {
+          "t": 62.75,
+          "value": 3.9
+        },
+        {
+          "t": 63.0,
+          "value": 3.9
+        },
+        {
+          "t": 63.25,
+          "value": 3.9
+        },
+        {
+          "t": 63.5,
+          "value": 3.9
+        },
+        {
+          "t": 63.75,
+          "value": 3.9
+        },
+        {
+          "t": 64.0,
+          "value": 3.9
+        },
+        {
+          "t": 64.25,
+          "value": 3.9
+        },
+        {
+          "t": 64.5,
+          "value": 3.9
+        },
+        {
+          "t": 64.75,
+          "value": 3.9
+        },
+        {
+          "t": 65.0,
+          "value": 3.9
+        },
+        {
+          "t": 65.25,
+          "value": 3.9
+        },
+        {
+          "t": 65.5,
+          "value": 3.9
+        },
+        {
+          "t": 65.75,
+          "value": 3.9
+        },
+        {
+          "t": 66.0,
+          "value": 3.9
+        },
+        {
+          "t": 66.25,
+          "value": 3.9
+        },
+        {
+          "t": 66.5,
+          "value": 3.9
+        },
+        {
+          "t": 66.75,
+          "value": 3.9
+        },
+        {
+          "t": 67.0,
+          "value": 3.9
+        },
+        {
+          "t": 67.25,
+          "value": 3.9
+        },
+        {
+          "t": 67.5,
+          "value": 3.9
+        },
+        {
+          "t": 67.75,
+          "value": 3.9
+        },
+        {
+          "t": 68.0,
+          "value": 3.9
+        },
+        {
+          "t": 68.25,
+          "value": 3.9
+        },
+        {
+          "t": 68.5,
+          "value": 3.9
+        },
+        {
+          "t": 68.75,
+          "value": 3.9
+        },
+        {
+          "t": 69.0,
+          "value": 3.9
+        },
+        {
+          "t": 69.25,
+          "value": 3.9
+        },
+        {
+          "t": 69.5,
+          "value": 3.9
+        },
+        {
+          "t": 69.75,
+          "value": 3.9
+        },
+        {
+          "t": 70.0,
+          "value": 3.9
+        }
+      ]
+    },
+    {
+      "channel": "localization_confidence",
+      "unit": "",
+      "samples": [
+        {
+          "t": 0.0,
+          "value": 0.955
+        },
+        {
+          "t": 0.25,
+          "value": 0.9555
+        },
+        {
+          "t": 0.5,
+          "value": 0.9561
+        },
+        {
+          "t": 0.75,
+          "value": 0.9566
+        },
+        {
+          "t": 1.0,
+          "value": 0.9571
+        },
+        {
+          "t": 1.25,
+          "value": 0.9577
+        },
+        {
+          "t": 1.5,
+          "value": 0.9582
+        },
+        {
+          "t": 1.75,
+          "value": 0.9587
+        },
+        {
+          "t": 2.0,
+          "value": 0.9592
+        },
+        {
+          "t": 2.25,
+          "value": 0.9597
+        },
+        {
+          "t": 2.5,
+          "value": 0.9602
+        },
+        {
+          "t": 2.75,
+          "value": 0.9607
+        },
+        {
+          "t": 3.0,
+          "value": 0.9612
+        },
+        {
+          "t": 3.25,
+          "value": 0.9616
+        },
+        {
+          "t": 3.5,
+          "value": 0.9621
+        },
+        {
+          "t": 3.75,
+          "value": 0.9625
+        },
+        {
+          "t": 4.0,
+          "value": 0.9629
+        },
+        {
+          "t": 4.25,
+          "value": 0.9633
+        },
+        {
+          "t": 4.5,
+          "value": 0.9637
+        },
+        {
+          "t": 4.75,
+          "value": 0.9641
+        },
+        {
+          "t": 5.0,
+          "value": 0.9644
+        },
+        {
+          "t": 5.25,
+          "value": 0.9647
+        },
+        {
+          "t": 5.5,
+          "value": 0.965
+        },
+        {
+          "t": 5.75,
+          "value": 0.9653
+        },
+        {
+          "t": 6.0,
+          "value": 0.9656
+        },
+        {
+          "t": 6.25,
+          "value": 0.9658
+        },
+        {
+          "t": 6.5,
+          "value": 0.966
+        },
+        {
+          "t": 6.75,
+          "value": 0.9662
+        },
+        {
+          "t": 7.0,
+          "value": 0.9664
+        },
+        {
+          "t": 7.25,
+          "value": 0.9666
+        },
+        {
+          "t": 7.5,
+          "value": 0.9667
+        },
+        {
+          "t": 7.75,
+          "value": 0.9668
+        },
+        {
+          "t": 8.0,
+          "value": 0.9669
+        },
+        {
+          "t": 8.25,
+          "value": 0.967
+        },
+        {
+          "t": 8.5,
+          "value": 0.967
+        },
+        {
+          "t": 8.75,
+          "value": 0.967
+        },
+        {
+          "t": 9.0,
+          "value": 0.967
+        },
+        {
+          "t": 9.25,
+          "value": 0.9669
+        },
+        {
+          "t": 9.5,
+          "value": 0.9669
+        },
+        {
+          "t": 9.75,
+          "value": 0.9668
+        },
+        {
+          "t": 10.0,
+          "value": 0.9667
+        },
+        {
+          "t": 10.25,
+          "value": 0.9666
+        },
+        {
+          "t": 10.5,
+          "value": 0.9664
+        },
+        {
+          "t": 10.75,
+          "value": 0.9662
+        },
+        {
+          "t": 11.0,
+          "value": 0.966
+        },
+        {
+          "t": 11.25,
+          "value": 0.9658
+        },
+        {
+          "t": 11.5,
+          "value": 0.9655
+        },
+        {
+          "t": 11.75,
+          "value": 0.9653
+        },
+        {
+          "t": 12.0,
+          "value": 0.965
+        },
+        {
+          "t": 12.25,
+          "value": 0.9647
+        },
+        {
+          "t": 12.5,
+          "value": 0.9643
+        },
+        {
+          "t": 12.75,
+          "value": 0.964
+        },
+        {
+          "t": 13.0,
+          "value": 0.9636
+        },
+        {
+          "t": 13.25,
+          "value": 0.9632
+        },
+        {
+          "t": 13.5,
+          "value": 0.9628
+        },
+        {
+          "t": 13.75,
+          "value": 0.9624
+        },
+        {
+          "t": 14.0,
+          "value": 0.962
+        },
+        {
+          "t": 14.25,
+          "value": 0.9615
+        },
+        {
+          "t": 14.5,
+          "value": 0.9611
+        },
+        {
+          "t": 14.75,
+          "value": 0.9606
+        },
+        {
+          "t": 15.0,
+          "value": 0.9601
+        },
+        {
+          "t": 15.25,
+          "value": 0.9596
+        },
+        {
+          "t": 15.5,
+          "value": 0.9591
+        },
+        {
+          "t": 15.75,
+          "value": 0.9586
+        },
+        {
+          "t": 16.0,
+          "value": 0.9581
+        },
+        {
+          "t": 16.25,
+          "value": 0.9576
+        },
+        {
+          "t": 16.5,
+          "value": 0.957
+        },
+        {
+          "t": 16.75,
+          "value": 0.9565
+        },
+        {
+          "t": 17.0,
+          "value": 0.956
+        },
+        {
+          "t": 17.25,
+          "value": 0.9554
+        },
+        {
+          "t": 17.5,
+          "value": 0.9549
+        },
+        {
+          "t": 17.75,
+          "value": 0.9544
+        },
+        {
+          "t": 18.0,
+          "value": 0.9538
+        },
+        {
+          "t": 18.25,
+          "value": 0.9533
+        },
+        {
+          "t": 18.5,
+          "value": 0.9528
+        },
+        {
+          "t": 18.75,
+          "value": 0.9522
+        },
+        {
+          "t": 19.0,
+          "value": 0.9517
+        },
+        {
+          "t": 19.25,
+          "value": 0.9512
+        },
+        {
+          "t": 19.5,
+          "value": 0.9507
+        },
+        {
+          "t": 19.75,
+          "value": 0.9502
+        },
+        {
+          "t": 20.0,
+          "value": 0.9497
+        },
+        {
+          "t": 20.25,
+          "value": 0.9492
+        },
+        {
+          "t": 20.5,
+          "value": 0.9487
+        },
+        {
+          "t": 20.75,
+          "value": 0.9483
+        },
+        {
+          "t": 21.0,
+          "value": 0.9478
+        },
+        {
+          "t": 21.25,
+          "value": 0.9474
+        },
+        {
+          "t": 21.5,
+          "value": 0.947
+        },
+        {
+          "t": 21.75,
+          "value": 0.9466
+        },
+        {
+          "t": 22.0,
+          "value": 0.9462
+        },
+        {
+          "t": 22.25,
+          "value": 0.9459
+        },
+        {
+          "t": 22.5,
+          "value": 0.9455
+        },
+        {
+          "t": 22.75,
+          "value": 0.9452
+        },
+        {
+          "t": 23.0,
+          "value": 0.9449
+        },
+        {
+          "t": 23.25,
+          "value": 0.9446
+        },
+        {
+          "t": 23.5,
+          "value": 0.9444
+        },
+        {
+          "t": 23.75,
+          "value": 0.9441
+        },
+        {
+          "t": 24.0,
+          "value": 0.9439
+        },
+        {
+          "t": 24.25,
+          "value": 0.9437
+        },
+        {
+          "t": 24.5,
+          "value": 0.9435
+        },
+        {
+          "t": 24.75,
+          "value": 0.9434
+        },
+        {
+          "t": 25.0,
+          "value": 0.9433
+        },
+        {
+          "t": 25.25,
+          "value": 0.9432
+        },
+        {
+          "t": 25.5,
+          "value": 0.9431
+        },
+        {
+          "t": 25.75,
+          "value": 0.943
+        },
+        {
+          "t": 26.0,
+          "value": 0.943
+        },
+        {
+          "t": 26.25,
+          "value": 0.943
+        },
+        {
+          "t": 26.5,
+          "value": 0.943
+        },
+        {
+          "t": 26.75,
+          "value": 0.9431
+        },
+        {
+          "t": 27.0,
+          "value": 0.9431
+        },
+        {
+          "t": 27.25,
+          "value": 0.9432
+        },
+        {
+          "t": 27.5,
+          "value": 0.9433
+        },
+        {
+          "t": 27.75,
+          "value": 0.9435
+        },
+        {
+          "t": 28.0,
+          "value": 0.9436
+        },
+        {
+          "t": 28.25,
+          "value": 0.9438
+        },
+        {
+          "t": 28.5,
+          "value": 0.944
+        },
+        {
+          "t": 28.75,
+          "value": 0.9443
+        },
+        {
+          "t": 29.0,
+          "value": 0.9445
+        },
+        {
+          "t": 29.25,
+          "value": 0.9448
+        },
+        {
+          "t": 29.5,
+          "value": 0.9451
+        },
+        {
+          "t": 29.75,
+          "value": 0.9454
+        },
+        {
+          "t": 30.0,
+          "value": 0.9457
+        },
+        {
+          "t": 30.25,
+          "value": 0.9461
+        },
+        {
+          "t": 30.5,
+          "value": 0.9464
+        },
+        {
+          "t": 30.75,
+          "value": 0.9468
+        },
+        {
+          "t": 31.0,
+          "value": 0.9472
+        },
+        {
+          "t": 31.25,
+          "value": 0.9477
+        },
+        {
+          "t": 31.5,
+          "value": 0.9481
+        },
+        {
+          "t": 31.75,
+          "value": 0.9485
+        },
+        {
+          "t": 32.0,
+          "value": 0.949
+        },
+        {
+          "t": 32.25,
+          "value": 0.9495
+        },
+        {
+          "t": 32.5,
+          "value": 0.95
+        },
+        {
+          "t": 32.75,
+          "value": 0.9505
+        },
+        {
+          "t": 33.0,
+          "value": 0.951
+        },
+        {
+          "t": 33.25,
+          "value": 0.9515
+        },
+        {
+          "t": 33.5,
+          "value": 0.952
+        },
+        {
+          "t": 33.75,
+          "value": 0.9525
+        },
+        {
+          "t": 34.0,
+          "value": 0.9531
+        },
+        {
+          "t": 34.25,
+          "value": 0.9536
+        },
+        {
+          "t": 34.5,
+          "value": 0.9541
+        },
+        {
+          "t": 34.75,
+          "value": 0.9547
+        },
+        {
+          "t": 35.0,
+          "value": 0.9552
+        },
+        {
+          "t": 35.25,
+          "value": 0.9557
+        },
+        {
+          "t": 35.5,
+          "value": 0.9563
+        },
+        {
+          "t": 35.75,
+          "value": 0.9568
+        },
+        {
+          "t": 36.0,
+          "value": 0.9573
+        },
+        {
+          "t": 36.25,
+          "value": 0.9579
+        },
+        {
+          "t": 36.5,
+          "value": 0.9584
+        },
+        {
+          "t": 36.75,
+          "value": 0.9589
+        },
+        {
+          "t": 37.0,
+          "value": 0.9594
+        },
+        {
+          "t": 37.25,
+          "value": 0.9599
+        },
+        {
+          "t": 37.5,
+          "value": 0.9604
+        },
+        {
+          "t": 37.75,
+          "value": 0.9609
+        },
+        {
+          "t": 38.0,
+          "value": 0.9613
+        },
+        {
+          "t": 38.25,
+          "value": 0.9618
+        },
+        {
+          "t": 38.5,
+          "value": 0.9622
+        },
+        {
+          "t": 38.75,
+          "value": 0.9627
+        },
+        {
+          "t": 39.0,
+          "value": 0.9631
+        },
+        {
+          "t": 39.25,
+          "value": 0.9635
+        },
+        {
+          "t": 39.5,
+          "value": 0.9638
+        },
+        {
+          "t": 39.75,
+          "value": 0.9642
+        },
+        {
+          "t": 40.0,
+          "value": 0.9645
+        },
+        {
+          "t": 40.25,
+          "value": 0.9648
+        },
+        {
+          "t": 40.5,
+          "value": 0.9651
+        },
+        {
+          "t": 40.75,
+          "value": 0.9654
+        },
+        {
+          "t": 41.0,
+          "value": 0.9657
+        },
+        {
+          "t": 41.25,
+          "value": 0.9659
+        },
+        {
+          "t": 41.5,
+          "value": 0.9661
+        },
+        {
+          "t": 41.75,
+          "value": 0.9663
+        },
+        {
+          "t": 42.0,
+          "value": 0.9665
+        },
+        {
+          "t": 42.25,
+          "value": 0.9666
+        },
+        {
+          "t": 42.5,
+          "value": 0.9668
+        },
+        {
+          "t": 42.75,
+          "value": 0.9668
+        },
+        {
+          "t": 43.0,
+          "value": 0.9669
+        },
+        {
+          "t": 43.25,
+          "value": 0.967
+        },
+        {
+          "t": 43.5,
+          "value": 0.967
+        },
+        {
+          "t": 43.75,
+          "value": 0.967
+        },
+        {
+          "t": 44.0,
+          "value": 0.967
+        },
+        {
+          "t": 44.25,
+          "value": 0.9669
+        },
+        {
+          "t": 44.5,
+          "value": 0.9669
+        },
+        {
+          "t": 44.75,
+          "value": 0.9668
+        },
+        {
+          "t": 45.0,
+          "value": 0.9666
+        },
+        {
+          "t": 45.25,
+          "value": 0.9665
+        },
+        {
+          "t": 45.5,
+          "value": 0.9663
+        },
+        {
+          "t": 45.75,
+          "value": 0.9661
+        },
+        {
+          "t": 46.0,
+          "value": 0.9659
+        },
+        {
+          "t": 46.25,
+          "value": 0.9657
+        },
+        {
+          "t": 46.5,
+          "value": 0.9654
+        },
+        {
+          "t": 46.75,
+          "value": 0.9652
+        },
+        {
+          "t": 47.0,
+          "value": 0.9649
+        },
+        {
+          "t": 47.25,
+          "value": 0.9645
+        },
+        {
+          "t": 47.5,
+          "value": 0.9642
+        },
+        {
+          "t": 47.75,
+          "value": 0.9639
+        },
+        {
+          "t": 48.0,
+          "value": 0.9635
+        },
+        {
+          "t": 48.25,
+          "value": 0.9631
+        },
+        {
+          "t": 48.5,
+          "value": 0.9627
+        },
+        {
+          "t": 48.75,
+          "value": 0.9623
+        },
+        {
+          "t": 49.0,
+          "value": 0.9618
+        },
+        {
+          "t": 49.25,
+          "value": 0.9614
+        },
+        {
+          "t": 49.5,
+          "value": 0.9609
+        },
+        {
+          "t": 49.75,
+          "value": 0.9604
+        },
+        {
+          "t": 50.0,
+          "value": 0.9599
+        },
+        {
+          "t": 50.25,
+          "value": 0.9594
+        },
+        {
+          "t": 50.5,
+          "value": 0.9589
+        },
+        {
+          "t": 50.75,
+          "value": 0.9584
+        },
+        {
+          "t": 51.0,
+          "value": 0.9579
+        },
+        {
+          "t": 51.25,
+          "value": 0.9574
+        },
+        {
+          "t": 51.5,
+          "value": 0.9568
+        },
+        {
+          "t": 51.75,
+          "value": 0.9563
+        },
+        {
+          "t": 52.0,
+          "value": 0.9558
+        },
+        {
+          "t": 52.25,
+          "value": 0.9552
+        },
+        {
+          "t": 52.5,
+          "value": 0.9547
+        },
+        {
+          "t": 52.75,
+          "value": 0.9542
+        },
+        {
+          "t": 53.0,
+          "value": 0.9536
+        },
+        {
+          "t": 53.25,
+          "value": 0.9531
+        },
+        {
+          "t": 53.5,
+          "value": 0.9526
+        },
+        {
+          "t": 53.75,
+          "value": 0.952
+        },
+        {
+          "t": 54.0,
+          "value": 0.9515
+        },
+        {
+          "t": 54.25,
+          "value": 0.951
+        },
+        {
+          "t": 54.5,
+          "value": 0.9505
+        },
+        {
+          "t": 54.75,
+          "value": 0.95
+        },
+        {
+          "t": 55.0,
+          "value": 0.9495
+        },
+        {
+          "t": 55.25,
+          "value": 0.949
+        },
+        {
+          "t": 55.5,
+          "value": 0.9486
+        },
+        {
+          "t": 55.75,
+          "value": 0.9481
+        },
+        {
+          "t": 56.0,
+          "value": 0.9477
+        },
+        {
+          "t": 56.25,
+          "value": 0.9473
+        },
+        {
+          "t": 56.5,
+          "value": 0.9469
+        },
+        {
+          "t": 56.75,
+          "value": 0.9465
+        },
+        {
+          "t": 57.0,
+          "value": 0.9461
+        },
+        {
+          "t": 57.25,
+          "value": 0.9457
+        },
+        {
+          "t": 57.5,
+          "value": 0.9454
+        },
+        {
+          "t": 57.75,
+          "value": 0.9451
+        },
+        {
+          "t": 58.0,
+          "value": 0.9448
+        },
+        {
+          "t": 58.25,
+          "value": 0.9445
+        },
+        {
+          "t": 58.5,
+          "value": 0.9443
+        },
+        {
+          "t": 58.75,
+          "value": 0.944
+        },
+        {
+          "t": 59.0,
+          "value": 0.9438
+        },
+        {
+          "t": 59.25,
+          "value": 0.9436
+        },
+        {
+          "t": 59.5,
+          "value": 0.9435
+        },
+        {
+          "t": 59.75,
+          "value": 0.9433
+        },
+        {
+          "t": 60.0,
+          "value": 0.9432
+        },
+        {
+          "t": 60.25,
+          "value": 0.9431
+        },
+        {
+          "t": 60.5,
+          "value": 0.9431
+        },
+        {
+          "t": 60.75,
+          "value": 0.943
+        },
+        {
+          "t": 61.0,
+          "value": 0.943
+        },
+        {
+          "t": 61.25,
+          "value": 0.943
+        },
+        {
+          "t": 61.5,
+          "value": 0.943
+        },
+        {
+          "t": 61.75,
+          "value": 0.9431
+        },
+        {
+          "t": 62.0,
+          "value": 0.9432
+        },
+        {
+          "t": 62.25,
+          "value": 0.9433
+        },
+        {
+          "t": 62.5,
+          "value": 0.9434
+        },
+        {
+          "t": 62.75,
+          "value": 0.9435
+        },
+        {
+          "t": 63.0,
+          "value": 0.9437
+        },
+        {
+          "t": 63.25,
+          "value": 0.9439
+        },
+        {
+          "t": 63.5,
+          "value": 0.9441
+        },
+        {
+          "t": 63.75,
+          "value": 0.9444
+        },
+        {
+          "t": 64.0,
+          "value": 0.9446
+        },
+        {
+          "t": 64.25,
+          "value": 0.9449
+        },
+        {
+          "t": 64.5,
+          "value": 0.9452
+        },
+        {
+          "t": 64.75,
+          "value": 0.9455
+        },
+        {
+          "t": 65.0,
+          "value": 0.9459
+        },
+        {
+          "t": 65.25,
+          "value": 0.9462
+        },
+        {
+          "t": 65.5,
+          "value": 0.9466
+        },
+        {
+          "t": 65.75,
+          "value": 0.947
+        },
+        {
+          "t": 66.0,
+          "value": 0.9474
+        },
+        {
+          "t": 66.25,
+          "value": 0.9478
+        },
+        {
+          "t": 66.5,
+          "value": 0.9483
+        },
+        {
+          "t": 66.75,
+          "value": 0.9487
+        },
+        {
+          "t": 67.0,
+          "value": 0.9492
+        },
+        {
+          "t": 67.25,
+          "value": 0.9497
+        },
+        {
+          "t": 67.5,
+          "value": 0.9501
+        },
+        {
+          "t": 67.75,
+          "value": 0.9506
+        },
+        {
+          "t": 68.0,
+          "value": 0.9512
+        },
+        {
+          "t": 68.25,
+          "value": 0.9517
+        },
+        {
+          "t": 68.5,
+          "value": 0.9522
+        },
+        {
+          "t": 68.75,
+          "value": 0.9527
+        },
+        {
+          "t": 69.0,
+          "value": 0.9532
+        },
+        {
+          "t": 69.25,
+          "value": 0.9538
+        },
+        {
+          "t": 69.5,
+          "value": 0.9543
+        },
+        {
+          "t": 69.75,
+          "value": 0.9549
+        },
+        {
+          "t": 70.0,
+          "value": 0.9554
+        }
+      ]
+    },
+    {
+      "channel": "battery_pct",
+      "unit": "%",
+      "samples": [
+        {
+          "t": 0.0,
+          "value": 64.0
+        },
+        {
+          "t": 0.25,
+          "value": 63.997
+        },
+        {
+          "t": 0.5,
+          "value": 63.993
+        },
+        {
+          "t": 0.75,
+          "value": 63.99
+        },
+        {
+          "t": 1.0,
+          "value": 63.987
+        },
+        {
+          "t": 1.25,
+          "value": 63.984
+        },
+        {
+          "t": 1.5,
+          "value": 63.98
+        },
+        {
+          "t": 1.75,
+          "value": 63.977
+        },
+        {
+          "t": 2.0,
+          "value": 63.974
+        },
+        {
+          "t": 2.25,
+          "value": 63.971
+        },
+        {
+          "t": 2.5,
+          "value": 63.968
+        },
+        {
+          "t": 2.75,
+          "value": 63.964
+        },
+        {
+          "t": 3.0,
+          "value": 63.961
+        },
+        {
+          "t": 3.25,
+          "value": 63.958
+        },
+        {
+          "t": 3.5,
+          "value": 63.955
+        },
+        {
+          "t": 3.75,
+          "value": 63.951
+        },
+        {
+          "t": 4.0,
+          "value": 63.948
+        },
+        {
+          "t": 4.25,
+          "value": 63.945
+        },
+        {
+          "t": 4.5,
+          "value": 63.941
+        },
+        {
+          "t": 4.75,
+          "value": 63.938
+        },
+        {
+          "t": 5.0,
+          "value": 63.935
+        },
+        {
+          "t": 5.25,
+          "value": 63.932
+        },
+        {
+          "t": 5.5,
+          "value": 63.928
+        },
+        {
+          "t": 5.75,
+          "value": 63.925
+        },
+        {
+          "t": 6.0,
+          "value": 63.922
+        },
+        {
+          "t": 6.25,
+          "value": 63.919
+        },
+        {
+          "t": 6.5,
+          "value": 63.916
+        },
+        {
+          "t": 6.75,
+          "value": 63.912
+        },
+        {
+          "t": 7.0,
+          "value": 63.909
+        },
+        {
+          "t": 7.25,
+          "value": 63.906
+        },
+        {
+          "t": 7.5,
+          "value": 63.903
+        },
+        {
+          "t": 7.75,
+          "value": 63.899
+        },
+        {
+          "t": 8.0,
+          "value": 63.896
+        },
+        {
+          "t": 8.25,
+          "value": 63.893
+        },
+        {
+          "t": 8.5,
+          "value": 63.889
+        },
+        {
+          "t": 8.75,
+          "value": 63.886
+        },
+        {
+          "t": 9.0,
+          "value": 63.883
+        },
+        {
+          "t": 9.25,
+          "value": 63.88
+        },
+        {
+          "t": 9.5,
+          "value": 63.877
+        },
+        {
+          "t": 9.75,
+          "value": 63.873
+        },
+        {
+          "t": 10.0,
+          "value": 63.87
+        },
+        {
+          "t": 10.25,
+          "value": 63.867
+        },
+        {
+          "t": 10.5,
+          "value": 63.864
+        },
+        {
+          "t": 10.75,
+          "value": 63.86
+        },
+        {
+          "t": 11.0,
+          "value": 63.857
+        },
+        {
+          "t": 11.25,
+          "value": 63.854
+        },
+        {
+          "t": 11.5,
+          "value": 63.85
+        },
+        {
+          "t": 11.75,
+          "value": 63.847
+        },
+        {
+          "t": 12.0,
+          "value": 63.844
+        },
+        {
+          "t": 12.25,
+          "value": 63.841
+        },
+        {
+          "t": 12.5,
+          "value": 63.837
+        },
+        {
+          "t": 12.75,
+          "value": 63.834
+        },
+        {
+          "t": 13.0,
+          "value": 63.831
+        },
+        {
+          "t": 13.25,
+          "value": 63.828
+        },
+        {
+          "t": 13.5,
+          "value": 63.825
+        },
+        {
+          "t": 13.75,
+          "value": 63.821
+        },
+        {
+          "t": 14.0,
+          "value": 63.818
+        },
+        {
+          "t": 14.25,
+          "value": 63.815
+        },
+        {
+          "t": 14.5,
+          "value": 63.812
+        },
+        {
+          "t": 14.75,
+          "value": 63.808
+        },
+        {
+          "t": 15.0,
+          "value": 63.805
+        },
+        {
+          "t": 15.25,
+          "value": 63.802
+        },
+        {
+          "t": 15.5,
+          "value": 63.798
+        },
+        {
+          "t": 15.75,
+          "value": 63.795
+        },
+        {
+          "t": 16.0,
+          "value": 63.792
+        },
+        {
+          "t": 16.25,
+          "value": 63.789
+        },
+        {
+          "t": 16.5,
+          "value": 63.785
+        },
+        {
+          "t": 16.75,
+          "value": 63.782
+        },
+        {
+          "t": 17.0,
+          "value": 63.779
+        },
+        {
+          "t": 17.25,
+          "value": 63.776
+        },
+        {
+          "t": 17.5,
+          "value": 63.773
+        },
+        {
+          "t": 17.75,
+          "value": 63.769
+        },
+        {
+          "t": 18.0,
+          "value": 63.766
+        },
+        {
+          "t": 18.25,
+          "value": 63.763
+        },
+        {
+          "t": 18.5,
+          "value": 63.76
+        },
+        {
+          "t": 18.75,
+          "value": 63.756
+        },
+        {
+          "t": 19.0,
+          "value": 63.753
+        },
+        {
+          "t": 19.25,
+          "value": 63.75
+        },
+        {
+          "t": 19.5,
+          "value": 63.746
+        },
+        {
+          "t": 19.75,
+          "value": 63.743
+        },
+        {
+          "t": 20.0,
+          "value": 63.74
+        },
+        {
+          "t": 20.25,
+          "value": 63.737
+        },
+        {
+          "t": 20.5,
+          "value": 63.733
+        },
+        {
+          "t": 20.75,
+          "value": 63.73
+        },
+        {
+          "t": 21.0,
+          "value": 63.727
+        },
+        {
+          "t": 21.25,
+          "value": 63.724
+        },
+        {
+          "t": 21.5,
+          "value": 63.721
+        },
+        {
+          "t": 21.75,
+          "value": 63.717
+        },
+        {
+          "t": 22.0,
+          "value": 63.714
+        },
+        {
+          "t": 22.25,
+          "value": 63.711
+        },
+        {
+          "t": 22.5,
+          "value": 63.708
+        },
+        {
+          "t": 22.75,
+          "value": 63.704
+        },
+        {
+          "t": 23.0,
+          "value": 63.701
+        },
+        {
+          "t": 23.25,
+          "value": 63.698
+        },
+        {
+          "t": 23.5,
+          "value": 63.694
+        },
+        {
+          "t": 23.75,
+          "value": 63.691
+        },
+        {
+          "t": 24.0,
+          "value": 63.688
+        },
+        {
+          "t": 24.25,
+          "value": 63.685
+        },
+        {
+          "t": 24.5,
+          "value": 63.681
+        },
+        {
+          "t": 24.75,
+          "value": 63.678
+        },
+        {
+          "t": 25.0,
+          "value": 63.675
+        },
+        {
+          "t": 25.25,
+          "value": 63.672
+        },
+        {
+          "t": 25.5,
+          "value": 63.669
+        },
+        {
+          "t": 25.75,
+          "value": 63.665
+        },
+        {
+          "t": 26.0,
+          "value": 63.662
+        },
+        {
+          "t": 26.25,
+          "value": 63.659
+        },
+        {
+          "t": 26.5,
+          "value": 63.656
+        },
+        {
+          "t": 26.75,
+          "value": 63.652
+        },
+        {
+          "t": 27.0,
+          "value": 63.649
+        },
+        {
+          "t": 27.25,
+          "value": 63.646
+        },
+        {
+          "t": 27.5,
+          "value": 63.642
+        },
+        {
+          "t": 27.75,
+          "value": 63.639
+        },
+        {
+          "t": 28.0,
+          "value": 63.636
+        },
+        {
+          "t": 28.25,
+          "value": 63.633
+        },
+        {
+          "t": 28.5,
+          "value": 63.63
+        },
+        {
+          "t": 28.75,
+          "value": 63.626
+        },
+        {
+          "t": 29.0,
+          "value": 63.623
+        },
+        {
+          "t": 29.25,
+          "value": 63.62
+        },
+        {
+          "t": 29.5,
+          "value": 63.617
+        },
+        {
+          "t": 29.75,
+          "value": 63.613
+        },
+        {
+          "t": 30.0,
+          "value": 63.61
+        },
+        {
+          "t": 30.25,
+          "value": 63.607
+        },
+        {
+          "t": 30.5,
+          "value": 63.603
+        },
+        {
+          "t": 30.75,
+          "value": 63.6
+        },
+        {
+          "t": 31.0,
+          "value": 63.597
+        },
+        {
+          "t": 31.25,
+          "value": 63.594
+        },
+        {
+          "t": 31.5,
+          "value": 63.59
+        },
+        {
+          "t": 31.75,
+          "value": 63.587
+        },
+        {
+          "t": 32.0,
+          "value": 63.584
+        },
+        {
+          "t": 32.25,
+          "value": 63.581
+        },
+        {
+          "t": 32.5,
+          "value": 63.578
+        },
+        {
+          "t": 32.75,
+          "value": 63.574
+        },
+        {
+          "t": 33.0,
+          "value": 63.571
+        },
+        {
+          "t": 33.25,
+          "value": 63.568
+        },
+        {
+          "t": 33.5,
+          "value": 63.565
+        },
+        {
+          "t": 33.75,
+          "value": 63.561
+        },
+        {
+          "t": 34.0,
+          "value": 63.558
+        },
+        {
+          "t": 34.25,
+          "value": 63.555
+        },
+        {
+          "t": 34.5,
+          "value": 63.551
+        },
+        {
+          "t": 34.75,
+          "value": 63.548
+        },
+        {
+          "t": 35.0,
+          "value": 63.545
+        },
+        {
+          "t": 35.25,
+          "value": 63.542
+        },
+        {
+          "t": 35.5,
+          "value": 63.538
+        },
+        {
+          "t": 35.75,
+          "value": 63.535
+        },
+        {
+          "t": 36.0,
+          "value": 63.532
+        },
+        {
+          "t": 36.25,
+          "value": 63.529
+        },
+        {
+          "t": 36.5,
+          "value": 63.526
+        },
+        {
+          "t": 36.75,
+          "value": 63.522
+        },
+        {
+          "t": 37.0,
+          "value": 63.519
+        },
+        {
+          "t": 37.25,
+          "value": 63.516
+        },
+        {
+          "t": 37.5,
+          "value": 63.513
+        },
+        {
+          "t": 37.75,
+          "value": 63.509
+        },
+        {
+          "t": 38.0,
+          "value": 63.506
+        },
+        {
+          "t": 38.25,
+          "value": 63.503
+        },
+        {
+          "t": 38.5,
+          "value": 63.499
+        },
+        {
+          "t": 38.75,
+          "value": 63.496
+        },
+        {
+          "t": 39.0,
+          "value": 63.493
+        },
+        {
+          "t": 39.25,
+          "value": 63.49
+        },
+        {
+          "t": 39.5,
+          "value": 63.486
+        },
+        {
+          "t": 39.75,
+          "value": 63.483
+        },
+        {
+          "t": 40.0,
+          "value": 63.48
+        },
+        {
+          "t": 40.25,
+          "value": 63.477
+        },
+        {
+          "t": 40.5,
+          "value": 63.474
+        },
+        {
+          "t": 40.75,
+          "value": 63.47
+        },
+        {
+          "t": 41.0,
+          "value": 63.467
+        },
+        {
+          "t": 41.25,
+          "value": 63.464
+        },
+        {
+          "t": 41.5,
+          "value": 63.461
+        },
+        {
+          "t": 41.75,
+          "value": 63.457
+        },
+        {
+          "t": 42.0,
+          "value": 63.454
+        },
+        {
+          "t": 42.25,
+          "value": 63.451
+        },
+        {
+          "t": 42.5,
+          "value": 63.447
+        },
+        {
+          "t": 42.75,
+          "value": 63.444
+        },
+        {
+          "t": 43.0,
+          "value": 63.441
+        },
+        {
+          "t": 43.25,
+          "value": 63.438
+        },
+        {
+          "t": 43.5,
+          "value": 63.434
+        },
+        {
+          "t": 43.75,
+          "value": 63.431
+        },
+        {
+          "t": 44.0,
+          "value": 63.428
+        },
+        {
+          "t": 44.25,
+          "value": 63.425
+        },
+        {
+          "t": 44.5,
+          "value": 63.422
+        },
+        {
+          "t": 44.75,
+          "value": 63.418
+        },
+        {
+          "t": 45.0,
+          "value": 63.415
+        },
+        {
+          "t": 45.25,
+          "value": 63.412
+        },
+        {
+          "t": 45.5,
+          "value": 63.408
+        },
+        {
+          "t": 45.75,
+          "value": 63.405
+        },
+        {
+          "t": 46.0,
+          "value": 63.402
+        },
+        {
+          "t": 46.25,
+          "value": 63.399
+        },
+        {
+          "t": 46.5,
+          "value": 63.395
+        },
+        {
+          "t": 46.75,
+          "value": 63.392
+        },
+        {
+          "t": 47.0,
+          "value": 63.389
+        },
+        {
+          "t": 47.25,
+          "value": 63.386
+        },
+        {
+          "t": 47.5,
+          "value": 63.383
+        },
+        {
+          "t": 47.75,
+          "value": 63.379
+        },
+        {
+          "t": 48.0,
+          "value": 63.376
+        },
+        {
+          "t": 48.25,
+          "value": 63.373
+        },
+        {
+          "t": 48.5,
+          "value": 63.37
+        },
+        {
+          "t": 48.75,
+          "value": 63.366
+        },
+        {
+          "t": 49.0,
+          "value": 63.363
+        },
+        {
+          "t": 49.25,
+          "value": 63.36
+        },
+        {
+          "t": 49.5,
+          "value": 63.356
+        },
+        {
+          "t": 49.75,
+          "value": 63.353
+        },
+        {
+          "t": 50.0,
+          "value": 63.35
+        },
+        {
+          "t": 50.25,
+          "value": 63.347
+        },
+        {
+          "t": 50.5,
+          "value": 63.343
+        },
+        {
+          "t": 50.75,
+          "value": 63.34
+        },
+        {
+          "t": 51.0,
+          "value": 63.337
+        },
+        {
+          "t": 51.25,
+          "value": 63.334
+        },
+        {
+          "t": 51.5,
+          "value": 63.331
+        },
+        {
+          "t": 51.75,
+          "value": 63.327
+        },
+        {
+          "t": 52.0,
+          "value": 63.324
+        },
+        {
+          "t": 52.25,
+          "value": 63.321
+        },
+        {
+          "t": 52.5,
+          "value": 63.318
+        },
+        {
+          "t": 52.75,
+          "value": 63.314
+        },
+        {
+          "t": 53.0,
+          "value": 63.311
+        },
+        {
+          "t": 53.25,
+          "value": 63.308
+        },
+        {
+          "t": 53.5,
+          "value": 63.304
+        },
+        {
+          "t": 53.75,
+          "value": 63.301
+        },
+        {
+          "t": 54.0,
+          "value": 63.298
+        },
+        {
+          "t": 54.25,
+          "value": 63.295
+        },
+        {
+          "t": 54.5,
+          "value": 63.291
+        },
+        {
+          "t": 54.75,
+          "value": 63.288
+        },
+        {
+          "t": 55.0,
+          "value": 63.285
+        },
+        {
+          "t": 55.25,
+          "value": 63.282
+        },
+        {
+          "t": 55.5,
+          "value": 63.279
+        },
+        {
+          "t": 55.75,
+          "value": 63.275
+        },
+        {
+          "t": 56.0,
+          "value": 63.272
+        },
+        {
+          "t": 56.25,
+          "value": 63.269
+        },
+        {
+          "t": 56.5,
+          "value": 63.266
+        },
+        {
+          "t": 56.75,
+          "value": 63.262
+        },
+        {
+          "t": 57.0,
+          "value": 63.259
+        },
+        {
+          "t": 57.25,
+          "value": 63.256
+        },
+        {
+          "t": 57.5,
+          "value": 63.252
+        },
+        {
+          "t": 57.75,
+          "value": 63.249
+        },
+        {
+          "t": 58.0,
+          "value": 63.246
+        },
+        {
+          "t": 58.25,
+          "value": 63.243
+        },
+        {
+          "t": 58.5,
+          "value": 63.239
+        },
+        {
+          "t": 58.75,
+          "value": 63.236
+        },
+        {
+          "t": 59.0,
+          "value": 63.233
+        },
+        {
+          "t": 59.25,
+          "value": 63.23
+        },
+        {
+          "t": 59.5,
+          "value": 63.227
+        },
+        {
+          "t": 59.75,
+          "value": 63.223
+        },
+        {
+          "t": 60.0,
+          "value": 63.22
+        },
+        {
+          "t": 60.25,
+          "value": 63.217
+        },
+        {
+          "t": 60.5,
+          "value": 63.214
+        },
+        {
+          "t": 60.75,
+          "value": 63.21
+        },
+        {
+          "t": 61.0,
+          "value": 63.207
+        },
+        {
+          "t": 61.25,
+          "value": 63.204
+        },
+        {
+          "t": 61.5,
+          "value": 63.2
+        },
+        {
+          "t": 61.75,
+          "value": 63.197
+        },
+        {
+          "t": 62.0,
+          "value": 63.194
+        },
+        {
+          "t": 62.25,
+          "value": 63.191
+        },
+        {
+          "t": 62.5,
+          "value": 63.188
+        },
+        {
+          "t": 62.75,
+          "value": 63.184
+        },
+        {
+          "t": 63.0,
+          "value": 63.181
+        },
+        {
+          "t": 63.25,
+          "value": 63.178
+        },
+        {
+          "t": 63.5,
+          "value": 63.175
+        },
+        {
+          "t": 63.75,
+          "value": 63.171
+        },
+        {
+          "t": 64.0,
+          "value": 63.168
+        },
+        {
+          "t": 64.25,
+          "value": 63.165
+        },
+        {
+          "t": 64.5,
+          "value": 63.161
+        },
+        {
+          "t": 64.75,
+          "value": 63.158
+        },
+        {
+          "t": 65.0,
+          "value": 63.155
+        },
+        {
+          "t": 65.25,
+          "value": 63.152
+        },
+        {
+          "t": 65.5,
+          "value": 63.148
+        },
+        {
+          "t": 65.75,
+          "value": 63.145
+        },
+        {
+          "t": 66.0,
+          "value": 63.142
+        },
+        {
+          "t": 66.25,
+          "value": 63.139
+        },
+        {
+          "t": 66.5,
+          "value": 63.136
+        },
+        {
+          "t": 66.75,
+          "value": 63.132
+        },
+        {
+          "t": 67.0,
+          "value": 63.129
+        },
+        {
+          "t": 67.25,
+          "value": 63.126
+        },
+        {
+          "t": 67.5,
+          "value": 63.123
+        },
+        {
+          "t": 67.75,
+          "value": 63.119
+        },
+        {
+          "t": 68.0,
+          "value": 63.116
+        },
+        {
+          "t": 68.25,
+          "value": 63.113
+        },
+        {
+          "t": 68.5,
+          "value": 63.109
+        },
+        {
+          "t": 68.75,
+          "value": 63.106
+        },
+        {
+          "t": 69.0,
+          "value": 63.103
+        },
+        {
+          "t": 69.25,
+          "value": 63.1
+        },
+        {
+          "t": 69.5,
+          "value": 63.096
+        },
+        {
+          "t": 69.75,
+          "value": 63.093
+        },
+        {
+          "t": 70.0,
+          "value": 63.09
+        }
+      ]
+    },
+    {
+      "channel": "planner_state",
+      "unit": "",
+      "samples": [
+        {
+          "t": 0.0,
+          "value": "executing"
+        },
+        {
+          "t": 34.0,
+          "value": "degraded"
+        },
+        {
+          "t": 60.0,
+          "value": "failed"
+        }
+      ]
+    },
+    {
+      "channel": "recovery_count",
+      "unit": "",
+      "samples": [
+        {
+          "t": 0.0,
+          "value": 0.0
+        }
+      ]
+    }
+  ]
+}
