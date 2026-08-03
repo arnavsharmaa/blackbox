@@ -249,6 +249,7 @@ class IncidentSummary(BaseModel):
     software_version: str
     summary: str
     event_count: int
+    recovery_attempts: int
     failure_category: FailureCategory | None = None
     confidence: float | None = None
 

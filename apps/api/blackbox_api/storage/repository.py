@@ -191,6 +191,12 @@ class IncidentRepository:
                     EventRow.incident_id == row.id
                 )
             )
+            recovery_attempts = self.session.scalar(
+                select(func.count(EventRow.id)).where(
+                    EventRow.incident_id == row.id,
+                    EventRow.event_type == "recovery_started",
+                )
+            )
             analysis = (
                 AnalysisResult.model_validate_json(row.analysis.result_json)
                 if row.analysis
@@ -211,6 +217,7 @@ class IncidentRepository:
                     software_version=row.software_version,
                     summary=row.summary,
                     event_count=event_count or 0,
+                    recovery_attempts=recovery_attempts or 0,
                     failure_category=analysis.failure_category if analysis else None,
                     confidence=analysis.confidence if analysis else None,
                 )
