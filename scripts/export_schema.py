@@ -8,13 +8,16 @@ non-Python consumers can validate incidents against the same contract.
 from __future__ import annotations
 
 import json
+import sys
 from pathlib import Path
 
-from pydantic.json_schema import models_json_schema
-
-from blackbox_api.schemas import AnalysisResult, Incident
-
 REPO_ROOT = Path(__file__).resolve().parent.parent
+# Works without an installed blackbox-api package (e.g. plain `python3`).
+sys.path.insert(0, str(REPO_ROOT / "apps" / "api"))
+
+from pydantic.json_schema import models_json_schema  # noqa: E402
+
+from blackbox_api.schemas import AnalysisResult, Incident  # noqa: E402
 OUT = REPO_ROOT / "packages" / "schemas" / "incident.schema.json"
 
 

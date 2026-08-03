@@ -1,0 +1,11 @@
+timestamp,event_type,subsystem,severity,message,payload,correlation_id,evidence_tags
+2026-07-20T08:00:00Z,task_started,task_manager,info,Task 'Move pallet to staging' started,"{""task"": ""move_pallet""}",TASK-1001,
+2026-07-20T08:00:01Z,nav_goal_issued,navigation,info,"Navigation goal issued: staging area (12.00, 4.00)","{""goal_x"": 12.0, ""goal_y"": 4.0}",TASK-1001,
+2026-07-20T08:00:02Z,planner_state_changed,planner,info,Planner state: executing,"{""state"": ""executing""}",TASK-1001,
+2026-07-20T08:00:10Z,velocity_command,controller,info,cmd_vel linear=0.70 m/s,"{""linear"": 0.7, ""angular"": 0.0}",TASK-1001,
+2026-07-20T08:00:30Z,warning_raised,perception,warning,Obstacle 0.55 m ahead,"{""distance_m"": 0.55}",TASK-1001,obstacle;safety_threshold
+2026-07-20T08:00:31Z,velocity_command,controller,info,cmd_vel linear=0.00 m/s (blocked),"{""linear"": 0.0, ""angular"": 0.0}",TASK-1001,zero_velocity
+2026-07-20T08:00:40Z,recovery_started,planner,warning,Recovery behavior started: rotate_in_place,"{""behavior"": ""rotate_in_place"", ""attempt"": 1}",TASK-1001,recovery
+2026-07-20T08:00:48Z,recovery_completed,planner,warning,Recovery rotate_in_place completed: no clear path,"{""behavior"": ""rotate_in_place"", ""attempt"": 1, ""success"": false}",TASK-1001,recovery
+2026-07-20T08:01:20Z,task_timed_out,task_manager,error,Task timed out after 80 s,"{""timeout_s"": 80}",TASK-1001,timeout
+2026-07-20T08:01:21Z,task_failed,task_manager,critical,Task failed: navigation timeout,"{""reason"": ""navigation_timeout""}",TASK-1001,timeout

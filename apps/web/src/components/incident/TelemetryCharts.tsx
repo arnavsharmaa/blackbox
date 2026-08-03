@@ -146,6 +146,12 @@ function ChannelChart({
   );
 }
 
+/** Keeps small-range axes (e.g. confidence 0.95–0.99) distinguishable. */
+function formatTick(value: number): string {
+  const text = Math.abs(value) >= 100 ? value.toFixed(0) : value.toFixed(2);
+  return text.replace(/\.?0+$/, "") || "0";
+}
+
 /**
  * The chart body never changes during replay — memoized so only the cheap
  * cursor overlay updates each frame.
@@ -174,7 +180,7 @@ const StaticChart = memo(function StaticChart({
           tick={{ fill: "#5d6875", fontSize: 10 }}
           tickLine={false}
           axisLine={{ stroke: "#232b36" }}
-          tickFormatter={(v: number) => v.toFixed(1)}
+          tickFormatter={formatTick}
           domain={["auto", "auto"]}
         />
         {spec.threshold !== undefined && (

@@ -14,6 +14,8 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO_ROOT / "packages" / "sample-data"))
+# Works without an installed blackbox-api package (e.g. plain `python3`).
+sys.path.insert(0, str(REPO_ROOT / "apps" / "api"))
 
 import generate  # noqa: E402  (packages/sample-data/generate.py)
 
