@@ -10,13 +10,18 @@ from blackbox_api.analysis.engine import analyze_incident
 from blackbox_api.ingestion.base import IncidentAdapter, IngestError
 from blackbox_api.ingestion.csv_adapter import CsvIncidentAdapter
 from blackbox_api.ingestion.json_adapter import JsonIncidentAdapter
+from blackbox_api.ingestion.rosbag2_adapter import Rosbag2Adapter
 from blackbox_api.logging import log
 from blackbox_api.schemas import AnalysisResult, Incident
 from blackbox_api.storage.repository import IncidentRepository
 
 logger = logging.getLogger("blackbox.ingestion")
 
-ADAPTERS: tuple[IncidentAdapter, ...] = (JsonIncidentAdapter(), CsvIncidentAdapter())
+ADAPTERS: tuple[IncidentAdapter, ...] = (
+    JsonIncidentAdapter(),
+    CsvIncidentAdapter(),
+    Rosbag2Adapter(),
+)
 
 MAX_UPLOAD_BYTES = 20 * 1024 * 1024
 

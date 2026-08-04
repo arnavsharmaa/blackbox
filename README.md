@@ -85,9 +85,11 @@ and guarded against drift by
 - **Ingestion with useful errors** — JSON and normalized-CSV uploads are
   validated against the canonical schema; malformed input returns
   field-level errors (HTTP 422), never a stack trace.
-- **ROS 2-ready** — documented adapter interface, topic mapping, pure
-  conversion helpers, and an example live recorder node. ROS is *not*
-  required to run BlackBox.
+- **ROS 2 bag ingestion** — upload a rosbag2 MCAP recording directly
+  (`ros2 bag record -s mcap`); decoding is pure Python, so ROS is *not*
+  required to run BlackBox. Plus a documented adapter interface, topic
+  mapping, and an example live recorder node. `make demo-bag` generates a
+  sample bag to try.
 
 ## Demo scenario
 
@@ -177,7 +179,7 @@ Interactive docs at http://localhost:8000/docs.
 | `POST /api/incidents/{id}/reanalyze` | Re-run the rules engine |
 | `GET /api/incidents/{id}/report` | Structured report + Markdown |
 | `GET /api/incidents/{id}/github-issue` | Issue title/body/labels (`?repo=owner/repo` adds a prefilled URL) |
-| `POST /api/incidents/upload` | Multipart upload of `.json` (full incident) or `.csv` (events + `metadata` form field) |
+| `POST /api/incidents/upload` | Multipart upload of `.json` (full incident), `.csv` (events + `metadata` form field), or `.mcap` (ROS 2 bag + `metadata` with at least `id` and `robot_id`) |
 
 Invalid uploads return `422` with `{"message", "errors": [{field, error, input_preview}]}`.
 
@@ -234,18 +236,22 @@ without a key.
 
 ROS 2 is not required. The path from a live robot or bag file:
 
-1. **Adapter interface** — [robotics/adapters/README.md](robotics/adapters/README.md)
-   documents `IncidentAdapter`; new formats plug into the same
-   validate→persist→analyze pipeline.
-2. **Topic mapping** — `/odom`, `/cmd_vel`, `/scan`, `/amcl_pose`,
-   `/navigate_to_pose/_action/status`, `/behavior_tree_log`, `/diagnostics`
-   map to canonical channels/events; pure, ROS-free conversion helpers live
-   in [ros2_topic_mapping.py](robotics/adapters/ros2_topic_mapping.py).
-3. **Live recorder** — [robotics/ros2/blackbox_recorder.py](robotics/ros2/blackbox_recorder.py)
+1. **rosbag2 (MCAP) ingestion — implemented.** Upload a `.mcap` bag to
+   `POST /api/incidents/upload` with a small metadata JSON (`id`,
+   `robot_id`, optional overrides); the adapter decodes `/odom`, `/cmd_vel`,
+   `/scan`, `/amcl_pose`, and `/navigate_to_pose/_action/status` with
+   pure-Python `mcap-ros2-support`, derives the outcome from the terminal
+   goal status, and runs the normal validate→persist→analyze pipeline.
+   `make demo-bag` writes a deterministic sample bag and prints the upload
+   command.
+2. **Adapter interface** — [robotics/adapters/README.md](robotics/adapters/README.md)
+   documents `IncidentAdapter`; new formats plug into the same pipeline.
+3. **Topic mapping** — pure, ROS-free conversion helpers live in
+   [ros2_mapping.py](apps/api/blackbox_api/ros2_mapping.py) (re-exported for
+   ROS environments via `robotics/adapters/ros2_topic_mapping.py`).
+4. **Live recorder** — [robotics/ros2/blackbox_recorder.py](robotics/ros2/blackbox_recorder.py)
    is an example `rclpy` node that buffers canonical samples and POSTs an
    incident when a Nav2 goal aborts.
-4. **rosbag2** — the batch-ingestion plan (bag slicing, downsampling) is in
-   [robotics/adapters/README.md](robotics/adapters/README.md).
 
 ## Testing
 
@@ -271,7 +277,10 @@ event inspector, and report rendering.
   deployment would want Postgres and migrations.
 - Telemetry is stored row-per-sample; fine at demo scale, but long incidents
   would warrant chunked storage.
-- rosbag2 ingestion is documented and mapped but not implemented; the live
+- rosbag2 ingestion supports the MCAP storage format and the five core
+  Nav2 topics; `/behavior_tree_log` (recovery events), `/diagnostics`, and
+  the sqlite3 (`.db3`) storage plugin are not handled yet, and it has been
+  validated against synthetic bags, not hardware recordings. The live
   recorder node is an example, untested against real hardware.
 - The AI layer supports the Anthropic API only (an OpenAI client would be a
   small addition to `blackbox_api/ai/explain.py`).
@@ -282,7 +291,8 @@ event inspector, and report rendering.
 
 ## Roadmap
 
-- rosbag2/MCAP batch adapter built on the existing topic mapping
+- rosbag2 adapter coverage: `/behavior_tree_log`, `/diagnostics`, `.db3`
+  storage, goal-distance derivation
 - Cross-incident analytics: recurring blockage locations, failure trends per
   software version
 - Rule plug-ins with per-facility thresholds

@@ -38,8 +38,17 @@ ros2 bag record /odom /cmd_vel /scan /amcl_pose \
     /navigate_to_pose/_action/status /behavior_tree_log /diagnostics
 ```
 
-Then follow the batch-adapter plan in
-[`../adapters/README.md`](../adapters/README.md#practical-rosbag2-ingestion-plan):
-read the bag with `rosbag2_py`, slice around the failed goal, downsample, and
-POST the resulting JSON. The conversion math is already in
-`ros2_topic_mapping.py`; the remaining work is bag iteration and time slicing.
+Record with MCAP storage (`-s mcap`, the default on recent distros), then
+upload the `.mcap` file directly — the rosbag2 adapter is implemented:
+
+```bash
+curl -X POST http://localhost:8000/api/incidents/upload \
+  -F "file=@rosbag2_.../rosbag2_..._0.mcap" \
+  -F 'metadata={"id": "INC-BAG-001", "robot_id": "W-104"}'
+```
+
+No ROS installation is needed on the BlackBox side. To try the path without a
+robot, `make demo-bag` generates a deterministic sample bag and prints the
+upload command. See
+[`../adapters/README.md`](../adapters/README.md#how-the-rosbag2-adapter-works)
+for supported topics and remaining work.

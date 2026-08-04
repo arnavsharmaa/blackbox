@@ -27,13 +27,15 @@ extension and error handling come for free.
 | --- | --- | --- |
 | `JsonIncidentAdapter` | `.json` | Full canonical incident document |
 | `CsvIncidentAdapter` | `.csv` | Normalized event stream + metadata JSON (see [`normalized-events.example.csv`](../sample-incidents/normalized-events.example.csv)) |
+| `Rosbag2Adapter` | `.mcap` | ROS 2 bags in MCAP format (`ros2 bag record -s mcap`); decoded with pure-Python `mcap-ros2-support`, no ROS install needed. Requires metadata with at least `id` and `robot_id`. Try it: `make demo-bag`. |
 
 ## ROS 2 topic mapping
 
-A future `Rosbag2Adapter` should map common Nav2-stack topics onto the
-canonical schema like this. `ros2_topic_mapping.py` in this directory encodes
-the same table as data plus pure conversion helpers you can unit-test without
-ROS installed.
+`Rosbag2Adapter` maps common Nav2-stack topics onto the canonical schema as
+below. The pure conversion helpers live in
+`apps/api/blackbox_api/ros2_mapping.py` (stdlib-only, unit-testable without
+ROS); `ros2_topic_mapping.py` in this directory is a compatibility shim that
+re-exports them for the live recorder node.
 
 | ROS 2 topic | Message type | Canonical target |
 | --- | --- | --- |
@@ -45,20 +47,18 @@ ROS installed.
 | `/behavior_tree_log` | `nav2_msgs/BehaviorTreeLog` | `planner_state_changed`, `recovery_started`, `recovery_completed` events + `planner_state` / `recovery_count` telemetry |
 | `/diagnostics` | `diagnostic_msgs/DiagnosticArray` | `warning_raised` / `error_raised` events with `evidence_tags` from hardware IDs |
 
-### Practical rosbag2 ingestion plan
+### How the rosbag2 adapter works
 
-1. Read the bag with `rosbag2_py.SequentialReader` (or `mcap` directly) —
-   offline, no ROS graph needed.
-2. Slice the bag around the failure: from `task_started` (first accepted
-   `navigate_to_pose` goal) to terminal goal status, plus a configurable
-   pre-roll.
-3. Downsample continuous topics to ~5 Hz into telemetry samples with
-   `t = stamp - start_stamp`.
-4. Emit events per the table above; carry the raw message (as a dict) in
-   `payload` for the event inspector.
-5. Validate through `Incident.model_validate` and POST the JSON to
-   `/api/incidents/upload` — nothing else in BlackBox needs to know the data
-   came from a bag.
+`blackbox_api/ingestion/rosbag2_adapter.py` reads the MCAP container with
+`mcap` + `mcap-ros2-support` (CDR decoding via the message definitions
+embedded in the bag — offline, no ROS graph needed), downsamples continuous
+topics to replay-friendly rates, derives the outcome from the terminal
+`navigate_to_pose` goal status, and validates the result through
+`Incident.model_validate` like every other adapter. Supported topics today:
+`/odom`, `/cmd_vel`, `/scan`, `/amcl_pose`,
+`/navigate_to_pose/_action/status`. Remaining work: `/behavior_tree_log`
+(recovery events), `/diagnostics` (sensor-staleness warnings), goal-distance
+derivation from the goal pose, and the sqlite3 (`.db3`) storage plugin.
 
 See [`../ros2/README.md`](../ros2/README.md) for the live recorder-node
 example.

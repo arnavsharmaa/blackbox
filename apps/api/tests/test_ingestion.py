@@ -40,8 +40,9 @@ CSV_BODY = (
 def test_adapter_selection() -> None:
     assert adapter_for_filename("incident.json").name == "json"
     assert adapter_for_filename("events.CSV").name == "csv"
+    assert adapter_for_filename("rosbag2_0.mcap").name == "rosbag2"
     with pytest.raises(IngestError, match="unsupported file type"):
-        adapter_for_filename("bag.mcap")
+        adapter_for_filename("bag.db3")
 
 
 def test_json_adapter_roundtrip(sample_incidents: dict[str, dict]) -> None:

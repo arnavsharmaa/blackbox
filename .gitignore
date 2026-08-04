@@ -25,3 +25,4 @@ data/*.db-journal
 .DS_Store
 .idea/
 .vscode/
+packages/sample-data/demo-capture.mcap
