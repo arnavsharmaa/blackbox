@@ -26,3 +26,6 @@ data/*.db-journal
 .idea/
 .vscode/
 packages/sample-data/demo-capture.mcap
+
+# Local tooling
+.claude/
