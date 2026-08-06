@@ -274,7 +274,7 @@ event inspector, and report rendering.
 ## Limitations
 
 - SQLite + `create_all` initialization — right for a local MVP; a real
-  deployment would want Postgres and migrations.
+  deployment would want Postgres and migrations (coming soon).
 - Telemetry is stored row-per-sample; fine at demo scale, but long incidents
   would warrant chunked storage.
 - rosbag2 ingestion supports the MCAP storage format and the five core
