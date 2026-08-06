@@ -1,5 +1,7 @@
 # BlackBox
 
+[![CI](https://github.com/arnavsharmaa/blackbox/actions/workflows/ci.yml/badge.svg)](https://github.com/arnavsharmaa/blackbox/actions/workflows/ci.yml)
+
 **BlackBox reconstructs robot failures from telemetry, planner decisions, sensor streams, and controller actions—then produces a replayable, evidence-backed incident report.**
 
 BlackBox is a flight recorder and incident-reconstruction platform for
@@ -29,7 +31,8 @@ root cause and the product is fully useful without any API key.
 ```mermaid
 flowchart LR
     subgraph Sources
-        R[ROS 2 topics / rosbag2] -.future adapter.-> ING
+        R[rosbag2 MCAP bags] --> ING
+        L[ROS 2 live recorder] -.example node.-> ING
         J[Incident JSON] --> ING
         C[Normalized CSV events] --> ING
         S[Seed script] --> ING

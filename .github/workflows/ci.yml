@@ -1,0 +1,70 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  backend:
+    name: Backend (pytest, ruff, mypy)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install
+        run: pip install -e "apps/api[dev]"
+      - name: Lint
+        working-directory: apps/api
+        run: ruff check blackbox_api tests
+      - name: Type check
+        working-directory: apps/api
+        run: mypy blackbox_api
+      - name: Test
+        working-directory: apps/api
+        run: pytest -q
+
+  frontend:
+    name: Frontend (vitest, eslint, tsc, build)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install
+        run: npm ci --no-audit --no-fund
+      - name: Lint
+        run: npm run lint
+      - name: Type check
+        run: npm run typecheck
+      - name: Test
+        run: npm run test
+      - name: Build
+        run: npm run build
+
+  docker:
+    name: Docker compose + smoke test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build and start the stack
+        run: docker compose up --build -d
+      - name: Wait for API health
+        run: |
+          timeout 120 bash -c 'until curl -sf http://localhost:8000/health; do sleep 3; done'
+      - name: Wait for web
+        run: |
+          timeout 120 bash -c 'until curl -sf http://localhost:3000 > /dev/null; do sleep 3; done'
+      - name: End-to-end smoke test
+        run: python3 scripts/smoke.py
+      - name: Show logs on failure
+        if: failure()
+        run: docker compose logs
+      - name: Tear down
+        if: always()
+        run: docker compose down -v
