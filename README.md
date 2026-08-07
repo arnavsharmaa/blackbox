@@ -227,9 +227,11 @@ guidance — the engine does not guess.
 
 ### Optional AI explanation
 
-If `ANTHROPIC_API_KEY` is set (and `pip install -e "apps/api[ai]"`),
-`GET /api/incidents/{id}/analysis?ai=true` attaches a short AI-generated
-summary. The prompt contains only the structured analysis and its evidence,
+If `ANTHROPIC_API_KEY` or `OPENAI_API_KEY` is set (and
+`pip install -e "apps/api[ai]"`), `GET /api/incidents/{id}/analysis?ai=true`
+attaches a short AI-generated summary (Anthropic is preferred when both keys
+are present; override models with `BLACKBOX_AI_ANTHROPIC_MODEL` /
+`BLACKBOX_AI_OPENAI_MODEL`). The prompt contains only the structured analysis and its evidence,
 forbids unsupported conclusions, and the response is validated (length,
 on-category) before being stored; it is always labeled as AI-generated in the
 UI and report, and everything falls back to the deterministic explanation
@@ -286,8 +288,6 @@ event inspector, and report rendering.
   yet, and it has been validated against synthetic bags, not hardware
   recordings. The live recorder node is an example, untested against real
   hardware.
-- The AI layer supports the Anthropic API only (an OpenAI client would be a
-  small addition to `blackbox_api/ai/explain.py`).
 - No authentication — BlackBox assumes a trusted network.
 - `docker compose` config is provided but was not runnable in this
   development environment (no Docker daemon); validate on a machine with

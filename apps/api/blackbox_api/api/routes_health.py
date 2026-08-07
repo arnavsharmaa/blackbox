@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy import select, text
 from sqlalchemy.orm import Session
 
-from blackbox_api.ai.explain import ai_available
+from blackbox_api.ai.explain import ai_provider
 from blackbox_api.analysis.engine import ENGINE_VERSION
 from blackbox_api.schemas import SCHEMA_VERSION
 from blackbox_api.storage.db import get_db
@@ -24,5 +24,5 @@ def health(db: Annotated[Session, Depends(get_db)]) -> dict[str, str | int]:
         "schema_version": SCHEMA_VERSION,
         "engine_version": ENGINE_VERSION,
         "incidents": incident_count,
-        "ai_explanations": "available" if ai_available() else "disabled",
+        "ai_explanations": ai_provider() or "disabled",
     }

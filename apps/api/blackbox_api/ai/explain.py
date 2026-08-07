@@ -1,8 +1,9 @@
 """Optional AI explanation layer.
 
-Converts the deterministic AnalysisResult into a short prose summary using the
-Anthropic API when ANTHROPIC_API_KEY is set (install with `pip install
-'blackbox-api[ai]'`). The LLM never determines the root cause — it may only
+Converts the deterministic AnalysisResult into a short prose summary using an
+LLM when an API key is present (install SDKs with `pip install
+'blackbox-api[ai]'`). ANTHROPIC_API_KEY is preferred; OPENAI_API_KEY is the
+fallback provider. The LLM never determines the root cause — it may only
 restate facts present in the structured analysis, and its output is validated
 before being attached. When no key or SDK is available, callers fall back to
 the deterministic explanation.
@@ -18,7 +19,8 @@ from blackbox_api.schemas import AnalysisResult, Incident
 
 logger = logging.getLogger("blackbox.ai")
 
-MODEL = "claude-opus-5"
+ANTHROPIC_MODEL = os.environ.get("BLACKBOX_AI_ANTHROPIC_MODEL", "claude-opus-5")
+OPENAI_MODEL = os.environ.get("BLACKBOX_AI_OPENAI_MODEL", "gpt-4o")
 MAX_SUMMARY_CHARS = 2000
 
 SYSTEM_PROMPT = (
@@ -32,14 +34,27 @@ SYSTEM_PROMPT = (
 )
 
 
+def ai_provider() -> str | None:
+    """The usable provider: 'anthropic' preferred, then 'openai', else None."""
+    if os.environ.get("ANTHROPIC_API_KEY"):
+        try:
+            import anthropic  # noqa: F401
+
+            return "anthropic"
+        except ImportError:
+            pass
+    if os.environ.get("OPENAI_API_KEY"):
+        try:
+            import openai  # noqa: F401
+
+            return "openai"
+        except ImportError:
+            pass
+    return None
+
+
 def ai_available() -> bool:
-    if not os.environ.get("ANTHROPIC_API_KEY"):
-        return False
-    try:
-        import anthropic  # noqa: F401
-    except ImportError:
-        return False
-    return True
+    return ai_provider() is not None
 
 
 def _build_prompt(incident: Incident, analysis: AnalysisResult) -> str:
@@ -83,31 +98,61 @@ def _validate_summary(text: str, analysis: AnalysisResult) -> str | None:
     return text
 
 
+def _anthropic_summary(prompt: str) -> str:
+    import anthropic
+
+    client = anthropic.Anthropic()
+    response = client.messages.create(
+        model=ANTHROPIC_MODEL,
+        max_tokens=1024,
+        system=SYSTEM_PROMPT,
+        messages=[{"role": "user", "content": prompt}],
+    )
+    if response.stop_reason == "refusal":
+        return ""
+    return next((b.text for b in response.content if b.type == "text"), "")
+
+
+def _openai_summary(prompt: str) -> str:
+    import openai
+
+    client = openai.OpenAI()
+    response = client.chat.completions.create(
+        model=OPENAI_MODEL,
+        max_tokens=1024,
+        messages=[
+            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "user", "content": prompt},
+        ],
+    )
+    return response.choices[0].message.content or ""
+
+
 def generate_ai_explanation(
     incident: Incident, analysis: AnalysisResult
 ) -> str | None:
     """Return a validated AI summary, or None if unavailable/invalid."""
-    if not ai_available():
+    provider = ai_provider()
+    if provider is None:
         return None
-    import anthropic
-
+    prompt = _build_prompt(incident, analysis)
     try:
-        client = anthropic.Anthropic()
-        response = client.messages.create(
-            model=MODEL,
-            max_tokens=1024,
-            system=SYSTEM_PROMPT,
-            messages=[{"role": "user", "content": _build_prompt(incident, analysis)}],
+        text = (
+            _anthropic_summary(prompt)
+            if provider == "anthropic"
+            else _openai_summary(prompt)
         )
-    except anthropic.APIError as exc:
-        log(logger, logging.WARNING, "AI explanation failed", error=str(exc))
+    except Exception as exc:  # SDK-specific errors vary; log and degrade
+        log(
+            logger, logging.WARNING, "AI explanation failed",
+            provider=provider, error=str(exc),
+        )
         return None
-    if response.stop_reason == "refusal":
-        log(logger, logging.WARNING, "AI explanation refused")
-        return None
-    text = next((b.text for b in response.content if b.type == "text"), "")
     summary = _validate_summary(text, analysis)
     if summary is None:
-        log(logger, logging.WARNING, "AI explanation failed validation")
+        log(
+            logger, logging.WARNING, "AI explanation failed validation",
+            provider=provider,
+        )
         return None
     return summary
