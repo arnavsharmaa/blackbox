@@ -280,11 +280,12 @@ event inspector, and report rendering.
   deployment would want Postgres and migrations (coming soon).
 - Telemetry is stored row-per-sample; fine at demo scale, but long incidents
   would warrant chunked storage.
-- rosbag2 ingestion supports the MCAP storage format and the five core
-  Nav2 topics; `/behavior_tree_log` (recovery events), `/diagnostics`, and
-  the sqlite3 (`.db3`) storage plugin are not handled yet, and it has been
-  validated against synthetic bags, not hardware recordings. The live
-  recorder node is an example, untested against real hardware.
+- rosbag2 ingestion supports the MCAP storage format and the six core
+  Nav2 topics (including `/behavior_tree_log` recovery/planner events);
+  `/diagnostics` and the sqlite3 (`.db3`) storage plugin are not handled
+  yet, and it has been validated against synthetic bags, not hardware
+  recordings. The live recorder node is an example, untested against real
+  hardware.
 - The AI layer supports the Anthropic API only (an OpenAI client would be a
   small addition to `blackbox_api/ai/explain.py`).
 - No authentication — BlackBox assumes a trusted network.
@@ -294,8 +295,8 @@ event inspector, and report rendering.
 
 ## Roadmap
 
-- rosbag2 adapter coverage: `/behavior_tree_log`, `/diagnostics`, `.db3`
-  storage, goal-distance derivation
+- rosbag2 adapter coverage: `/diagnostics`, `.db3` storage, goal-distance
+  derivation
 - Cross-incident analytics: recurring blockage locations, failure trends per
   software version
 - Rule plug-ins with per-facility thresholds

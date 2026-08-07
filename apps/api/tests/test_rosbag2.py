@@ -41,14 +41,30 @@ def test_bag_parses_to_canonical_incident(bag_bytes: bytes) -> None:
     channels = {series.channel.value for series in incident.telemetry}
     assert {
         "pos_x", "pos_y", "heading", "linear_velocity", "angular_velocity",
-        "obstacle_distance", "localization_confidence",
+        "obstacle_distance", "localization_confidence", "planner_state",
+        "recovery_count",
     } <= channels
 
     event_types = {event.event_type.value for event in incident.events}
     assert {
         "task_started", "nav_goal_issued", "velocity_command",
-        "pose_updated", "task_failed",
+        "pose_updated", "task_failed", "recovery_started",
+        "recovery_completed", "planner_state_changed",
     } <= event_types
+
+    # The behavior-tree log yields three failed recoveries and a replan.
+    recoveries = [
+        e for e in incident.events if e.event_type.value == "recovery_started"
+    ]
+    assert [e.payload["behavior"] for e in recoveries] == [
+        "Spin", "BackUp", "Wait",
+    ]
+    states = next(
+        s for s in incident.telemetry if s.channel.value == "planner_state"
+    )
+    assert [sample.value for sample in states.samples] == [
+        "planning", "executing", "replanning",
+    ]
 
     # Obstacle clearance drops to 0.5 m once the obstacle appears at t=12 s.
     obstacle = next(
@@ -64,8 +80,13 @@ def test_bag_incident_gets_obstacle_diagnosis(bag_bytes: bytes) -> None:
     incident = Rosbag2Adapter().parse(bag_bytes, metadata=METADATA)
     analysis = analyze_incident(incident)
     assert analysis.failure_category == FailureCategory.PERSISTENT_OBSTACLE
+    # Recovery evidence from the behavior-tree log lifts confidence well
+    # above what odometry/scan/cmd_vel alone can support.
+    assert analysis.confidence >= 0.75
     summaries = " | ".join(item.summary for item in analysis.evidence)
     assert "zero-velocity commands" in summaries
+    assert "3 recovery behaviors were attempted" in summaries
+    assert "Spin, BackUp, Wait" in summaries
 
 
 def test_bag_requires_metadata(bag_bytes: bytes) -> None:

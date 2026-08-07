@@ -24,8 +24,11 @@ from pydantic import ValidationError
 from blackbox_api.ingestion.base import IncidentAdapter, IngestError
 from blackbox_api.ingestion.json_adapter import format_validation_error
 from blackbox_api.ros2_mapping import (
+    BT_NODE_TO_PLANNER_STATE,
     GOAL_STATUS_TO_EVENT,
+    RECOVERY_BT_NODES,
     amcl_to_confidence,
+    bt_status_changes,
     odom_to_samples,
     scan_to_obstacle_distance,
 )
@@ -37,6 +40,7 @@ SUPPORTED_TOPICS = (
     "/scan",
     "/amcl_pose",
     "/navigate_to_pose/_action/status",
+    "/behavior_tree_log",
 )
 
 # Downsampling intervals (seconds) keep incidents at replay-friendly rates.
@@ -159,12 +163,13 @@ class Rosbag2Adapter(IncidentAdapter):
         def iso(t: float) -> str:
             return (base + timedelta(seconds=t)).isoformat()
 
-        samples: dict[str, list[dict[str, float]]] = {}
+        samples: dict[str, list[dict[str, float | str]]] = {}
 
-        def record(channel: str, t: float, value: float) -> None:
-            samples.setdefault(channel, []).append(
-                {"t": round(t, 3), "value": round(value, 4)}
-            )
+        def record(channel: str, t: float, value: float | str) -> None:
+            samples.setdefault(channel, []).append({
+                "t": round(t, 3),
+                "value": value if isinstance(value, str) else round(value, 4),
+            })
 
         events: list[dict[str, Any]] = []
 
@@ -195,6 +200,10 @@ class Rosbag2Adapter(IncidentAdapter):
         last_status: int | None = None
         outcome = "failed"
         goal_seen = False
+        recovery_attempts = 0
+        open_recoveries: set[str] = set()
+        executing_seen = False
+        planner_state: str | None = None
 
         event(
             0.0,
@@ -269,6 +278,53 @@ class Rosbag2Adapter(IncidentAdapter):
                         "navigate_to_pose goal succeeded",
                         payload={"state": "succeeded", "goal_status": code},
                     )
+            elif topic == "/behavior_tree_log":
+                for change_ns, node, prev, curr in bt_status_changes(msg):
+                    # Entries without their own stamp fall back to bag time.
+                    tc = (change_ns - t0_ns) / 1e9 if change_ns else t
+                    tc = min(max(tc, 0.0), max(t_last, 1.0))
+                    started = curr == "RUNNING" and prev != "RUNNING"
+                    finished = prev == "RUNNING" and curr in (
+                        "SUCCESS", "FAILURE",
+                    )
+                    if node in RECOVERY_BT_NODES:
+                        if started:
+                            recovery_attempts += 1
+                            open_recoveries.add(node)
+                            record("recovery_count", tc, float(recovery_attempts))
+                            event(
+                                tc, "recovery_started", "planner",
+                                f"Recovery behavior started: {node} "
+                                f"(attempt {recovery_attempts})",
+                                severity="warning",
+                                payload={"behavior": node,
+                                         "attempt": recovery_attempts},
+                            )
+                        elif finished and node in open_recoveries:
+                            open_recoveries.discard(node)
+                            succeeded = curr == "SUCCESS"
+                            event(
+                                tc, "recovery_completed", "planner",
+                                f"Recovery {node} completed: "
+                                f"{'succeeded' if succeeded else 'failed'}",
+                                severity="info" if succeeded else "warning",
+                                payload={"behavior": node,
+                                         "success": succeeded},
+                            )
+                    elif node in BT_NODE_TO_PLANNER_STATE and started:
+                        state = BT_NODE_TO_PLANNER_STATE[node]
+                        if state == "planning" and executing_seen:
+                            state = "replanning"
+                        if state == "executing":
+                            executing_seen = True
+                        if state != planner_state:
+                            planner_state = state
+                            record("planner_state", tc, state)
+                            event(
+                                tc, "planner_state_changed", "planner",
+                                f"Planner state: {state} (BT node {node})",
+                                payload={"state": state, "bt_node": node},
+                            )
 
         telemetry = [
             {"channel": channel, "unit": _UNIT_BY_CHANNEL.get(channel, ""),

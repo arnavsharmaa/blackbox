@@ -7,8 +7,9 @@ rosbag2 ingestion adapter without a ROS installation: the bag is written with
 
 The scripted run (all timestamps fixed, no randomness): the robot drives
 +x at 0.6 m/s for 15 s, a forward obstacle appears at 12 s (clearance drops
-to 0.5 m), the controller holds zero velocity from 15 s on, and the
-navigate_to_pose goal aborts at 29 s.
+to 0.5 m), the controller holds zero velocity from 15 s on, the Nav2
+behavior tree runs three failed recoveries (Spin, BackUp, Wait) plus a
+failed replan, and the navigate_to_pose goal aborts at 29 s.
 """
 
 from __future__ import annotations
@@ -117,6 +118,17 @@ float64 y
 float64 z
 float64 w"""
 
+BEHAVIOR_TREE_LOG_MSGDEF = f"""builtin_interfaces/Time timestamp
+nav2_msgs/BehaviorTreeStatusChange[] event_log
+{_SEP}
+MSG: nav2_msgs/BehaviorTreeStatusChange
+builtin_interfaces/Time timestamp
+string node_name
+string previous_status
+string current_status
+{_SEP}
+{_TIME_DEF}"""
+
 GOAL_STATUS_ARRAY_MSGDEF = f"""action_msgs/GoalStatus[] status_list
 {_SEP}
 MSG: action_msgs/GoalStatus
@@ -174,6 +186,9 @@ def build_blocked_run_bag() -> bytes:
     status_schema = writer.register_msgdef(
         "action_msgs/msg/GoalStatusArray", GOAL_STATUS_ARRAY_MSGDEF
     )
+    bt_schema = writer.register_msgdef(
+        "nav2_msgs/msg/BehaviorTreeLog", BEHAVIOR_TREE_LOG_MSGDEF
+    )
 
     def write(topic: str, schema: object, t: float, message: dict) -> None:
         ns = BAG_START_NS + int(t * 1e9)
@@ -193,7 +208,33 @@ def build_blocked_run_bag() -> bytes:
             }],
         })
 
+    def bt_change(t: float, node: str, prev: str, curr: str) -> None:
+        write("/behavior_tree_log", bt_schema, t, {
+            "timestamp": _stamp(t),
+            "event_log": [{
+                "timestamp": _stamp(t),
+                "node_name": node,
+                "previous_status": prev,
+                "current_status": curr,
+            }],
+        })
+
     goal_status(0.2, 2)  # STATUS_EXECUTING — goal accepted
+
+    # Nav2 behavior tree: plan, follow, then three failed recoveries once the
+    # obstacle blocks the path at t=12 s.
+    bt_change(0.3, "ComputePathToPose", "IDLE", "RUNNING")
+    bt_change(0.6, "ComputePathToPose", "RUNNING", "SUCCESS")
+    bt_change(0.7, "FollowPath", "IDLE", "RUNNING")
+    bt_change(14.8, "FollowPath", "RUNNING", "FAILURE")
+    bt_change(15.0, "Spin", "IDLE", "RUNNING")
+    bt_change(18.0, "Spin", "RUNNING", "FAILURE")
+    bt_change(19.0, "BackUp", "IDLE", "RUNNING")
+    bt_change(22.0, "BackUp", "RUNNING", "FAILURE")
+    bt_change(23.0, "Wait", "IDLE", "RUNNING")
+    bt_change(26.0, "Wait", "RUNNING", "FAILURE")
+    bt_change(26.5, "ComputePathToPose", "IDLE", "RUNNING")
+    bt_change(28.0, "ComputePathToPose", "RUNNING", "FAILURE")
 
     steps = int(BAG_DURATION_S / 0.2)
     for i in range(steps + 1):

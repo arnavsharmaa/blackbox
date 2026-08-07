@@ -121,3 +121,49 @@ GOAL_STATUS_TO_EVENT: dict[int, tuple[str | None, str]] = {
     5: ("task_failed", "aborted"),       # STATUS_CANCELED
     6: ("task_failed", "failed"),        # STATUS_ABORTED
 }
+
+
+#: Nav2 behavior-tree node names that implement recovery behaviors.
+RECOVERY_BT_NODES: frozenset[str] = frozenset({
+    "Spin",
+    "BackUp",
+    "Wait",
+    "DriveOnHeading",
+    "ClearLocalCostmap",
+    "ClearGlobalCostmap",
+    "ClearEntireCostmap",
+})
+
+#: Nav2 behavior-tree node names → canonical planner state while RUNNING.
+BT_NODE_TO_PLANNER_STATE: dict[str, str] = {
+    "ComputePathToPose": "planning",
+    "FollowPath": "executing",
+    "NavigateRecovery": "recovering",
+}
+
+
+def bt_status_changes(
+    msg: dict[str, Any],
+) -> list[tuple[int, str, str, str]]:
+    """nav2_msgs/BehaviorTreeLog (as dict) → (t_ns, node, prev, current).
+
+    Each BehaviorTreeStatusChange carries its own stamp; entries missing one
+    fall back to the log-level timestamp.
+    """
+
+    def to_ns(stamp: dict[str, Any] | None) -> int | None:
+        if not stamp:
+            return None
+        return int(stamp["sec"]) * 1_000_000_000 + int(stamp["nanosec"])
+
+    log_ns = to_ns(msg.get("timestamp")) or 0
+    changes: list[tuple[int, str, str, str]] = []
+    for entry in msg.get("event_log") or []:
+        t_ns = to_ns(entry.get("timestamp")) or log_ns
+        changes.append((
+            t_ns,
+            str(entry.get("node_name", "")),
+            str(entry.get("previous_status", "")),
+            str(entry.get("current_status", "")),
+        ))
+    return changes

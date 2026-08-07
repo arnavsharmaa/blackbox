@@ -56,9 +56,10 @@ topics to replay-friendly rates, derives the outcome from the terminal
 `navigate_to_pose` goal status, and validates the result through
 `Incident.model_validate` like every other adapter. Supported topics today:
 `/odom`, `/cmd_vel`, `/scan`, `/amcl_pose`,
-`/navigate_to_pose/_action/status`. Remaining work: `/behavior_tree_log`
-(recovery events), `/diagnostics` (sensor-staleness warnings), goal-distance
-derivation from the goal pose, and the sqlite3 (`.db3`) storage plugin.
+`/navigate_to_pose/_action/status`, and `/behavior_tree_log` (Nav2 recovery
+behaviors and planner-state transitions). Remaining work: `/diagnostics`
+(sensor-staleness warnings), goal-distance derivation from the goal pose,
+and the sqlite3 (`.db3`) storage plugin.
 
 See [`../ros2/README.md`](../ros2/README.md) for the live recorder-node
 example.
