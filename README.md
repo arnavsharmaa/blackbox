@@ -19,12 +19,17 @@ backed by timestamped evidence you can click to jump the replay to. An
 optional LLM layer can summarize the analysis, but it never determines the
 root cause and the product is fully useful without any API key.
 
-| Incident overview | Incident replay |
-| --- | --- |
-| _dashboard: fleet stats, filters, failure-category breakdown_ | _synchronized timeline, telemetry cursors, 2D path map, evidence panel_ |
+**Incident overview** — fleet stats, filters, deterministic diagnoses:
 
-> Screenshots: run `make demo` and open http://localhost:3000 — the seeded
-> primary incident (`INC-2026-0728-001`) is the demo scenario below.
+![Incident overview dashboard](docs/screenshots/overview.png)
+
+**Incident replay** (paused at the failure moment) — synchronized timeline,
+telemetry cursors, 2D path map, evidence panel, per-subsystem health:
+
+![Incident replay at the failure moment](docs/screenshots/incident-replay.png)
+
+> Reproduce locally: `make demo`, open http://localhost:3000, and open the
+> primary incident (`INC-2026-0728-001`) — the demo scenario below.
 
 ## Architecture
 
@@ -163,9 +168,9 @@ docker compose up --build
 - `web` builds the production bundle and serves on `:3000` once the API is
   healthy.
 
-Data persists in the `blackbox-data` volume. (Compose files are included in
-the repo; they were authored against Docker Compose v2 but this machine's
-checkout was validated via the local `make demo` path.)
+Data persists in the `blackbox-data` volume. The compose setup is exercised
+in CI on every push: the docker job builds both images, boots the stack, and
+runs the end-to-end smoke test against it.
 
 ## API
 
