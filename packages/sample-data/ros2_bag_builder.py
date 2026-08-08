@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import io
 import math
+from types import SimpleNamespace
 
 BAG_DURATION_S = 30.0
 BAG_START_NS = 1_753_900_000_000_000_000  # fixed epoch: deterministic output
@@ -129,6 +130,22 @@ string current_status
 {_SEP}
 {_TIME_DEF}"""
 
+DIAGNOSTIC_ARRAY_MSGDEF = f"""std_msgs/Header header
+diagnostic_msgs/DiagnosticStatus[] status
+{_SEP}
+MSG: diagnostic_msgs/DiagnosticStatus
+byte level
+string name
+string message
+string hardware_id
+diagnostic_msgs/KeyValue[] values
+{_SEP}
+MSG: diagnostic_msgs/KeyValue
+string key
+string value
+{_SEP}
+{_HEADER_DEF}"""
+
 GOAL_STATUS_ARRAY_MSGDEF = f"""action_msgs/GoalStatus[] status_list
 {_SEP}
 MSG: action_msgs/GoalStatus
@@ -189,6 +206,9 @@ def build_blocked_run_bag() -> bytes:
     bt_schema = writer.register_msgdef(
         "nav2_msgs/msg/BehaviorTreeLog", BEHAVIOR_TREE_LOG_MSGDEF
     )
+    diag_schema = writer.register_msgdef(
+        "diagnostic_msgs/msg/DiagnosticArray", DIAGNOSTIC_ARRAY_MSGDEF
+    )
 
     def write(topic: str, schema: object, t: float, message: dict) -> None:
         ns = BAG_START_NS + int(t * 1e9)
@@ -206,6 +226,19 @@ def build_blocked_run_bag() -> bytes:
                 },
                 "status": code,
             }],
+        })
+
+    def diagnostics(t: float, statuses: list[tuple[str, int, str, str]]) -> None:
+        write("/diagnostics", diag_schema, t, {
+            "header": _header(t, "base_link"),
+            # SimpleNamespace, not dict: mcap-ros2's serializer resolves the
+            # field named "values" via hasattr first, which on a dict hits the
+            # built-in .values method instead of the entry.
+            "status": [
+                SimpleNamespace(level=level, name=name, message=text,
+                                hardware_id=hw_id, values=[])
+                for name, level, text, hw_id in statuses
+            ],
         })
 
     def bt_change(t: float, node: str, prev: str, curr: str) -> None:
@@ -235,6 +268,17 @@ def build_blocked_run_bag() -> bytes:
     bt_change(26.0, "Wait", "RUNNING", "FAILURE")
     bt_change(26.5, "ComputePathToPose", "IDLE", "RUNNING")
     bt_change(28.0, "ComputePathToPose", "RUNNING", "FAILURE")
+
+    # 1 Hz diagnostics; the drive controller trips a WARN while blocked.
+    for tick in range(int(BAG_DURATION_S)):
+        warn = 20 <= tick
+        diagnostics(float(tick), [
+            ("drive_controller: Motor state",
+             1 if warn else 0,
+             "Motor temperature high" if warn else "OK",
+             "roboteq_sbl2360"),
+            ("lidar_front: Scan rate", 0, "OK", "sick_tim781"),
+        ])
 
     steps = int(BAG_DURATION_S / 0.2)
     for i in range(steps + 1):
@@ -297,6 +341,61 @@ def build_blocked_run_bag() -> bytes:
             })
 
     goal_status(29.0, 6)  # STATUS_ABORTED — no path around the obstacle
+
+    writer.finish()
+    return buffer.getvalue()
+
+
+def build_stale_lidar_bag() -> bytes:
+    """A short run whose front lidar diagnostics go STALE at t=2 s."""
+    from mcap_ros2.writer import Writer
+
+    buffer = io.BytesIO()
+    writer = Writer(buffer)
+    diag_schema = writer.register_msgdef(
+        "diagnostic_msgs/msg/DiagnosticArray", DIAGNOSTIC_ARRAY_MSGDEF
+    )
+    odom_schema = writer.register_msgdef("nav_msgs/msg/Odometry", ODOMETRY_MSGDEF)
+
+    def write(topic: str, schema: object, t: float, message: dict) -> None:
+        ns = BAG_START_NS + int(t * 1e9)
+        writer.write_message(
+            topic=topic, schema=schema, message=message,
+            log_time=ns, publish_time=ns,
+        )
+
+    for tick in range(6):
+        t = float(tick)
+        write("/odom", odom_schema, t, {
+            "header": _header(t, "odom"),
+            "child_frame_id": "base_link",
+            "pose": {
+                "pose": {
+                    "position": {"x": 1.0 + 0.2 * t, "y": 0.0, "z": 0.0},
+                    "orientation": {"x": 0.0, "y": 0.0, "z": 0.0, "w": 1.0},
+                },
+                "covariance": _ZERO36,
+            },
+            "twist": {
+                "twist": {
+                    "linear": {"x": 0.2, "y": 0.0, "z": 0.0},
+                    "angular": {"x": 0.0, "y": 0.0, "z": 0.0},
+                },
+                "covariance": _ZERO36,
+            },
+        })
+        stale = t >= 2.0
+        write("/diagnostics", diag_schema, t, {
+            "header": _header(t, "base_link"),
+            # SimpleNamespace for the same .values-shadowing reason as above.
+            "status": [SimpleNamespace(
+                level=3 if stale else 0,
+                name="lidar_front: Scan timestamps",
+                message="Scan data is stale" if stale else "OK",
+                hardware_id="sick_tim781",
+                values=[],
+            )],
+        })
 
     writer.finish()
     return buffer.getvalue()

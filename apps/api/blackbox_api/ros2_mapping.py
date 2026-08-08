@@ -167,3 +167,37 @@ def bt_status_changes(
             str(entry.get("current_status", "")),
         ))
     return changes
+
+
+#: diagnostic_msgs/DiagnosticStatus level values.
+DIAG_OK, DIAG_WARN, DIAG_ERROR, DIAG_STALE = 0, 1, 2, 3
+
+#: Substrings marking a diagnostics component as an obstacle/perception sensor.
+SENSOR_COMPONENT_HINTS = (
+    "lidar", "laser", "scan", "camera", "imu", "sonar", "range", "sensor",
+)
+
+
+def is_sensor_component(name: str, hardware_id: str) -> bool:
+    haystack = f"{name} {hardware_id}".lower()
+    return any(hint in haystack for hint in SENSOR_COMPONENT_HINTS)
+
+
+def diagnostic_entries(msg: dict[str, Any]) -> list[tuple[str, int, str, str]]:
+    """diagnostic_msgs/DiagnosticArray (as dict) → (name, level, message, hw_id).
+
+    ``level`` is declared as ``byte`` in ROS 2, which decoders variously
+    surface as int, bytes, or a one-element list — normalize to int.
+    """
+    entries: list[tuple[str, int, str, str]] = []
+    for status in msg.get("status") or []:
+        level = status.get("level", 0)
+        if isinstance(level, (bytes, bytearray, list, tuple)):
+            level = level[0] if len(level) else 0
+        entries.append((
+            str(status.get("name", "")),
+            int(level),
+            str(status.get("message", "")),
+            str(status.get("hardware_id", "")),
+        ))
+    return entries

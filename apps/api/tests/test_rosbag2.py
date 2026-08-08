@@ -4,7 +4,7 @@ import json
 
 import pytest
 from fastapi.testclient import TestClient
-from ros2_bag_builder import build_blocked_run_bag
+from ros2_bag_builder import build_blocked_run_bag, build_stale_lidar_bag
 
 from blackbox_api.analysis.engine import analyze_incident
 from blackbox_api.ingestion.base import IngestError
@@ -66,6 +66,16 @@ def test_bag_parses_to_canonical_incident(bag_bytes: bytes) -> None:
         "planning", "executing", "replanning",
     ]
 
+    # Diagnostics transitions become warnings (repeats deduplicated).
+    diag_warnings = [
+        e for e in incident.events
+        if e.event_type.value == "warning_raised"
+        and "diagnostics" in e.evidence_tags
+    ]
+    assert len(diag_warnings) == 1
+    assert "Motor temperature high" in diag_warnings[0].message
+    assert "sensor" not in diag_warnings[0].evidence_tags
+
     # Obstacle clearance drops to 0.5 m once the obstacle appears at t=12 s.
     obstacle = next(
         s for s in incident.telemetry if s.channel.value == "obstacle_distance"
@@ -124,3 +134,24 @@ def test_upload_endpoint_accepts_mcap(
 
     detail = client.get("/api/incidents/INC-BAG-001").json()
     assert detail["analysis"]["failure_category"] == "persistent_obstacle"
+
+
+def test_stale_sensor_diagnostics_are_tagged() -> None:
+    incident = Rosbag2Adapter().parse(
+        build_stale_lidar_bag(),
+        metadata={"id": "INC-BAG-STALE-001", "robot_id": "W-058"},
+    )
+    stale = [
+        e for e in incident.events
+        if e.event_type.value == "warning_raised"
+        and "stale" in e.evidence_tags
+    ]
+    # STALE repeats for four ticks but only the transition is recorded.
+    assert len(stale) == 1
+    assert "sensor" in stale[0].evidence_tags
+    assert "lidar_front" in stale[0].message
+    # The stale-warning feature the sensor-dropout rule consumes is present.
+    from blackbox_api.analysis.features import compute_features
+
+    features = compute_features(incident)
+    assert len(features.sensor_stale_warning_ts) == 1

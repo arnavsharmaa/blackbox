@@ -25,10 +25,15 @@ from blackbox_api.ingestion.base import IncidentAdapter, IngestError
 from blackbox_api.ingestion.json_adapter import format_validation_error
 from blackbox_api.ros2_mapping import (
     BT_NODE_TO_PLANNER_STATE,
+    DIAG_ERROR,
+    DIAG_OK,
+    DIAG_STALE,
     GOAL_STATUS_TO_EVENT,
     RECOVERY_BT_NODES,
     amcl_to_confidence,
     bt_status_changes,
+    diagnostic_entries,
+    is_sensor_component,
     odom_to_samples,
     scan_to_obstacle_distance,
 )
@@ -41,6 +46,7 @@ SUPPORTED_TOPICS = (
     "/amcl_pose",
     "/navigate_to_pose/_action/status",
     "/behavior_tree_log",
+    "/diagnostics",
 )
 
 # Downsampling intervals (seconds) keep incidents at replay-friendly rates.
@@ -180,6 +186,7 @@ class Rosbag2Adapter(IncidentAdapter):
             message: str,
             severity: str = "info",
             payload: dict[str, Any] | None = None,
+            tags: list[str] | None = None,
         ) -> None:
             events.append({
                 "timestamp": iso(t),
@@ -189,7 +196,7 @@ class Rosbag2Adapter(IncidentAdapter):
                 "message": message,
                 "payload": payload or {},
                 "correlation_id": None,
-                "evidence_tags": [],
+                "evidence_tags": tags or [],
             })
 
         odom_ds = _Downsampler(ODOM_SAMPLE_S)
@@ -204,6 +211,7 @@ class Rosbag2Adapter(IncidentAdapter):
         open_recoveries: set[str] = set()
         executing_seen = False
         planner_state: str | None = None
+        diag_levels: dict[str, int] = {}
 
         event(
             0.0,
@@ -325,6 +333,30 @@ class Rosbag2Adapter(IncidentAdapter):
                                 f"Planner state: {state} (BT node {node})",
                                 payload={"state": state, "bt_node": node},
                             )
+            elif topic == "/diagnostics":
+                # Diagnostics repeat at a fixed rate; emit only transitions.
+                for name, level, text, hw_id in diagnostic_entries(msg):
+                    if diag_levels.get(name, DIAG_OK) == level:
+                        continue
+                    diag_levels[name] = level
+                    if level == DIAG_OK:
+                        continue
+                    tags = ["diagnostics"]
+                    if is_sensor_component(name, hw_id):
+                        tags.append("sensor")
+                    if level == DIAG_STALE:
+                        tags.append("stale")
+                    event(
+                        t,
+                        "error_raised" if level == DIAG_ERROR
+                        else "warning_raised",
+                        "system",
+                        f"Diagnostics {name}: {text or 'level changed'}",
+                        severity="error" if level == DIAG_ERROR else "warning",
+                        payload={"component": name, "level": level,
+                                 "hardware_id": hw_id},
+                        tags=tags,
+                    )
 
         telemetry = [
             {"channel": channel, "unit": _UNIT_BY_CHANNEL.get(channel, ""),

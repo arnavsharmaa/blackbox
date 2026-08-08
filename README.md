@@ -287,12 +287,10 @@ event inspector, and report rendering.
   deployment would want Postgres and migrations (coming soon).
 - Telemetry is stored row-per-sample; fine at demo scale, but long incidents
   would warrant chunked storage.
-- rosbag2 ingestion supports the MCAP storage format and the six core
-  Nav2 topics (including `/behavior_tree_log` recovery/planner events);
-  `/diagnostics` and the sqlite3 (`.db3`) storage plugin are not handled
-  yet, and it has been validated against synthetic bags, not hardware
-  recordings. The live recorder node is an example, untested against real
-  hardware.
+- rosbag2 ingestion supports the MCAP storage format and all seven core
+  Nav2 topics; the sqlite3 (`.db3`) storage plugin is not handled, and it
+  has been validated against synthetic bags, not hardware recordings. The
+  live recorder node is an example, untested against real hardware.
 - No authentication — BlackBox assumes a trusted network.
 - `docker compose` config is provided but was not runnable in this
   development environment (no Docker daemon); validate on a machine with
@@ -300,8 +298,7 @@ event inspector, and report rendering.
 
 ## Roadmap
 
-- rosbag2 adapter coverage: `/diagnostics`, `.db3` storage, goal-distance
-  derivation
+- rosbag2 adapter coverage: `.db3` storage, goal-distance derivation
 - Cross-incident analytics: recurring blockage locations, failure trends per
   software version
 - Rule plug-ins with per-facility thresholds
