@@ -68,3 +68,41 @@ jobs:
       - name: Tear down
         if: always()
         run: docker compose down -v
+
+  e2e:
+    name: Playwright end-to-end
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install backend
+        run: pip install -e "apps/api[dev]"
+      - name: Install frontend
+        run: npm ci --no-audit --no-fund
+      - name: Seed database
+        run: python scripts/seed.py
+      - name: Start API
+        run: |
+          nohup python -m uvicorn blackbox_api.main:app --app-dir apps/api --port 8000 > api.log 2>&1 &
+          timeout 60 bash -c 'until curl -sf http://localhost:8000/health; do sleep 2; done'
+      - name: Build and start web
+        run: |
+          npm run build
+          nohup npm run start --workspace apps/web > web.log 2>&1 &
+          timeout 60 bash -c 'until curl -sf http://localhost:3000 > /dev/null; do sleep 2; done'
+      - name: Install Playwright browser
+        working-directory: apps/web
+        run: npx playwright install --with-deps chromium
+      - name: Run e2e tests
+        working-directory: apps/web
+        run: npx playwright test
+      - name: Show server logs on failure
+        if: failure()
+        run: tail -50 api.log web.log

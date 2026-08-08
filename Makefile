@@ -1,5 +1,5 @@
 .PHONY: setup dev api web seed test test-api test-web lint lint-api lint-web \
-        typecheck build demo smoke schema demo-bag clean
+        typecheck build demo smoke e2e schema demo-bag clean
 
 PY := .venv/bin/python
 PIP := .venv/bin/pip
@@ -47,6 +47,10 @@ test-web:
 ## smoke: end-to-end smoke test against a running app (make demo in another shell)
 smoke:
 	$(PY) scripts/smoke.py
+
+## e2e: Playwright browser tests against a running app (make demo in another shell)
+e2e:
+	cd apps/web && npx playwright test
 
 lint: lint-api lint-web typecheck
 

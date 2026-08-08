@@ -151,6 +151,7 @@ Open **http://localhost:3000**, click into
 | `make lint` | ruff + mypy (strict) + eslint + `tsc --noEmit` |
 | `make build` | Production build of the frontend |
 | `make smoke` | End-to-end smoke test against a running stack |
+| `make e2e` | Playwright browser tests against a running stack |
 | `make schema` | Re-export the JSON Schema from the Pydantic models |
 
 Copy `.env.example` to `.env` to override defaults (database path, CORS,
@@ -270,7 +271,8 @@ make test        # backend (pytest) + frontend (vitest)
 make lint        # ruff, mypy --strict, eslint, tsc --noEmit
 make build       # next build
 make demo        # in one shell…
-make smoke       # …then the end-to-end smoke test in another
+make smoke       # …then the HTTP smoke test in another
+make e2e         # …and/or the Playwright browser suite
 ```
 
 Backend tests cover schema validation, event ordering, both ingestion
@@ -279,7 +281,10 @@ distinctness), API response shapes/filters, and Pydantic⇄TypeScript schema
 sync. Frontend tests cover the replay store (tick, pause-at-failure, speed,
 clamping), overview rendering/filters/error/empty states, timeline selection
 and category filters, evidence timestamp navigation, replay controls, the
-event inspector, and report rendering.
+event inspector, and report rendering. The Playwright suite drives the real
+browser through the full demo flow — overview, filters, replay to the
+failure moment, evidence seeking, timeline inspection, report, and the
+GitHub issue preview — and runs in CI against the production build.
 
 ## Limitations
 
