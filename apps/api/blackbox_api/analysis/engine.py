@@ -12,6 +12,7 @@ from datetime import UTC, datetime
 
 from blackbox_api.analysis.features import compute_features
 from blackbox_api.analysis.rules import ALL_RULES, RuleResult
+from blackbox_api.analysis.thresholds import get_thresholds
 from blackbox_api.schemas import (
     AlternativeCause,
     AnalysisResult,
@@ -30,8 +31,11 @@ CONFIDENCE_CEILING = 0.95
 
 
 def analyze_incident(incident: Incident) -> AnalysisResult:
-    features = compute_features(incident)
-    results: list[RuleResult] = [rule(features) for rule in ALL_RULES]
+    thresholds = get_thresholds()
+    features = compute_features(incident, thresholds)
+    results: list[RuleResult] = [
+        rule(features, thresholds) for rule in ALL_RULES
+    ]
     results.sort(key=lambda r: r.score, reverse=True)
 
     top = results[0]

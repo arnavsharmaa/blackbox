@@ -9,11 +9,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
-from blackbox_api.analysis.features import (
-    ANGULAR_FLIP_MIN_RAD_S,
-    OBSTACLE_SAFETY_THRESHOLD_M,
-    IncidentFeatures,
-)
+from blackbox_api.analysis.features import IncidentFeatures
+from blackbox_api.analysis.thresholds import AnalysisThresholds
 from blackbox_api.schemas import EvidenceItem, FailureCategory, TelemetryChannel
 
 
@@ -97,15 +94,18 @@ class _Scorer:
         return round(self.earned / self.total_weight, 3) if self.total_weight else 0.0
 
 
-def rule_persistent_obstacle(f: IncidentFeatures) -> RuleResult:
+def rule_persistent_obstacle(
+    f: IncidentFeatures, th: AnalysisThresholds
+) -> RuleResult:
     s = _Scorer("persistent-obstacle")
     low = f.obstacle_low_interval
     s.condition(
-        low is not None and low.duration >= 5.0,
+        low is not None and low.duration >= th.obstacle_blockage_min_s,
         0.25,
         "obstacle_below_threshold",
         summary=(
-            f"Obstacle distance remained below {OBSTACLE_SAFETY_THRESHOLD_M:.2f} m "
+            f"Obstacle distance remained below "
+            f"{th.obstacle_safety_threshold_m:.2f} m "
             f"for {low.duration:.1f} s (minimum {low.min_value:.2f} m)"
             if low
             else None
@@ -118,7 +118,7 @@ def rule_persistent_obstacle(f: IncidentFeatures) -> RuleResult:
         tags=["obstacle", "safety_threshold"],
     )
     s.condition(
-        f.zero_cmd_streak >= 5,
+        f.zero_cmd_streak >= th.zero_cmd_streak_min,
         0.20,
         "repeated_zero_velocity",
         summary=(
@@ -131,7 +131,7 @@ def rule_persistent_obstacle(f: IncidentFeatures) -> RuleResult:
         tags=["controller", "zero_velocity"],
     )
     s.condition(
-        len(f.recoveries) >= 2,
+        len(f.recoveries) >= th.recovery_attempts_min,
         0.15,
         "multiple_recovery_attempts",
         summary=(
@@ -146,7 +146,7 @@ def rule_persistent_obstacle(f: IncidentFeatures) -> RuleResult:
     )
     s.condition(
         f.displacement_during_recoveries is not None
-        and f.displacement_during_recoveries < 0.3,
+        and f.displacement_during_recoveries < th.recovery_displacement_max_m,
         0.15,
         "no_position_change",
         summary=(
@@ -180,7 +180,7 @@ def rule_persistent_obstacle(f: IncidentFeatures) -> RuleResult:
         t=f.timeout_t or f.duration_s,
         tags=["timeout"],
     )
-    if f.loc_conf_min is not None and f.loc_conf_min >= 0.9:
+    if f.loc_conf_min is not None and f.loc_conf_min >= th.loc_conf_healthy_min:
         s.support(
             f"Localization confidence remained above "
             f"{f.loc_conf_min * 100:.0f}% for the entire incident",
@@ -216,10 +216,12 @@ def rule_persistent_obstacle(f: IncidentFeatures) -> RuleResult:
     )
 
 
-def rule_localization_failure(f: IncidentFeatures) -> RuleResult:
+def rule_localization_failure(
+    f: IncidentFeatures, th: AnalysisThresholds
+) -> RuleResult:
     s = _Scorer("localization-failure")
     s.condition(
-        f.loc_conf_min is not None and f.loc_conf_min < 0.5,
+        f.loc_conf_min is not None and f.loc_conf_min < th.loc_conf_fault,
         0.30,
         "confidence_collapse",
         summary=(
@@ -233,7 +235,7 @@ def rule_localization_failure(f: IncidentFeatures) -> RuleResult:
         tags=["localization"],
     )
     s.condition(
-        f.loc_conf_max_drop > 0.4,
+        f.loc_conf_max_drop > th.loc_conf_drop,
         0.20,
         "rapid_confidence_drop",
         summary=(
@@ -247,7 +249,7 @@ def rule_localization_failure(f: IncidentFeatures) -> RuleResult:
         tags=["localization"],
     )
     s.condition(
-        f.max_pose_jump > 1.0,
+        f.max_pose_jump > th.pose_jump_m,
         0.20,
         "pose_jump",
         summary=(
@@ -304,16 +306,18 @@ def rule_localization_failure(f: IncidentFeatures) -> RuleResult:
     )
 
 
-def rule_controller_oscillation(f: IncidentFeatures) -> RuleResult:
+def rule_controller_oscillation(
+    f: IncidentFeatures, th: AnalysisThresholds
+) -> RuleResult:
     s = _Scorer("controller-oscillation")
     window = f.angular_flip_window
     s.condition(
-        f.angular_flips >= 8,
+        f.angular_flips >= th.angular_flips_min,
         0.30,
         "rapid_angular_alternation",
         summary=(
             f"Commanded angular velocity flipped sign {f.angular_flips} times "
-            f"(|ω| ≥ {ANGULAR_FLIP_MIN_RAD_S} rad/s) between "
+            f"(|ω| ≥ {th.angular_flip_min_rad_s} rad/s) between "
             f"t={window[0]:.1f} s and t={window[1]:.1f} s"
             if window
             else None
@@ -324,7 +328,8 @@ def rule_controller_oscillation(f: IncidentFeatures) -> RuleResult:
         tags=["controller", "oscillation"],
     )
     s.condition(
-        f.progress_in_flip_window is not None and f.progress_in_flip_window < 0.5,
+        f.progress_in_flip_window is not None
+        and f.progress_in_flip_window < th.flip_progress_max_m,
         0.25,
         "little_forward_progress",
         summary=(
@@ -338,7 +343,7 @@ def rule_controller_oscillation(f: IncidentFeatures) -> RuleResult:
         tags=["motion"],
     )
     s.condition(
-        f.replan_count >= 2,
+        f.replan_count >= th.replan_min,
         0.20,
         "repeated_replanning",
         summary=f"Planner re-planned {f.replan_count} times without progress",
@@ -348,7 +353,7 @@ def rule_controller_oscillation(f: IncidentFeatures) -> RuleResult:
     )
     s.condition(
         f.mean_abs_linear_in_flip_window is not None
-        and f.mean_abs_linear_in_flip_window < 0.15,
+        and f.mean_abs_linear_in_flip_window < th.flip_mean_speed_max,
         0.15,
         "low_linear_velocity",
         summary=(
@@ -396,13 +401,16 @@ def rule_controller_oscillation(f: IncidentFeatures) -> RuleResult:
     )
 
 
-def rule_sensor_dropout(f: IncidentFeatures) -> RuleResult:
+def rule_sensor_dropout(
+    f: IncidentFeatures, th: AnalysisThresholds
+) -> RuleResult:
     s = _Scorer("sensor-dropout")
     median = f.obstacle_median_gap
     dropout = (
         median is not None
         and median > 0
-        and f.obstacle_max_gap > max(5 * median, 2.0)
+        and f.obstacle_max_gap
+        > max(th.sensor_gap_factor * median, th.sensor_gap_min_s)
     )
     s.condition(
         dropout,

@@ -231,6 +231,13 @@ as alternatives. No LLM is involved.
 If nothing clears the threshold the result is `unknown` with manual-review
 guidance — the engine does not guess.
 
+Every numeric threshold in the table above is configurable per deployment
+via `BLACKBOX_RULE_*` environment variables (see
+[thresholds.py](apps/api/blackbox_api/analysis/thresholds.py) and
+`.env.example`), so facilities can tune detection — e.g. a wider clearance
+threshold for fast aisles — without forking the rules. Overridden values
+flow through to the evidence text and the replay's threshold guides.
+
 ### Optional AI explanation
 
 If `ANTHROPIC_API_KEY` or `OPENAI_API_KEY` is set (and

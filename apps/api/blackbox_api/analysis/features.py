@@ -10,6 +10,7 @@ from __future__ import annotations
 import math
 from dataclasses import dataclass, field
 
+from blackbox_api.analysis.thresholds import AnalysisThresholds, get_thresholds
 from blackbox_api.schemas import (
     EventType,
     Incident,
@@ -82,11 +83,6 @@ class IncidentFeatures:
     failure_t: float | None = None
 
 
-OBSTACLE_SAFETY_THRESHOLD_M = 0.6
-ZERO_CMD_EPS = 0.01
-ANGULAR_FLIP_MIN_RAD_S = 0.3
-
-
 def event_t(incident: Incident, event: IncidentEvent) -> float:
     return (event.timestamp - incident.start_time).total_seconds()
 
@@ -154,7 +150,10 @@ def _displacement(xs: list[Point], ys: list[Point], t0: float, t1: float) -> flo
     return math.hypot(x1 - x0, y1 - y0)
 
 
-def compute_features(incident: Incident) -> IncidentFeatures:
+def compute_features(
+    incident: Incident, thresholds: AnalysisThresholds | None = None
+) -> IncidentFeatures:
+    th = thresholds or get_thresholds()
     f = IncidentFeatures(duration_s=incident.duration_s)
 
     xs = numeric_series(incident, TelemetryChannel.POS_X)
@@ -170,7 +169,7 @@ def compute_features(incident: Incident) -> IncidentFeatures:
             continue
         linear = float(ev.payload.get("linear", 0.0))
         angular = float(ev.payload.get("angular", 0.0))
-        if abs(linear) < ZERO_CMD_EPS and abs(angular) < ZERO_CMD_EPS:
+        if abs(linear) < th.zero_cmd_eps and abs(angular) < th.zero_cmd_eps:
             if streak == 0:
                 streak_start_t = event_t(incident, ev)
             streak += 1
@@ -185,7 +184,7 @@ def compute_features(incident: Incident) -> IncidentFeatures:
     if obstacle:
         f.obstacle_min = min(v for _, v in obstacle)
         f.obstacle_low_interval = _longest_interval_below(
-            obstacle, OBSTACLE_SAFETY_THRESHOLD_M
+            obstacle, th.obstacle_safety_threshold_m
         )
         gaps = [
             (b[0] - a[0], a[0])
@@ -268,7 +267,7 @@ def compute_features(incident: Incident) -> IncidentFeatures:
     flip_ts: list[float] = []
     prev_sign = 0
     for t, w in ang_cmds:
-        if abs(w) < ANGULAR_FLIP_MIN_RAD_S:
+        if abs(w) < th.angular_flip_min_rad_s:
             continue
         sign = 1 if w > 0 else -1
         if prev_sign != 0 and sign != prev_sign:
