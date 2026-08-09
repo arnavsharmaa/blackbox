@@ -45,6 +45,7 @@ SUPPORTED_TOPICS = (
     "/scan",
     "/amcl_pose",
     "/navigate_to_pose/_action/status",
+    "/plan",
     "/behavior_tree_log",
     "/diagnostics",
 )
@@ -212,6 +213,7 @@ class Rosbag2Adapter(IncidentAdapter):
         executing_seen = False
         planner_state: str | None = None
         diag_levels: dict[str, int] = {}
+        goal_xy: tuple[float, float] | None = None
 
         event(
             0.0,
@@ -226,8 +228,14 @@ class Rosbag2Adapter(IncidentAdapter):
             msg = _ros_msg_to_dict(ros_msg)
 
             if topic == "/odom" and odom_ds.accept(t):
-                for channel, value in odom_to_samples(msg).items():
+                motion = odom_to_samples(msg)
+                for channel, value in motion.items():
                     record(channel, t, value)
+                if goal_xy is not None:
+                    record("goal_distance", t, math.hypot(
+                        motion["pos_x"] - goal_xy[0],
+                        motion["pos_y"] - goal_xy[1],
+                    ))
                 if pose_ev_ds.accept(t):
                     position = msg["pose"]["pose"]["position"]
                     event(
@@ -252,6 +260,20 @@ class Rosbag2Adapter(IncidentAdapter):
                     record("obstacle_distance", t, clearance)
             elif topic == "/amcl_pose" and amcl_ds.accept(t):
                 record("localization_confidence", t, amcl_to_confidence(msg))
+            elif topic == "/plan" and goal_xy is None:
+                # The global plan's final pose is the navigation goal; from
+                # here on, odometry samples also yield goal_distance.
+                poses = msg.get("poses") or []
+                if poses:
+                    goal_position = poses[-1]["pose"]["position"]
+                    goal_xy = (
+                        float(goal_position["x"]), float(goal_position["y"]),
+                    )
+                    for existing in events:
+                        if existing["event_type"] == "nav_goal_issued":
+                            existing["payload"].update(
+                                {"goal_x": goal_xy[0], "goal_y": goal_xy[1]}
+                            )
             elif topic == "/navigate_to_pose/_action/status":
                 status_list = msg.get("status_list") or []
                 if not status_list:
@@ -265,10 +287,15 @@ class Rosbag2Adapter(IncidentAdapter):
                 )
                 if event_type == "nav_goal_issued" and not goal_seen:
                     goal_seen = True
+                    payload: dict[str, Any] = {"goal_status": code}
+                    if goal_xy is not None:
+                        payload.update(
+                            {"goal_x": goal_xy[0], "goal_y": goal_xy[1]}
+                        )
                     event(
                         t, "nav_goal_issued", "navigation",
                         "navigate_to_pose goal accepted",
-                        payload={"goal_status": code},
+                        payload=payload,
                     )
                 elif event_type == "task_failed":
                     outcome = mapped_outcome
@@ -397,5 +424,6 @@ _UNIT_BY_CHANNEL = {
     "linear_velocity": "m/s",
     "angular_velocity": "rad/s",
     "obstacle_distance": "m",
+    "goal_distance": "m",
     "localization_confidence": "",
 }

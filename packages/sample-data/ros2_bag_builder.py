@@ -146,6 +146,30 @@ string value
 {_SEP}
 {_HEADER_DEF}"""
 
+PATH_MSGDEF = f"""std_msgs/Header header
+geometry_msgs/PoseStamped[] poses
+{_SEP}
+MSG: geometry_msgs/PoseStamped
+std_msgs/Header header
+geometry_msgs/Pose pose
+{_SEP}
+MSG: geometry_msgs/Pose
+geometry_msgs/Point position
+geometry_msgs/Quaternion orientation
+{_SEP}
+MSG: geometry_msgs/Point
+float64 x
+float64 y
+float64 z
+{_SEP}
+MSG: geometry_msgs/Quaternion
+float64 x
+float64 y
+float64 z
+float64 w
+{_SEP}
+{_HEADER_DEF}"""
+
 GOAL_STATUS_ARRAY_MSGDEF = f"""action_msgs/GoalStatus[] status_list
 {_SEP}
 MSG: action_msgs/GoalStatus
@@ -209,6 +233,7 @@ def build_blocked_run_bag() -> bytes:
     diag_schema = writer.register_msgdef(
         "diagnostic_msgs/msg/DiagnosticArray", DIAGNOSTIC_ARRAY_MSGDEF
     )
+    path_schema = writer.register_msgdef("nav_msgs/msg/Path", PATH_MSGDEF)
 
     def write(topic: str, schema: object, t: float, message: dict) -> None:
         ns = BAG_START_NS + int(t * 1e9)
@@ -268,6 +293,21 @@ def build_blocked_run_bag() -> bytes:
     bt_change(26.0, "Wait", "RUNNING", "FAILURE")
     bt_change(26.5, "ComputePathToPose", "IDLE", "RUNNING")
     bt_change(28.0, "ComputePathToPose", "RUNNING", "FAILURE")
+
+    # Global plan published at t=0.8: straight line to the goal at x=13.4.
+    write("/plan", path_schema, 0.8, {
+        "header": _header(0.8, "map"),
+        "poses": [
+            {
+                "header": _header(0.8, "map"),
+                "pose": {
+                    "position": {"x": 2.0 + 0.6 * step, "y": 3.0, "z": 0.0},
+                    "orientation": {"x": 0.0, "y": 0.0, "z": 0.0, "w": 1.0},
+                },
+            }
+            for step in range(20)  # last pose: x = 13.4 (the goal)
+        ],
+    })
 
     # 1 Hz diagnostics; the drive controller trips a WARN while blocked.
     for tick in range(int(BAG_DURATION_S)):

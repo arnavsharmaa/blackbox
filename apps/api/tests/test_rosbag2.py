@@ -42,7 +42,7 @@ def test_bag_parses_to_canonical_incident(bag_bytes: bytes) -> None:
     assert {
         "pos_x", "pos_y", "heading", "linear_velocity", "angular_velocity",
         "obstacle_distance", "localization_confidence", "planner_state",
-        "recovery_count",
+        "recovery_count", "goal_distance",
     } <= channels
 
     event_types = {event.event_type.value for event in incident.events}
@@ -65,6 +65,19 @@ def test_bag_parses_to_canonical_incident(bag_bytes: bytes) -> None:
     assert [sample.value for sample in states.samples] == [
         "planning", "executing", "replanning",
     ]
+
+    # Goal distance comes from navigate_to_pose feedback and plateaus at
+    # 2.4 m once the robot stops 15 s in.
+    goal_distance = next(
+        s for s in incident.telemetry if s.channel.value == "goal_distance"
+    )
+    late_distance = [
+        float(sample.value)
+        for sample in goal_distance.samples
+        if sample.t > 16.0
+    ]
+    assert late_distance
+    assert all(abs(value - 2.4) < 0.01 for value in late_distance)
 
     # Diagnostics transitions become warnings (repeats deduplicated).
     diag_warnings = [

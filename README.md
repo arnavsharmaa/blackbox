@@ -303,7 +303,7 @@ GitHub issue preview — and runs in CI against the production build.
 
 ## Roadmap
 
-- rosbag2 adapter coverage: `.db3` storage, goal-distance derivation
+- rosbag2 adapter coverage: `.db3` (sqlite3) storage plugin
 - Cross-incident analytics: recurring blockage locations, failure trends per
   software version
 - Rule plug-ins with per-facility thresholds

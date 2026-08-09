@@ -43,7 +43,8 @@ re-exports them for the live recorder node.
 | `/cmd_vel` | `geometry_msgs/Twist` | `velocity_command` events (`payload.linear`, `payload.angular`) |
 | `/scan` | `sensor_msgs/LaserScan` | `obstacle_distance` telemetry (min range in the forward arc) + `obstacle_distance_updated` events; scan gaps become sensor-staleness warnings |
 | `/amcl_pose` | `geometry_msgs/PoseWithCovarianceStamped` | `localization_confidence` telemetry (mapped from covariance trace) |
-| `/navigate_to_pose/_action/status` | `action_msgs/GoalStatusArray` | `nav_goal_issued`, `task_timed_out`, `task_failed` events; `goal_distance` derived from the active goal pose |
+| `/navigate_to_pose/_action/status` | `action_msgs/GoalStatusArray` | `nav_goal_issued`, `task_timed_out`, `task_failed` events |
+| `/plan` | `nav_msgs/Path` | Navigation goal (the plan's final pose) → `goal_distance` telemetry derived from odometry, and goal coordinates on the `nav_goal_issued` event |
 | `/behavior_tree_log` | `nav2_msgs/BehaviorTreeLog` | `planner_state_changed`, `recovery_started`, `recovery_completed` events + `planner_state` / `recovery_count` telemetry |
 | `/diagnostics` | `diagnostic_msgs/DiagnosticArray` | `warning_raised` / `error_raised` events with `evidence_tags` from hardware IDs |
 
@@ -56,11 +57,14 @@ topics to replay-friendly rates, derives the outcome from the terminal
 `navigate_to_pose` goal status, and validates the result through
 `Incident.model_validate` like every other adapter. Supported topics today:
 `/odom`, `/cmd_vel`, `/scan`, `/amcl_pose`,
-`/navigate_to_pose/_action/status`, `/behavior_tree_log` (Nav2 recovery
-behaviors and planner-state transitions), and `/diagnostics` (level
-transitions become warnings/errors; stale sensor components are tagged for
-the sensor-dropout rule). Remaining work: goal-distance derivation from the
-goal pose and the sqlite3 (`.db3`) storage plugin.
+`/navigate_to_pose/_action/status`, `/plan` (goal pose → `goal_distance`),
+`/behavior_tree_log` (Nav2 recovery behaviors and planner-state
+transitions), and `/diagnostics` (level transitions become warnings/errors;
+stale sensor components are tagged for the sensor-dropout rule). Action
+feedback topics are not decodable by `mcap-ros2-support` (its message-name
+parser rejects the generated `*_FeedbackMessage` types), which is why the
+goal comes from `/plan`. Remaining work: the sqlite3 (`.db3`) storage
+plugin.
 
 See [`../ros2/README.md`](../ros2/README.md) for the live recorder-node
 example.
