@@ -1,5 +1,6 @@
 import type {
   AnalysisResult,
+  AnalyticsResponse,
   GithubIssue,
   IncidentDetail,
   IncidentListResponse,
@@ -94,4 +95,8 @@ export function fetchGithubIssue(
   return request<GithubIssue>(
     `/api/incidents/${encodeURIComponent(id)}/github-issue${suffix}`,
   );
+}
+
+export function fetchAnalytics(): Promise<AnalyticsResponse> {
+  return request<AnalyticsResponse>("/api/analytics");
 }

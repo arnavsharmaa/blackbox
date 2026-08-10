@@ -211,3 +211,55 @@ export interface IncidentReport {
   ai_explanation: string | null;
   markdown: string;
 }
+
+/** Body of GET /api/analytics. */
+export interface CategoryCount {
+  category: FailureCategory;
+  count: number;
+}
+
+export interface OutcomeCount {
+  outcome: Outcome;
+  count: number;
+}
+
+export interface RobotStats {
+  robot_id: string;
+  robot_model: string;
+  incidents: number;
+  critical: number;
+  recovery_attempts: number;
+  top_category: FailureCategory | null;
+}
+
+export interface VersionStats {
+  software_version: string;
+  incidents: number;
+  categories: CategoryCount[];
+}
+
+export interface BlockageHotspot {
+  facility: string;
+  x: number;
+  y: number;
+  count: number;
+  incident_ids: string[];
+}
+
+export interface DailyCount {
+  date: string;
+  category: FailureCategory;
+  count: number;
+}
+
+export interface AnalyticsResponse {
+  total_incidents: number;
+  critical_incidents: number;
+  total_recovery_attempts: number;
+  categories: CategoryCount[];
+  outcomes: OutcomeCount[];
+  by_robot: RobotStats[];
+  by_software_version: VersionStats[];
+  blockage_hotspots: BlockageHotspot[];
+  daily: DailyCount[];
+}
