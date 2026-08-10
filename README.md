@@ -186,6 +186,7 @@ Interactive docs at http://localhost:8000/docs.
 | `GET /api/incidents/{id}/telemetry` | Telemetry series; filter: `channel` |
 | `GET /api/incidents/{id}/analysis` | Deterministic analysis (`?ai=true` attaches a labeled AI summary if a key is configured) |
 | `POST /api/incidents/{id}/reanalyze` | Re-run the rules engine |
+| `DELETE /api/incidents/{id}` | Remove an incident and its events, telemetry, and analysis |
 | `GET /api/incidents/{id}/report` | Structured report + Markdown |
 | `GET /api/incidents/{id}/github-issue` | Issue title/body/labels (`?repo=owner/repo` adds a prefilled URL) |
 | `GET /api/analytics` | Fleet analytics: category/outcome mix, per-robot and per-software-version stats, blockage hotspots, daily trend |

@@ -139,6 +139,19 @@ def get_analysis(
     return analysis
 
 
+@router.delete("/{incident_id}", status_code=204)
+def delete_incident(
+    incident_id: str, db: Annotated[Session, Depends(get_db)]
+) -> None:
+    repo = IncidentRepository(db)
+    if not repo.delete_incident(incident_id):
+        raise HTTPException(
+            status_code=404, detail=f"incident '{incident_id}' not found"
+        )
+    db.commit()
+    log(logger, logging.INFO, "incident deleted", incident_id=incident_id)
+
+
 class ReanalyzeResponse(BaseModel):
     model_config = ConfigDict(extra="forbid")
 

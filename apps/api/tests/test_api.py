@@ -244,3 +244,25 @@ def test_upload_csv_without_metadata_fails(client: TestClient) -> None:
         files={"file": ("events.csv", b"timestamp,event_type\n", "text/csv")},
     )
     assert response.status_code == 422
+
+
+def test_delete_incident(seeded_client: TestClient) -> None:
+    response = seeded_client.delete("/api/incidents/INC-2026-0731-004")
+    assert response.status_code == 204
+
+    assert (
+        seeded_client.get("/api/incidents/INC-2026-0731-004").status_code
+        == 404
+    )
+    remaining = seeded_client.get("/api/incidents").json()
+    assert remaining["total"] == 3
+    # Cascade: analytics no longer count the deleted incident's category.
+    categories = {
+        c["category"]
+        for c in seeded_client.get("/api/analytics").json()["categories"]
+    }
+    assert "sensor_dropout" not in categories
+
+
+def test_delete_missing_incident_404(client: TestClient) -> None:
+    assert client.delete("/api/incidents/NOPE").status_code == 404
