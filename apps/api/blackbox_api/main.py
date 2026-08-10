@@ -7,6 +7,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from blackbox_api.api.routes_analytics import router as analytics_router
 from blackbox_api.api.routes_health import router as health_router
 from blackbox_api.api.routes_incidents import router as incidents_router
 from blackbox_api.config import get_settings
@@ -41,6 +42,7 @@ def create_app() -> FastAPI:
     )
     app.include_router(health_router)
     app.include_router(incidents_router)
+    app.include_router(analytics_router)
     return app
 
 

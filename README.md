@@ -188,6 +188,7 @@ Interactive docs at http://localhost:8000/docs.
 | `POST /api/incidents/{id}/reanalyze` | Re-run the rules engine |
 | `GET /api/incidents/{id}/report` | Structured report + Markdown |
 | `GET /api/incidents/{id}/github-issue` | Issue title/body/labels (`?repo=owner/repo` adds a prefilled URL) |
+| `GET /api/analytics` | Fleet analytics: category/outcome mix, per-robot and per-software-version stats, blockage hotspots, daily trend |
 | `POST /api/incidents/upload` | Multipart upload of `.json` (full incident), `.csv` (events + `metadata` form field), or `.mcap` (ROS 2 bag + `metadata` with at least `id` and `robot_id`) |
 
 Invalid uploads return `422` with `{"message", "errors": [{field, error, input_preview}]}`.
