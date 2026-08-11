@@ -47,7 +47,10 @@ describe("upload page", () => {
     expect(link.getAttribute("href")).toBe("/incidents/INC-BAG-001");
 
     // The request was a multipart POST to the upload endpoint.
-    const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit];
+    const [url, init] = fetchMock.mock.calls[0] as unknown as [
+      string,
+      RequestInit,
+    ];
     expect(url).toContain("/api/incidents/upload");
     expect(init.method).toBe("POST");
     expect(init.body).toBeInstanceOf(FormData);

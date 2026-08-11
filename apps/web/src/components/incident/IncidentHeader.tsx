@@ -1,7 +1,10 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import type { AnalysisResult, Incident } from "@blackbox/schemas";
+import { deleteIncident } from "@/lib/api";
 import {
   CATEGORY_COLORS,
   CATEGORY_LABELS,
@@ -21,6 +24,27 @@ export function IncidentHeader({
   incident: Incident;
   analysis: AnalysisResult | null;
 }) {
+  const router = useRouter();
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+
+  const handleDelete = async () => {
+    const confirmed = window.confirm(
+      `Delete incident ${incident.id}? This removes its events, telemetry, ` +
+        "and analysis permanently.",
+    );
+    if (!confirmed || deleting) return;
+    setDeleting(true);
+    setDeleteError(null);
+    try {
+      await deleteIncident(incident.id);
+      router.push("/");
+    } catch (error) {
+      setDeleteError(error instanceof Error ? error.message : String(error));
+      setDeleting(false);
+    }
+  };
+
   return (
     <div className="rounded-lg border border-edge bg-surface-1 px-5 py-4">
       <div className="flex flex-wrap items-start justify-between gap-4">
@@ -49,8 +73,22 @@ export function IncidentHeader({
           >
             GitHub issue
           </Link>
+          <button
+            type="button"
+            onClick={handleDelete}
+            disabled={deleting}
+            aria-label="Delete incident"
+            className="rounded border border-red-500/40 bg-red-950/20 px-3 py-1.5 text-sm text-red-300 hover:border-red-400 disabled:opacity-40"
+          >
+            {deleting ? "Deleting…" : "Delete"}
+          </button>
         </div>
       </div>
+      {deleteError && (
+        <p role="alert" className="mt-2 text-sm text-red-300">
+          {deleteError}
+        </p>
+      )}
 
       <dl className="mt-4 grid grid-cols-2 gap-x-6 gap-y-2 text-sm sm:grid-cols-3 lg:grid-cols-5">
         <Meta label="Robot">

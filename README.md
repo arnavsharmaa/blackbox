@@ -90,9 +90,13 @@ and guarded against drift by
 - **GitHub issue generation** — complete issue Markdown (repro steps,
   expected/actual, evidence, investigation list) with copy, download, and a
   prefilled `github.com/.../issues/new` URL. No OAuth needed.
-- **Ingestion with useful errors** — JSON and normalized-CSV uploads are
-  validated against the canonical schema; malformed input returns
-  field-level errors (HTTP 422), never a stack trace.
+- **Ingestion with useful errors** — JSON, normalized-CSV, and ROS 2 MCAP
+  uploads (drag-and-drop on the Upload page, or the API) are validated
+  against the canonical schema; malformed input returns field-level errors
+  (HTTP 422), never a stack trace.
+- **Fleet analytics** — a cross-incident dashboard: failure-category and
+  outcome mix, per-robot and per-software-version stats, recurring blockage
+  hotspots, and a daily trend.
 - **ROS 2 bag ingestion** — upload a rosbag2 MCAP recording directly
   (`ros2 bag record -s mcap`); decoding is pure Python, so ROS is *not*
   required to run BlackBox. Plus a documented adapter interface, topic

@@ -117,3 +117,31 @@ test.describe("demo flow", () => {
     );
   });
 });
+
+test.describe("fleet features", () => {
+  test("analytics page shows fleet aggregates", async ({ page }) => {
+    await page.goto("/analytics");
+    await expect(
+      page.getByRole("heading", { name: "Fleet analytics" }),
+    ).toBeVisible();
+    await expect(page.getByText("Blockage hotspots")).toBeVisible();
+    // The seeded persistent-obstacle incident is a hotspot linking to itself.
+    await expect(
+      page.getByRole("link", { name: PRIMARY }),
+    ).toBeVisible();
+  });
+
+  test("upload page rejects malformed json with field errors", async ({
+    page,
+  }) => {
+    await page.goto("/upload");
+    await page.getByLabel(/Incident file/).setInputFiles({
+      name: "bad.json",
+      mimeType: "application/json",
+      buffer: Buffer.from("{not valid json"),
+    });
+    await page.getByRole("button", { name: "Upload and analyze" }).click();
+    await expect(page.getByRole("alert")).toBeVisible();
+    await expect(page.getByText(/not valid JSON/)).toBeVisible();
+  });
+});
