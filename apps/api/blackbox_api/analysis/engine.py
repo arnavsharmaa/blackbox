@@ -11,7 +11,8 @@ from __future__ import annotations
 from datetime import UTC, datetime
 
 from blackbox_api.analysis.features import compute_features
-from blackbox_api.analysis.rules import ALL_RULES, RuleResult
+from blackbox_api.analysis.plugins import get_all_rules
+from blackbox_api.analysis.rules import RuleResult
 from blackbox_api.analysis.thresholds import get_thresholds
 from blackbox_api.schemas import (
     AlternativeCause,
@@ -33,9 +34,15 @@ CONFIDENCE_CEILING = 0.95
 def analyze_incident(incident: Incident) -> AnalysisResult:
     thresholds = get_thresholds()
     features = compute_features(incident, thresholds)
-    results: list[RuleResult] = [
-        rule(features, thresholds) for rule in ALL_RULES
-    ]
+    results: list[RuleResult] = []
+    for rule in get_all_rules():
+        result = rule(features, thresholds)
+        if not isinstance(result, RuleResult):
+            raise TypeError(
+                f"analysis rule {getattr(rule, '__name__', rule)!r} returned "
+                f"{type(result).__name__}, expected RuleResult"
+            )
+        results.append(result)
     results.sort(key=lambda r: r.score, reverse=True)
 
     top = results[0]

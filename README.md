@@ -233,6 +233,12 @@ as alternatives. No LLM is involved.
 If nothing clears the threshold the result is `unknown` with manual-review
 guidance — the engine does not guess.
 
+Deployments can also add **custom rules without forking**: set
+`BLACKBOX_EXTRA_RULES=module:function` (comma-separated) to importable
+functions with the built-in rule signature — they compete with the built-in
+rules on equal footing (see
+[plugins.py](apps/api/blackbox_api/analysis/plugins.py)).
+
 Every numeric threshold in the table above is configurable per deployment
 via `BLACKBOX_RULE_*` environment variables (see
 [thresholds.py](apps/api/blackbox_api/analysis/thresholds.py) and
@@ -315,7 +321,6 @@ GitHub issue preview — and runs in CI against the production build.
 - rosbag2 adapter coverage: `.db3` (sqlite3) storage plugin
 - Cross-incident analytics: recurring blockage locations, failure trends per
   software version
-- Rule plug-ins with per-facility thresholds
 - Live streaming ingestion (websocket) with rolling pre-failure buffers
 - Incident diffing: compare a failure against a known-good run
 
