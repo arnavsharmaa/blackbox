@@ -5,6 +5,7 @@ import type {
   IncidentDetail,
   IncidentListResponse,
   IncidentReport,
+  UploadResponse,
 } from "@blackbox/schemas";
 
 export const API_BASE =
@@ -99,4 +100,69 @@ export function fetchGithubIssue(
 
 export function fetchAnalytics(): Promise<AnalyticsResponse> {
   return request<AnalyticsResponse>("/api/analytics");
+}
+
+export interface UploadFieldError {
+  field: string;
+  error: string;
+}
+
+/** Shape of the 422 detail returned by the upload endpoint. */
+export interface UploadErrorDetail {
+  message: string;
+  errors: UploadFieldError[];
+}
+
+export async function uploadIncident(
+  file: File,
+  metadata?: string,
+): Promise<UploadResponse> {
+  const form = new FormData();
+  form.append("file", file);
+  if (metadata && metadata.trim()) form.append("metadata", metadata.trim());
+
+  let response: Response;
+  try {
+    response = await fetch(`${API_BASE}/api/incidents/upload`, {
+      method: "POST",
+      body: form,
+    });
+  } catch {
+    throw new ApiError(
+      `Cannot reach the BlackBox API at ${API_BASE}. Is the backend running?`,
+      0,
+    );
+  }
+  if (!response.ok) {
+    let detail: unknown;
+    try {
+      detail = (await response.json()).detail;
+    } catch {
+      detail = undefined;
+    }
+    throw new ApiError(
+      `Upload rejected (${response.status})`,
+      response.status,
+      detail,
+    );
+  }
+  return (await response.json()) as UploadResponse;
+}
+
+export async function deleteIncident(id: string): Promise<void> {
+  let response: Response;
+  try {
+    response = await fetch(
+      `${API_BASE}/api/incidents/${encodeURIComponent(id)}`,
+      { method: "DELETE" },
+    );
+  } catch {
+    throw new ApiError(
+      `Cannot reach the BlackBox API at ${API_BASE}. Is the backend running?`,
+      0,
+    );
+  }
+  if (!response.ok) {
+    throw new ApiError(`Delete failed (${response.status})`, response.status);
+  }
 }

@@ -35,6 +35,9 @@ export default function RootLayout({
               <Link href="/analytics" className="hover:text-ink">
                 Analytics
               </Link>
+              <Link href="/upload" className="hover:text-ink">
+                Upload
+              </Link>
               <a
                 href={`${process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000"}/docs`}
                 target="_blank"
