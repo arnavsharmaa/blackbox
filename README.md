@@ -19,6 +19,11 @@ backed by timestamped evidence you can click to jump the replay to. An
 optional LLM layer can summarize the analysis, but it never determines the
 root cause and the product is fully useful without any API key.
 
+> **Status:** working end-to-end — ingestion (JSON/CSV/ROS 2 MCAP), analysis,
+> replay, reports, analytics, all CI-tested. The current focus is validating
+> the pipeline against **bags recorded from real robots**; if you run Nav2
+> and have a failure bag to share, see the [roadmap](#roadmap).
+
 **Incident overview** — fleet stats, filters, deterministic diagnoses:
 
 ![Incident overview dashboard](docs/screenshots/overview.png)
@@ -294,21 +299,25 @@ make smoke       # …then the HTTP smoke test in another
 make e2e         # …and/or the Playwright browser suite
 ```
 
-Backend tests cover schema validation, event ordering, both ingestion
-adapters, invalid-upload errors, all four diagnoses (plus determinism and
-distinctness), API response shapes/filters, and Pydantic⇄TypeScript schema
-sync. Frontend tests cover the replay store (tick, pause-at-failure, speed,
-clamping), overview rendering/filters/error/empty states, timeline selection
-and category filters, evidence timestamp navigation, replay controls, the
-event inspector, and report rendering. The Playwright suite drives the real
-browser through the full demo flow — overview, filters, replay to the
-failure moment, evidence seeking, timeline inspection, report, and the
-GitHub issue preview — and runs in CI against the production build.
+Backend tests cover schema validation, event ordering, the JSON/CSV/MCAP
+ingestion adapters, invalid-upload errors, all four diagnoses (plus
+determinism and distinctness), threshold overrides, rule plug-in loading,
+fleet analytics aggregation, API response shapes/filters, and
+Pydantic⇄TypeScript schema sync. Frontend tests cover the replay store
+(tick, pause-at-failure, speed, clamping), overview
+rendering/filters/error/empty states, timeline selection and category
+filters, evidence timestamp navigation, replay controls, the event
+inspector, report rendering, the analytics dashboard, the upload flow
+(including 422 field errors), and incident deletion. The Playwright suite
+drives the real browser through the full demo flow — overview, filters,
+replay to the failure moment, evidence seeking, timeline inspection,
+report, the GitHub issue preview, fleet analytics, and upload validation —
+and runs in CI against the production build.
 
 ## Limitations
 
 - SQLite + `create_all` initialization — right for a local MVP; a real
-  deployment would want Postgres and migrations (coming soon).
+  deployment would want Postgres and migrations (see the roadmap).
 - Telemetry is stored row-per-sample; fine at demo scale, but long incidents
   would warrant chunked storage.
 - rosbag2 ingestion supports the MCAP storage format and all seven core
@@ -316,17 +325,59 @@ GitHub issue preview — and runs in CI against the production build.
   has been validated against synthetic bags, not hardware recordings. The
   live recorder node is an example, untested against real hardware.
 - No authentication — BlackBox assumes a trusted network.
-- `docker compose` config is provided but was not runnable in this
-  development environment (no Docker daemon); validate on a machine with
-  Docker before relying on it.
 
 ## Roadmap
 
-- rosbag2 adapter coverage: `.db3` (sqlite3) storage plugin
-- Cross-incident analytics: recurring blockage locations, failure trends per
-  software version
-- Live streaming ingestion (websocket) with rolling pre-failure buffers
-- Incident diffing: compare a failure against a known-good run
+Where BlackBox is heading, in the order the work should land.
+
+### Now — validate against reality
+
+- [ ] **Hardware bag validation** — ingest MCAP bags recorded from real
+  Nav2 robots (TurtleBot, or any fleet willing to share failure bags) and
+  fix what the synthetic bags didn't predict. *This is the single
+  highest-value contribution an outside user can make: run
+  `ros2 bag record -s mcap` on a failed task, upload the bag, and
+  [open an issue](https://github.com/arnavsharmaa/blackbox/issues) with
+  what the diagnosis got right or wrong.*
+- [ ] **Confidence calibration** — collect diagnosed incidents with
+  human-confirmed labels and report per-rule precision, so "95% confidence"
+  is backed by measurement instead of rule weights alone.
+- [ ] **`.db3` bag support** — the rosbag2 sqlite3 storage plugin, for
+  fleets that don't record MCAP. Blocked on message-definition sourcing
+  (sqlite3 bags don't embed types the way MCAP does); likely lands as an
+  optional ROS-required extra.
+
+### Next — production deployment
+
+- [ ] **Postgres + Alembic migrations** — swap `create_all` for real
+  migrations behind the existing repository interface; SQLite stays the
+  zero-config default.
+- [ ] **Auth & multi-tenancy** — API tokens per fleet, so one BlackBox
+  instance can serve multiple facilities without seeing each other's data.
+- [ ] **Chunked telemetry storage** — column-oriented blobs per channel
+  instead of row-per-sample, for hour-long incidents at full sample rates.
+- [ ] **Live streaming ingestion** — a WebSocket endpoint with rolling
+  pre-failure ring buffers, so robots stream continuously and BlackBox cuts
+  an incident automatically when a task fails (the live recorder node
+  becomes a supported client instead of an example).
+
+### Later — deeper analysis
+
+- [ ] **Incident diffing** — compare a failure against a known-good run of
+  the same task: aligned timelines, diverging-telemetry highlights, the
+  first moment the runs meaningfully separated.
+- [ ] **Cross-incident rule mining** — surface recurring patterns the
+  per-incident rules can't see (e.g. the same shelf edge degrading
+  localization across dozens of near-misses that never became incidents).
+- [ ] **Community rule registry** — a home for shared
+  [`BLACKBOX_EXTRA_RULES` plug-ins](apps/api/blackbox_api/analysis/plugins.py)
+  (battery sag, wheel slip, motor-current anomalies) with fixture incidents
+  proving each rule fires.
+
+Recently shipped: fleet analytics with blockage hotspots, drag-and-drop
+upload with field-level errors, per-deployment thresholds
+(`BLACKBOX_RULE_*`), custom analysis rules via plug-ins, rosbag2 MCAP
+ingestion, and a 4-job CI (backend, frontend, Docker smoke, Playwright).
 
 ## Contributing
 
