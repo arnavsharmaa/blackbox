@@ -34,6 +34,11 @@ telemetry cursors, 2D path map, evidence panel, per-subsystem health:
 
 ![Incident replay at the failure moment](docs/screenshots/incident-replay.png)
 
+**Incident comparison** — the failure diffed against a known-good baseline
+run, with the first sustained divergence pinned per channel:
+
+![Incident diff against a baseline run](docs/screenshots/incident-diff.png)
+
 > Reproduce locally: `make demo`, open http://localhost:3000, and open the
 > primary incident (`INC-2026-0728-001`) — the demo scenario below.
 
