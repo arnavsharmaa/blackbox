@@ -141,7 +141,9 @@ test.describe("fleet features", () => {
       buffer: Buffer.from("{not valid json"),
     });
     await page.getByRole("button", { name: "Upload and analyze" }).click();
-    await expect(page.getByRole("alert")).toBeVisible();
-    await expect(page.getByText(/not valid JSON/)).toBeVisible();
+    // Scope to our alert: Next.js's route announcer also has role="alert".
+    await expect(
+      page.getByRole("alert").filter({ hasText: /not valid JSON/ }),
+    ).toBeVisible();
   });
 });
