@@ -11,6 +11,7 @@ from sqlalchemy.orm import Session
 
 from blackbox_api.ai.explain import ai_available, generate_ai_explanation
 from blackbox_api.analysis.engine import analyze_incident
+from blackbox_api.diff import DiffResponse, compute_diff
 from blackbox_api.ingestion.base import IngestError
 from blackbox_api.ingestion.service import ingest_incident
 from blackbox_api.logging import log
@@ -137,6 +138,22 @@ def get_analysis(
             repo.save_analysis(analysis)
             db.commit()
     return analysis
+
+
+@router.get("/{incident_id}/diff/{baseline_id}", response_model=DiffResponse)
+def diff_incidents(
+    incident_id: str, baseline_id: str, db: Annotated[Session, Depends(get_db)]
+) -> DiffResponse:
+    """Compare an incident against a baseline run of the same task."""
+    if incident_id == baseline_id:
+        raise HTTPException(
+            status_code=400,
+            detail="cannot diff an incident against itself",
+        )
+    repo = IncidentRepository(db)
+    incident = _get_incident_or_404(repo, incident_id)
+    baseline = _get_incident_or_404(repo, baseline_id)
+    return compute_diff(incident, baseline)
 
 
 @router.delete("/{incident_id}", status_code=204)

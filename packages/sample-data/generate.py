@@ -849,15 +849,17 @@ def incident_baseline() -> dict:
     xs, ys, hs, lin, ang = motion_series(times, x_keys, y_keys, h_keys)
 
     def clearance(t: float) -> float:
-        # Corridor is clear the whole way; lidar reports near max range.
-        return round(4.6 + 0.3 * math.sin(0.4 * t), 3)
+        # Corridor is clear the whole way; same near-max-range signature
+        # as the failed run before its pallet appears, so a diff pins the
+        # first divergence on the blockage rather than sensor noise.
+        return round(4.9 + 0.08 * math.sin(0.7 * t), 3)
 
     obs = [(t, clearance(t)) for t in times]
     goal_dist = [
         (t, round(dist_to(x_keys, y_keys, t, *goal), 3)) for t in times
     ]
     loc = [(t, round(0.97 + 0.015 * math.sin(0.15 * t), 4)) for t in times]
-    battery = [(t, round(95.5 - 0.012 * t, 3)) for t in times]
+    battery = [(t, round(93.0 - 0.012 * t, 3)) for t in times]
 
     planner_states = [
         (0.0, "idle"), (0.8, "planning"), (1.5, "executing"),
