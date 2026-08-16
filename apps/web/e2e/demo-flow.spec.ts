@@ -132,6 +132,31 @@ test.describe("fleet features", () => {
     ).toBeVisible();
   });
 
+  test("diff page finds the divergence and deep-links the replay", async ({
+    page,
+  }) => {
+    await page.goto(`/incidents/${PRIMARY}/diff`);
+    await expect(
+      page.getByRole("heading", { name: "Incident comparison" }),
+    ).toBeVisible();
+    // The successful same-task run is preselected as the baseline.
+    await expect(page.getByLabel("Baseline")).toHaveValue(
+      "INC-2026-0721-BASE",
+    );
+    // Clearance diverges at t=20 when the failed run's lidar sees the pallet.
+    await expect(page.getByText("First divergence")).toBeVisible();
+    await expect(page.getByText("20.0 s").first()).toBeVisible();
+    await expect(page.getByText(/only here/i).first()).toBeVisible();
+
+    // The callout deep-links into the replay at the divergence moment.
+    await page
+      .getByRole("link", { name: /Open the replay at that moment/ })
+      .click();
+    await expect(
+      page.getByRole("slider", { name: "Replay position" }),
+    ).toHaveValue("20");
+  });
+
   test("upload page rejects malformed json with field errors", async ({
     page,
   }) => {

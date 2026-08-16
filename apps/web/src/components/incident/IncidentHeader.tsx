@@ -62,6 +62,12 @@ export function IncidentHeader({
         </div>
         <div className="flex items-center gap-2">
           <Link
+            href={`/incidents/${encodeURIComponent(incident.id)}/diff`}
+            className="rounded border border-edge-strong bg-surface-2 px-3 py-1.5 text-sm hover:border-accent"
+          >
+            Compare
+          </Link>
+          <Link
             href={`/incidents/${encodeURIComponent(incident.id)}/report`}
             className="rounded border border-edge-strong bg-surface-2 px-3 py-1.5 text-sm hover:border-accent"
           >

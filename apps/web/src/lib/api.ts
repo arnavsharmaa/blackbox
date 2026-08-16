@@ -1,6 +1,7 @@
 import type {
   AnalysisResult,
   AnalyticsResponse,
+  DiffResponse,
   GithubIssue,
   IncidentDetail,
   IncidentListResponse,
@@ -100,6 +101,15 @@ export function fetchGithubIssue(
 
 export function fetchAnalytics(): Promise<AnalyticsResponse> {
   return request<AnalyticsResponse>("/api/analytics");
+}
+
+export function fetchDiff(
+  id: string,
+  baselineId: string,
+): Promise<DiffResponse> {
+  return request<DiffResponse>(
+    `/api/incidents/${encodeURIComponent(id)}/diff/${encodeURIComponent(baselineId)}`,
+  );
 }
 
 export interface UploadFieldError {

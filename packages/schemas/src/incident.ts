@@ -263,3 +263,37 @@ export interface AnalyticsResponse {
   blockage_hotspots: BlockageHotspot[];
   daily: DailyCount[];
 }
+
+/** Body of GET /api/incidents/{id}/diff/{baseline_id}. */
+export interface RunRef {
+  id: string;
+  robot_id: string;
+  task_name: string;
+  outcome: Outcome;
+  duration_s: number;
+}
+
+export interface ChannelDiff {
+  channel: TelemetryChannel;
+  /** Null for string channels, which diverge on any value mismatch. */
+  delta_threshold: number | null;
+  max_abs_delta: number | null;
+  max_abs_delta_t: number | null;
+  first_divergence_t: number | null;
+}
+
+export interface EventTypeDelta {
+  event_type: EventType;
+  incident_count: number;
+  baseline_count: number;
+}
+
+export interface DiffResponse {
+  incident: RunRef;
+  baseline: RunRef;
+  channels: ChannelDiff[];
+  first_divergence_t: number | null;
+  first_divergence_channel: TelemetryChannel | null;
+  events: EventTypeDelta[];
+  event_types_only_in_incident: EventType[];
+}
