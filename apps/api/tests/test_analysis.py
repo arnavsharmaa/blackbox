@@ -58,7 +58,13 @@ def test_diagnoses_are_distinct(parsed_incidents: dict[str, Incident]) -> None:
     categories = {
         analyze_incident(i).failure_category for i in parsed_incidents.values()
     }
-    assert len(categories) == 4
+    # Four distinct failure diagnoses, plus "unknown" for the successful
+    # baseline run — the engine must not invent a failure for it.
+    assert len(categories) == 5
+    assert (
+        analyze_incident(parsed_incidents["baseline"]).failure_category
+        == FailureCategory.UNKNOWN
+    )
 
 
 def test_analysis_is_deterministic(parsed_incidents: dict[str, Incident]) -> None:

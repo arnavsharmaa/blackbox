@@ -7,9 +7,10 @@ test.describe("demo flow", () => {
     page,
   }) => {
     await page.goto("/");
+    // The failure and its successful baseline share a task name — expect both.
     await expect(
       page.getByRole("link", { name: "Deliver pallet to Loading Bay B" }),
-    ).toBeVisible();
+    ).toHaveCount(2);
     await expect(
       page.getByRole("link", { name: "Return to charging dock" }),
     ).toBeVisible();
@@ -25,7 +26,7 @@ test.describe("demo flow", () => {
     await page.goto("/");
     await page.getByLabel("Robot").selectOption("W-104");
     await expect(
-      page.getByRole("link", { name: "Deliver pallet to Loading Bay B" }),
+      page.getByRole("link", { name: "Deliver pallet to Loading Bay B" }).first(),
     ).toBeVisible();
     await expect(
       page.getByRole("link", { name: "Return to charging dock" }),

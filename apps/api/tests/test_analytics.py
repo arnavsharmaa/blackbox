@@ -16,7 +16,8 @@ def test_analytics_aggregates_seeded_fleet(seeded_client: TestClient) -> None:
     assert response.status_code == 200
     body = response.json()
 
-    assert body["total_incidents"] == 4
+    # Four failures plus the successful baseline run.
+    assert body["total_incidents"] == 5
     assert body["critical_incidents"] == 1
     # Primary incident carries the fleet's three recovery attempts, the
     # localization incident one more.
@@ -28,13 +29,17 @@ def test_analytics_aggregates_seeded_fleet(seeded_client: TestClient) -> None:
         "localization_failure": 1,
         "controller_oscillation": 1,
         "sensor_dropout": 1,
+        "unknown": 1,
     }
 
     outcomes = {o["outcome"]: o["count"] for o in body["outcomes"]}
-    assert outcomes == {"failed": 2, "timed_out": 1, "aborted": 1}
+    assert outcomes == {
+        "failed": 2, "timed_out": 1, "aborted": 1, "success": 1,
+    }
 
     robots = {r["robot_id"]: r for r in body["by_robot"]}
     assert set(robots) == {"W-104", "W-087", "W-231", "W-058"}
+    assert robots["W-104"]["incidents"] == 2
     assert robots["W-104"]["critical"] == 1
     assert robots["W-104"]["top_category"] == "persistent_obstacle"
     assert robots["W-104"]["recovery_attempts"] == 3
@@ -42,8 +47,8 @@ def test_analytics_aggregates_seeded_fleet(seeded_client: TestClient) -> None:
     versions = body["by_software_version"]
     assert len(versions) == 1
     assert versions[0]["software_version"] == "nav-stack 2.14.1"
-    assert versions[0]["incidents"] == 4
-    assert len(versions[0]["categories"]) == 4
+    assert versions[0]["incidents"] == 5
+    assert len(versions[0]["categories"]) == 5
 
 
 def test_analytics_blockage_hotspots(seeded_client: TestClient) -> None:
@@ -61,7 +66,7 @@ def test_analytics_blockage_hotspots(seeded_client: TestClient) -> None:
 def test_analytics_daily_trend(seeded_client: TestClient) -> None:
     body = seeded_client.get("/api/analytics").json()
     daily = body["daily"]
-    # Four incidents on four distinct days, one category each.
-    assert len(daily) == 4
+    # Five incidents on five distinct days, one category each.
+    assert len(daily) == 5
     assert [d["date"] for d in daily] == sorted(d["date"] for d in daily)
     assert {d["count"] for d in daily} == {1}

@@ -816,6 +816,140 @@ def incident_sensor_dropout() -> dict:
 # ---------------------------------------------------------------------------
 
 
+# ---------------------------------------------------------------------------
+# Baseline — the same delivery task completing normally (for incident diffing)
+# ---------------------------------------------------------------------------
+
+
+def incident_baseline() -> dict:
+    """A successful run of the primary task, one week before the failure.
+
+    Mirrors INC-2026-0728-001's route for the first ~26 s so a diff shows
+    near-zero deltas until the pallet blockage, then continues to the goal.
+    """
+    base = datetime(2026, 7, 21, 9, 2, 11, tzinfo=timezone.utc)
+    duration, dt = 58.0, 0.2
+    times = sample_times(duration, dt)
+    goal = (18.0, 6.5)
+    corr = "TASK-4655"
+
+    x_keys = [
+        (0, 2.0), (2, 2.8), (12, 10.0), (16, 11.6), (26, 13.0), (32, 14.2),
+        (40, 16.0), (48, 17.6), (52, 18.0), (58, 18.0),
+    ]
+    y_keys = [
+        (0, 2.0), (12, 2.0), (16, 3.0), (26, 4.8), (32, 5.4), (40, 6.0),
+        (48, 6.4), (52, 6.5), (58, 6.5),
+    ]
+    h_keys = [
+        (0, 0.0), (12, 0.0), (16, 0.55), (24, 0.85), (40, 0.5), (48, 0.3),
+        (52, 0.2), (58, 0.2),
+    ]
+
+    xs, ys, hs, lin, ang = motion_series(times, x_keys, y_keys, h_keys)
+
+    def clearance(t: float) -> float:
+        # Corridor is clear the whole way; lidar reports near max range.
+        return round(4.6 + 0.3 * math.sin(0.4 * t), 3)
+
+    obs = [(t, clearance(t)) for t in times]
+    goal_dist = [
+        (t, round(dist_to(x_keys, y_keys, t, *goal), 3)) for t in times
+    ]
+    loc = [(t, round(0.97 + 0.015 * math.sin(0.15 * t), 4)) for t in times]
+    battery = [(t, round(95.5 - 0.012 * t, 3)) for t in times]
+
+    planner_states = [
+        (0.0, "idle"), (0.8, "planning"), (1.5, "executing"),
+        (56.0, "succeeded"),
+    ]
+
+    events: list[dict] = [
+        event(base, 0.0, "task_started", "task_manager",
+              "Task 'Deliver pallet to Loading Bay B' started",
+              payload={"task": "deliver_pallet", "destination": "Loading Bay B"},
+              correlation_id=corr),
+        event(base, 0.5, "nav_goal_issued", "navigation",
+              "Navigation goal issued: Loading Bay B (18.00, 6.50)",
+              payload={"goal_x": goal[0], "goal_y": goal[1],
+                       "frame": "map", "tolerance_m": 0.25},
+              correlation_id=corr),
+        event(base, 0.8, "planner_state_changed", "planner",
+              "Planner state: planning", payload={"state": "planning"},
+              correlation_id=corr),
+        event(base, 1.5, "planner_state_changed", "planner",
+              "Planner state: executing (global path 17.6 m)",
+              payload={"state": "executing", "path_length_m": 17.6},
+              correlation_id=corr),
+    ]
+
+    for t in [round(v, 1) for v in frange(2.0, 54.0, 4.0)]:
+        events.append(event(
+            base, t, "velocity_command", "controller",
+            f"cmd_vel linear={interp_val(lin, t):.2f} m/s "
+            f"angular={interp_val(ang, t):.2f} rad/s",
+            payload={"linear": interp_val(lin, t), "angular": interp_val(ang, t)},
+            correlation_id=corr))
+    for t in [round(v, 1) for v in frange(5.0, 55.0, 5.0)]:
+        events.append(event(
+            base, t, "pose_updated", "localization",
+            f"Pose ({interp(x_keys, t):.2f}, {interp(y_keys, t):.2f}) "
+            f"θ={interp(h_keys, t):.2f}",
+            payload={"x": round(interp(x_keys, t), 3),
+                     "y": round(interp(y_keys, t), 3),
+                     "heading": round(interp(h_keys, t), 3),
+                     "covariance_trace": 0.013},
+            correlation_id=corr))
+    for t in [round(v, 1) for v in frange(20.0, 52.0, 8.0)]:
+        events.append(event(
+            base, t, "obstacle_distance_updated", "perception",
+            f"Nearest obstacle {clearance(t):.2f} m",
+            payload={"distance_m": clearance(t),
+                     "bearing_rad": 0.82, "source": "lidar_front"},
+            correlation_id=corr))
+
+    events.append(event(
+        base, 56.0, "planner_state_changed", "planner",
+        "Planner state: succeeded — goal reached (18.00, 6.50)",
+        payload={"state": "succeeded", "final_goal_distance_m": 0.08},
+        correlation_id=corr))
+
+    return {
+        "schema_version": "1.0",
+        "id": "INC-2026-0721-BASE",
+        "robot_id": "W-104",
+        "robot_model": "Fetchbot AMR-600",
+        "facility": "Warehouse 3 — Fremont",
+        "task_name": "Deliver pallet to Loading Bay B",
+        "task_goal": "Navigate from Pick Station 7 to Loading Bay B "
+                     "(18.00, 6.50) and drop pallet PLT-87710",
+        "start_time": iso(base, 0.0),
+        "end_time": iso(base, duration),
+        "outcome": "success",
+        "severity": "info",
+        "software_version": "nav-stack 2.14.1",
+        "map_version": "warehouse3-2026.07.12",
+        "environment": "Indoor warehouse, aisle corridor C, mixed traffic",
+        "summary": "Baseline run: W-104 completed the same delivery to "
+                   "Loading Bay B in 58 s through a clear aisle corridor C. "
+                   "Recorded as a known-good reference for incident diffing.",
+        "events": events,
+        "telemetry": [
+            series("pos_x", "m", xs),
+            series("pos_y", "m", ys),
+            series("heading", "rad", hs),
+            series("linear_velocity", "m/s", lin),
+            series("angular_velocity", "rad/s", ang),
+            series("obstacle_distance", "m", obs),
+            series("goal_distance", "m", goal_dist),
+            series("localization_confidence", "", loc),
+            series("battery_pct", "%", battery),
+            series("planner_state", "",
+                   [(t, s) for t, s in planner_states]),
+        ],
+    }
+
+
 def frange(start: float, stop: float, step: float) -> list[float]:
     out = []
     v = start
@@ -834,6 +968,7 @@ GENERATORS = [
     incident_localization,
     incident_oscillation,
     incident_sensor_dropout,
+    incident_baseline,
 ]
 
 

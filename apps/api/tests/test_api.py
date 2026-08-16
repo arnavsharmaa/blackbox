@@ -19,7 +19,7 @@ def test_list_incidents_shape_and_pagination(seeded_client: TestClient) -> None:
     response = seeded_client.get("/api/incidents", params={"limit": 2})
     assert response.status_code == 200
     body = response.json()
-    assert body["total"] == 4
+    assert body["total"] == 5
     assert body["limit"] == 2
     assert len(body["items"]) == 2
     item = body["items"][0]
@@ -37,8 +37,11 @@ def test_list_incidents_filters(seeded_client: TestClient) -> None:
     by_robot = seeded_client.get(
         "/api/incidents", params={"robot_id": "W-104"}
     ).json()
-    assert by_robot["total"] == 1
-    assert by_robot["items"][0]["id"] == "INC-2026-0728-001"
+    # W-104 has the primary failure and its successful baseline run.
+    assert by_robot["total"] == 2
+    assert {i["id"] for i in by_robot["items"]} == {
+        "INC-2026-0728-001", "INC-2026-0721-BASE",
+    }
 
     by_severity = seeded_client.get(
         "/api/incidents", params={"severity": "critical"}
@@ -255,7 +258,7 @@ def test_delete_incident(seeded_client: TestClient) -> None:
         == 404
     )
     remaining = seeded_client.get("/api/incidents").json()
-    assert remaining["total"] == 3
+    assert remaining["total"] == 4
     # Cascade: analytics no longer count the deleted incident's category.
     categories = {
         c["category"]

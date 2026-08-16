@@ -24,6 +24,7 @@ def sample_incidents() -> dict[str, dict]:
         "localization": incidents[1],
         "oscillation": incidents[2],
         "sensor_dropout": incidents[3],
+        "baseline": incidents[4],
     }
 
 
@@ -61,7 +62,7 @@ def client(
 def seeded_client(
     client: TestClient, sample_incidents: dict[str, dict]
 ) -> TestClient:
-    """Client whose database contains all four sample incidents."""
+    """Client whose database contains all the sample incidents."""
     import json
 
     for raw in sample_incidents.values():
