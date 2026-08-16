@@ -37,6 +37,11 @@ export default function IncidentDetailPage({
         new Date(incident.start_time).getTime()) /
       1000;
     useReplayStore.getState().init(duration, failureTime(incident));
+    // Deep link: /incidents/{id}?t=45 opens the replay at that moment.
+    const t = Number(
+      new URLSearchParams(window.location.search).get("t") ?? NaN,
+    );
+    if (Number.isFinite(t)) useReplayStore.getState().seek(t);
   }, [incident]);
 
   if (detail.loading) return <LoadingState label="Loading incident…" />;

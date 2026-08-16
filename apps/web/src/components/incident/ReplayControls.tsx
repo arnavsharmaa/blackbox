@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { REPLAY_SPEEDS, useReplayStore } from "@/store/replay";
 import { formatClock } from "@/lib/format";
 
@@ -33,6 +33,27 @@ export function ReplayControls() {
     "rounded border border-edge-strong bg-surface-2 px-2.5 py-1.5 text-sm " +
     "hover:border-accent disabled:opacity-40 disabled:hover:border-edge-strong";
 
+  const [copied, setCopied] = useState(false);
+  const copiedTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(
+    () => () => {
+      if (copiedTimer.current) clearTimeout(copiedTimer.current);
+    },
+    [],
+  );
+  const copyMomentLink = async () => {
+    const t = useReplayStore.getState().time;
+    const url = `${window.location.origin}${window.location.pathname}?t=${t.toFixed(1)}`;
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      if (copiedTimer.current) clearTimeout(copiedTimer.current);
+      copiedTimer.current = setTimeout(() => setCopied(false), 1500);
+    } catch {
+      // Clipboard unavailable (permissions, insecure context) — ignore.
+    }
+  };
+
   return (
     <div className="flex flex-wrap items-center gap-3 rounded-lg border border-edge bg-surface-1 px-4 py-3">
       <div className="flex items-center gap-1.5">
@@ -60,6 +81,15 @@ export function ReplayControls() {
           aria-label="Jump to failure moment"
         >
           ⚑ Failure
+        </button>
+        <button
+          type="button"
+          onClick={copyMomentLink}
+          className={buttonClass}
+          aria-label="Copy link to this moment"
+          title="Copy a link that opens the replay at the current time"
+        >
+          {copied ? "✓ Copied" : "⎘ Link"}
         </button>
       </div>
 
