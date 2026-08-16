@@ -20,7 +20,8 @@ optional LLM layer can summarize the analysis, but it never determines the
 root cause and the product is fully useful without any API key.
 
 > **Status:** working end-to-end — ingestion (JSON/CSV/ROS 2 MCAP), analysis,
-> replay, reports, analytics, all CI-tested. The current focus is validating
+> replay, baseline diffing, reports, analytics, all CI-tested. The current
+> focus is validating
 > the pipeline against **bags recorded from real robots**; if you run Nav2
 > and have a failure bag to share, see the [roadmap](#roadmap).
 
@@ -88,7 +89,13 @@ and guarded against drift by
   the timeline cursor, five synchronized telemetry charts, the 2D path map,
   the system-health panel, and the event inspector from one store.
 - **Evidence you can click** — every evidence item seeks the replay to the
-  moment it describes.
+  moment it describes, and any replay moment can be copied as a shareable
+  deep link (`/incidents/{id}?t=45`) for tickets and chat.
+- **Incident diffing** — compare a failure against a known-good run of the
+  same task: telemetry overlaid channel-by-channel, the first sustained
+  divergence marked per channel, a headline "the runs first diverge at
+  20.0 s in obstacle distance" that deep-links the replay, and an
+  event-type comparison that calls out failure-only events.
 - **Incident reports** — executive summary, metadata, root cause, evidence,
   key timeline, telemetry extremes, reproduction notes; copy as Markdown,
   download as JSON, print view.
@@ -131,8 +138,12 @@ motion; localization is explicitly ruled out with exculpatory evidence.
 
 Three more incidents exercise the other rules: a localization-confidence
 collapse next to reflective racking (`…-002`), controller oscillation in a
-0.78 m doorway (`…-003`), and a 22 s lidar dropout (`…-004`). All sample data
-is generated deterministically — fixed timestamps, no randomness — by
+0.78 m doorway (`…-003`), and a 22 s lidar dropout (`…-004`). A fifth
+sample (`INC-2026-0721-BASE`) is a *successful* run of the same delivery a
+week earlier — the known-good baseline the comparison view diffs against,
+which pins the first divergence at t=20 s when the failed run's lidar picks
+up the pallet, ten seconds before the robot stops. All sample data is
+generated deterministically — fixed timestamps, no randomness — by
 [packages/sample-data/generate.py](packages/sample-data/generate.py).
 
 ## Quick start
@@ -196,6 +207,7 @@ Interactive docs at http://localhost:8000/docs.
 | `GET /api/incidents/{id}/analysis` | Deterministic analysis (`?ai=true` attaches a labeled AI summary if a key is configured) |
 | `POST /api/incidents/{id}/reanalyze` | Re-run the rules engine |
 | `DELETE /api/incidents/{id}` | Remove an incident and its events, telemetry, and analysis |
+| `GET /api/incidents/{id}/diff/{baseline_id}` | Compare two runs: per-channel deltas, first sustained divergence, event-type comparison |
 | `GET /api/incidents/{id}/report` | Structured report + Markdown |
 | `GET /api/incidents/{id}/github-issue` | Issue title/body/labels (`?repo=owner/repo` adds a prefilled URL) |
 | `GET /api/analytics` | Fleet analytics: category/outcome mix, per-robot and per-software-version stats, blockage hotspots, daily trend |
@@ -308,11 +320,12 @@ Pydantic⇄TypeScript schema sync. Frontend tests cover the replay store
 rendering/filters/error/empty states, timeline selection and category
 filters, evidence timestamp navigation, replay controls, the event
 inspector, report rendering, the analytics dashboard, the upload flow
-(including 422 field errors), and incident deletion. The Playwright suite
-drives the real browser through the full demo flow — overview, filters,
-replay to the failure moment, evidence seeking, timeline inspection,
-report, the GitHub issue preview, fleet analytics, and upload validation —
-and runs in CI against the production build.
+(including 422 field errors), incident deletion, the comparison view, and
+replay deep links. The Playwright suite drives the real browser through
+the full demo flow — overview, filters, replay to the failure moment,
+evidence seeking, timeline inspection, report, the GitHub issue preview,
+fleet analytics, the incident diff with its replay deep link, and upload
+validation — and runs in CI against the production build.
 
 ## Limitations
 
@@ -363,9 +376,6 @@ Where BlackBox is heading, in the order the work should land.
 
 ### Later — deeper analysis
 
-- [ ] **Incident diffing** — compare a failure against a known-good run of
-  the same task: aligned timelines, diverging-telemetry highlights, the
-  first moment the runs meaningfully separated.
 - [ ] **Cross-incident rule mining** — surface recurring patterns the
   per-incident rules can't see (e.g. the same shelf edge degrading
   localization across dozens of near-misses that never became incidents).
@@ -374,10 +384,12 @@ Where BlackBox is heading, in the order the work should land.
   (battery sag, wheel slip, motor-current anomalies) with fixture incidents
   proving each rule fires.
 
-Recently shipped: fleet analytics with blockage hotspots, drag-and-drop
-upload with field-level errors, per-deployment thresholds
-(`BLACKBOX_RULE_*`), custom analysis rules via plug-ins, rosbag2 MCAP
-ingestion, and a 4-job CI (backend, frontend, Docker smoke, Playwright).
+Recently shipped: incident diffing against known-good baseline runs with
+first-divergence detection, shareable replay deep links, fleet analytics
+with blockage hotspots, drag-and-drop upload with field-level errors,
+per-deployment thresholds (`BLACKBOX_RULE_*`), custom analysis rules via
+plug-ins, rosbag2 MCAP ingestion, and a 4-job CI (backend, frontend,
+Docker smoke, Playwright).
 
 ## Contributing
 

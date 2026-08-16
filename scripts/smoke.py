@@ -89,6 +89,14 @@ def main() -> int:
           all("t" in item for item in analysis["evidence"])
           and len(analysis["evidence"]) >= 4)
 
+    diff = get(f"{API}/api/incidents/{PRIMARY}/diff/INC-2026-0721-BASE")
+    assert isinstance(diff, dict)
+    check(
+        "diff pins first divergence on obstacle_distance",
+        diff["first_divergence_channel"] == "obstacle_distance"
+        and diff["first_divergence_t"] is not None,
+    )
+
     report = get(f"{API}/api/incidents/{PRIMARY}/report")
     assert isinstance(report, dict)
     check("report has markdown", "# Incident Report" in report["markdown"])
