@@ -114,6 +114,9 @@ and guarded against drift by
 - **Fleet analytics** — a cross-incident dashboard: failure-category and
   outcome mix, per-robot and per-software-version stats, recurring blockage
   hotspots, and a daily trend.
+- **Measured confidence** — engineers confirm or correct each diagnosis in
+  one click; analytics reports the resulting precision per category, so
+  "95% confidence" is checked against how often humans actually agreed.
 - **ROS 2 bag ingestion** — upload a rosbag2 MCAP recording directly
   (`ros2 bag record -s mcap`); decoding is pure Python, so ROS is *not*
   required to run BlackBox. Plus a documented adapter interface, topic
@@ -211,6 +214,7 @@ Interactive docs at http://localhost:8000/docs.
 | `GET /api/incidents/{id}/telemetry` | Telemetry series; filter: `channel` |
 | `GET /api/incidents/{id}/analysis` | Deterministic analysis (`?ai=true` attaches a labeled AI summary if a key is configured) |
 | `POST /api/incidents/{id}/reanalyze` | Re-run the rules engine |
+| `POST /api/incidents/{id}/feedback` | Record an engineer's verdict (confirmed / corrected + actual category); feeds calibration |
 | `DELETE /api/incidents/{id}` | Remove an incident and its events, telemetry, and analysis |
 | `GET /api/incidents/{id}/diff/{baseline_id}` | Compare two runs: per-channel deltas, first sustained divergence, event-type comparison |
 | `GET /api/incidents/{id}/report` | Structured report + Markdown |
@@ -286,7 +290,9 @@ without a key.
 
 ## ROS 2 integration path
 
-ROS 2 is not required. The path from a live robot or bag file:
+ROS 2 is not required to run BlackBox. The full walkthrough — record a
+Nav2 failure in Gazebo and run it through the pipeline — is in
+[docs/hardware-validation.md](docs/hardware-validation.md). The pieces:
 
 1. **rosbag2 (MCAP) ingestion — implemented.** Upload a `.mcap` bag to
    `POST /api/incidents/upload` with a small metadata JSON (`id`,
@@ -353,13 +359,14 @@ Where BlackBox is heading, in the order the work should land.
 - [ ] **Hardware bag validation** — ingest MCAP bags recorded from real
   Nav2 robots (TurtleBot, or any fleet willing to share failure bags) and
   fix what the synthetic bags didn't predict. *This is the single
-  highest-value contribution an outside user can make: run
-  `ros2 bag record -s mcap` on a failed task, upload the bag, and
-  [open an issue](https://github.com/arnavsharmaa/blackbox/issues) with
-  what the diagnosis got right or wrong.*
-- [ ] **Confidence calibration** — collect diagnosed incidents with
-  human-confirmed labels and report per-rule precision, so "95% confidence"
-  is backed by measurement instead of rule weights alone.
+  highest-value contribution an outside user can make:* follow the
+  [hardware validation guide](docs/hardware-validation.md) (Gazebo works,
+  no hardware needed) and
+  [open a bag validation report](https://github.com/arnavsharmaa/blackbox/issues/new?template=bag-validation.md)
+  with what the diagnosis got right or wrong.
+- [ ] **Confidence calibration data** — the machinery shipped (engineer
+  verdicts + measured precision per category in analytics); what's needed
+  now is volume: reviewed incidents from real deployments.
 - [ ] **`.db3` bag support** — the rosbag2 sqlite3 storage plugin, for
   fleets that don't record MCAP. Blocked on message-definition sourcing
   (sqlite3 bags don't embed types the way MCAP does); likely lands as an
@@ -389,7 +396,8 @@ Where BlackBox is heading, in the order the work should land.
   (battery sag, wheel slip, motor-current anomalies) with fixture incidents
   proving each rule fires.
 
-Recently shipped: incident diffing against known-good baseline runs with
+Recently shipped: diagnosis feedback with measured per-category precision,
+incident diffing against known-good baseline runs with
 first-divergence detection, shareable replay deep links, fleet analytics
 with blockage hotspots, drag-and-drop upload with field-level errors,
 per-deployment thresholds (`BLACKBOX_RULE_*`), custom analysis rules via
