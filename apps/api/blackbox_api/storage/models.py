@@ -42,6 +42,9 @@ class IncidentRow(Base):
     analysis: Mapped[AnalysisRow | None] = relationship(
         back_populates="incident", cascade="all, delete-orphan"
     )
+    feedback: Mapped[FeedbackRow | None] = relationship(
+        back_populates="incident", cascade="all, delete-orphan"
+    )
 
 
 class EventRow(Base):
@@ -92,3 +95,22 @@ class AnalysisRow(Base):
     analyzed_at: Mapped[datetime]
 
     incident: Mapped[IncidentRow] = relationship(back_populates="analysis")
+
+
+class FeedbackRow(Base):
+    """One engineer verdict per incident; re-submitting replaces it."""
+
+    __tablename__ = "diagnosis_feedback"
+
+    incident_id: Mapped[str] = mapped_column(
+        ForeignKey("incidents.id", ondelete="CASCADE"), primary_key=True
+    )
+    verdict: Mapped[str] = mapped_column(String(16))
+    diagnosed_category: Mapped[str] = mapped_column(String(48), index=True)
+    actual_category: Mapped[str | None] = mapped_column(
+        String(48), nullable=True
+    )
+    note: Mapped[str] = mapped_column(Text, default="")
+    created_at: Mapped[datetime]
+
+    incident: Mapped[IncidentRow] = relationship(back_populates="feedback")

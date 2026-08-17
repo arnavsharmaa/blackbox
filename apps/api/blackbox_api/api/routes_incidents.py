@@ -2,11 +2,11 @@ from __future__ import annotations
 
 import json
 import logging
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends, Form, HTTPException, Query, UploadFile
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, ValidationError
 from sqlalchemy.orm import Session
 
 from blackbox_api.ai.explain import ai_available, generate_ai_explanation
@@ -19,8 +19,10 @@ from blackbox_api.reports.github_issue import build_github_issue
 from blackbox_api.reports.report import build_report, report_markdown
 from blackbox_api.schemas import (
     AnalysisResult,
+    DiagnosisFeedback,
     EventType,
     FailureCategory,
+    FeedbackVerdict,
     Incident,
     IncidentDetail,
     IncidentEvent,
@@ -80,7 +82,11 @@ def get_incident(
 ) -> IncidentDetail:
     repo = IncidentRepository(db)
     incident = _get_incident_or_404(repo, incident_id)
-    return IncidentDetail(incident=incident, analysis=repo.get_analysis(incident_id))
+    return IncidentDetail(
+        incident=incident,
+        analysis=repo.get_analysis(incident_id),
+        feedback=repo.get_feedback(incident_id),
+    )
 
 
 @router.get("/{incident_id}/events", response_model=list[IncidentEvent])
@@ -167,6 +173,75 @@ def delete_incident(
         )
     db.commit()
     log(logger, logging.INFO, "incident deleted", incident_id=incident_id)
+
+
+class FeedbackRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    verdict: FeedbackVerdict
+    actual_category: FailureCategory | None = None
+    note: str = ""
+
+
+@router.post(
+    "/{incident_id}/feedback",
+    response_model=DiagnosisFeedback,
+    status_code=201,
+)
+def submit_feedback(
+    incident_id: str,
+    body: FeedbackRequest,
+    db: Annotated[Session, Depends(get_db)],
+) -> DiagnosisFeedback:
+    """Record an engineer's verdict on the stored diagnosis.
+
+    Re-submitting replaces the previous verdict. These verdicts feed the
+    calibration section of fleet analytics.
+    """
+    repo = IncidentRepository(db)
+    _get_incident_or_404(repo, incident_id)
+    analysis = repo.get_analysis(incident_id)
+    if analysis is None:
+        raise HTTPException(
+            status_code=409,
+            detail=f"incident '{incident_id}' has no stored analysis to "
+            "give feedback on",
+        )
+    try:
+        feedback = DiagnosisFeedback(
+            incident_id=incident_id,
+            verdict=body.verdict,
+            diagnosed_category=analysis.failure_category,
+            actual_category=body.actual_category,
+            note=body.note,
+            created_at=datetime.now(UTC),
+        )
+    except ValidationError as exc:
+        raise HTTPException(
+            status_code=422,
+            detail={
+                "message": "invalid feedback",
+                "errors": [
+                    {"field": "/".join(str(p) for p in e["loc"]) or "body",
+                     "error": e["msg"]}
+                    for e in exc.errors()
+                ],
+            },
+        ) from exc
+    repo.save_feedback(feedback)
+    db.commit()
+    log(
+        logger,
+        logging.INFO,
+        "diagnosis feedback recorded",
+        incident_id=incident_id,
+        verdict=feedback.verdict.value,
+        diagnosed=feedback.diagnosed_category.value,
+        actual=(
+            feedback.actual_category.value if feedback.actual_category else None
+        ),
+    )
+    return feedback
 
 
 class ReanalyzeResponse(BaseModel):

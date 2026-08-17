@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session, selectinload
 
 from blackbox_api.schemas import (
     AnalysisResult,
+    DiagnosisFeedback,
     FailureCategory,
     Incident,
     IncidentEvent,
@@ -20,6 +21,7 @@ from blackbox_api.schemas import (
 from blackbox_api.storage.models import (
     AnalysisRow,
     EventRow,
+    FeedbackRow,
     IncidentRow,
     TelemetrySampleRow,
 )
@@ -119,6 +121,26 @@ class IncidentRepository:
             )
         )
 
+    def save_feedback(self, feedback: DiagnosisFeedback) -> None:
+        existing = self.session.get(FeedbackRow, feedback.incident_id)
+        if existing is not None:
+            self.session.delete(existing)
+            self.session.flush()
+        self.session.add(
+            FeedbackRow(
+                incident_id=feedback.incident_id,
+                verdict=feedback.verdict.value,
+                diagnosed_category=feedback.diagnosed_category.value,
+                actual_category=(
+                    feedback.actual_category.value
+                    if feedback.actual_category
+                    else None
+                ),
+                note=feedback.note,
+                created_at=feedback.created_at,
+            )
+        )
+
     def delete_incident(self, incident_id: str) -> bool:
         row = self.session.get(IncidentRow, incident_id)
         if row is None:
@@ -146,6 +168,26 @@ class IncidentRepository:
         if row is None:
             return None
         return AnalysisResult.model_validate_json(row.result_json)
+
+    def get_feedback(self, incident_id: str) -> DiagnosisFeedback | None:
+        row = self.session.get(FeedbackRow, incident_id)
+        if row is None:
+            return None
+        return self._row_to_feedback(row)
+
+    def list_feedback(self) -> list[DiagnosisFeedback]:
+        rows = self.session.scalars(select(FeedbackRow)).all()
+        return [self._row_to_feedback(row) for row in rows]
+
+    def _row_to_feedback(self, row: FeedbackRow) -> DiagnosisFeedback:
+        return DiagnosisFeedback(
+            incident_id=row.incident_id,
+            verdict=row.verdict,  # type: ignore[arg-type]
+            diagnosed_category=row.diagnosed_category,  # type: ignore[arg-type]
+            actual_category=row.actual_category,  # type: ignore[arg-type]
+            note=row.note,
+            created_at=_utc(row.created_at),
+        )
 
     def list_incidents(
         self, filters: IncidentFilters, limit: int = 50, offset: int = 0

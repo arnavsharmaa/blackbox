@@ -231,6 +231,48 @@ class AnalysisResult(BaseModel):
     )
 
 
+class FeedbackVerdict(StrEnum):
+    CONFIRMED = "confirmed"
+    CORRECTED = "corrected"
+
+
+class DiagnosisFeedback(BaseModel):
+    """An engineer's verdict on a stored diagnosis.
+
+    The raw material for confidence calibration: fleet analytics computes
+    per-category precision from these, so "95% confidence" can be checked
+    against how often engineers actually agreed.
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    incident_id: str
+    verdict: FeedbackVerdict
+    diagnosed_category: FailureCategory = Field(
+        description="What the engine said at the time feedback was given"
+    )
+    actual_category: FailureCategory | None = Field(
+        default=None,
+        description="The human-determined category; required when corrected",
+    )
+    note: str = ""
+    created_at: datetime
+
+    @model_validator(mode="after")
+    def _check_actual_category(self) -> DiagnosisFeedback:
+        if (
+            self.verdict is FeedbackVerdict.CORRECTED
+            and self.actual_category is None
+        ):
+            raise ValueError("corrected feedback requires actual_category")
+        if (
+            self.verdict is FeedbackVerdict.CONFIRMED
+            and self.actual_category is not None
+        ):
+            raise ValueError("confirmed feedback must not set actual_category")
+        return self
+
+
 class IncidentSummary(BaseModel):
     """Compact incident representation for list views."""
 
@@ -259,6 +301,7 @@ class IncidentDetail(BaseModel):
 
     incident: Incident
     analysis: AnalysisResult | None = None
+    feedback: DiagnosisFeedback | None = None
 
 
 class IncidentListResponse(BaseModel):
