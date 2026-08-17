@@ -53,6 +53,15 @@ const analytics: AnalyticsResponse = {
     { date: "2026-07-28", category: "persistent_obstacle", count: 1 },
     { date: "2026-07-29", category: "localization_failure", count: 1 },
   ],
+  calibration: [
+    {
+      category: "persistent_obstacle",
+      reviewed: 4,
+      confirmed: 3,
+      precision: 0.75,
+      corrected_to: [{ category: "sensor_dropout", count: 1 }],
+    },
+  ],
 };
 
 function stubFetch(body: AnalyticsResponse) {
@@ -100,10 +109,26 @@ describe("analytics page", () => {
       by_robot: [],
       blockage_hotspots: [],
       daily: [],
+      calibration: [],
     });
     render(<AnalyticsPage />);
     expect(
       await screen.findByText("No incidents recorded yet"),
+    ).toBeTruthy();
+  });
+
+  it("shows measured diagnosis precision from verdicts", async () => {
+    render(<AnalyticsPage />);
+    expect(await screen.findByText("Diagnosis calibration")).toBeTruthy();
+    expect(screen.getByText("75%")).toBeTruthy();
+    expect(screen.getByText("Sensor dropout ×1")).toBeTruthy();
+  });
+
+  it("prompts for verdicts when none exist yet", async () => {
+    stubFetch({ ...analytics, calibration: [] });
+    render(<AnalyticsPage />);
+    expect(
+      await screen.findByText(/No engineer verdicts yet/),
     ).toBeTruthy();
   });
 });

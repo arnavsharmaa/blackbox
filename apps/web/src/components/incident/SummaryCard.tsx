@@ -1,14 +1,23 @@
 "use client";
 
-import type { AnalysisResult, Incident } from "@blackbox/schemas";
+import { useState } from "react";
+import type {
+  AnalysisResult,
+  DiagnosisFeedback,
+  FailureCategory,
+  Incident,
+} from "@blackbox/schemas";
+import { submitFeedback } from "@/lib/api";
 import { CATEGORY_LABELS } from "@/lib/format";
 
 export function SummaryCard({
   incident,
   analysis,
+  initialFeedback = null,
 }: {
   incident: Incident;
   analysis: AnalysisResult | null;
+  initialFeedback?: DiagnosisFeedback | null;
 }) {
   return (
     <div className="rounded-lg border border-edge bg-surface-1">
@@ -78,9 +87,157 @@ export function SummaryCard({
                 </ul>
               </div>
             )}
+            <FeedbackControls
+              incidentId={incident.id}
+              initialFeedback={initialFeedback}
+            />
           </>
         )}
       </div>
+    </div>
+  );
+}
+
+const ALL_CATEGORIES = Object.keys(CATEGORY_LABELS) as FailureCategory[];
+
+/**
+ * "Was this diagnosis right?" — engineer verdicts feed the calibration
+ * section of fleet analytics.
+ */
+function FeedbackControls({
+  incidentId,
+  initialFeedback,
+}: {
+  incidentId: string;
+  initialFeedback: DiagnosisFeedback | null;
+}) {
+  const [feedback, setFeedback] = useState(initialFeedback);
+  const [correcting, setCorrecting] = useState(false);
+  const [category, setCategory] = useState<FailureCategory>("unknown");
+  const [note, setNote] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const send = async (body: Parameters<typeof submitFeedback>[1]) => {
+    setBusy(true);
+    setError(null);
+    try {
+      setFeedback(await submitFeedback(incidentId, body));
+      setCorrecting(false);
+      setNote("");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const buttonClass =
+    "rounded border border-edge-strong bg-surface-2 px-2.5 py-1 text-xs " +
+    "hover:border-accent disabled:opacity-40";
+
+  return (
+    <div className="rounded border border-edge bg-surface-2/40 p-3">
+      <h3 className="text-[11px] font-semibold uppercase tracking-wider text-ink-faint">
+        Was this diagnosis right?
+      </h3>
+      {feedback ? (
+        <div className="mt-1.5 text-xs">
+          {feedback.verdict === "confirmed" ? (
+            <p className="text-emerald-300">
+              ✓ Confirmed by an engineer
+              {feedback.note && (
+                <span className="text-ink-dim"> — {feedback.note}</span>
+              )}
+            </p>
+          ) : (
+            <p className="text-amber-300">
+              ✎ Corrected to{" "}
+              {feedback.actual_category
+                ? CATEGORY_LABELS[feedback.actual_category]
+                : "?"}
+              {feedback.note && (
+                <span className="text-ink-dim"> — {feedback.note}</span>
+              )}
+            </p>
+          )}
+          <button
+            type="button"
+            onClick={() => setFeedback(null)}
+            className="mt-1.5 text-[11px] text-ink-faint underline hover:text-ink"
+          >
+            Change verdict
+          </button>
+        </div>
+      ) : correcting ? (
+        <div className="mt-2 space-y-2">
+          <label className="flex items-center gap-2 text-xs text-ink-dim">
+            Actual cause
+            <select
+              value={category}
+              onChange={(e) => setCategory(e.target.value as FailureCategory)}
+              className="rounded border border-edge-strong bg-surface-2 px-2 py-1 text-xs text-ink"
+            >
+              {ALL_CATEGORIES.map((value) => (
+                <option key={value} value={value}>
+                  {CATEGORY_LABELS[value]}
+                </option>
+              ))}
+            </select>
+          </label>
+          <input
+            type="text"
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+            placeholder="What actually happened? (optional)"
+            aria-label="Correction note"
+            className="w-full rounded border border-edge-strong bg-surface-2 px-2 py-1 text-xs text-ink placeholder:text-ink-faint"
+          />
+          <div className="flex gap-2">
+            <button
+              type="button"
+              disabled={busy}
+              onClick={() =>
+                send({ verdict: "corrected", actual_category: category, note })
+              }
+              className={buttonClass}
+            >
+              Save correction
+            </button>
+            <button
+              type="button"
+              onClick={() => setCorrecting(false)}
+              className="text-[11px] text-ink-faint underline hover:text-ink"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      ) : (
+        <div className="mt-2 flex gap-2">
+          <button
+            type="button"
+            disabled={busy}
+            onClick={() => send({ verdict: "confirmed" })}
+            className={`${buttonClass} text-emerald-300`}
+          >
+            ✓ Confirm
+          </button>
+          <button
+            type="button"
+            disabled={busy}
+            onClick={() => setCorrecting(true)}
+            className={`${buttonClass} text-amber-300`}
+          >
+            ✎ Correct…
+          </button>
+        </div>
+      )}
+      {error && (
+        <p role="alert" className="mt-1.5 text-xs text-red-300">
+          {error}
+        </p>
+      )}
     </div>
   );
 }

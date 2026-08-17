@@ -60,7 +60,11 @@ export default function IncidentDetailPage({
           <TelemetryCharts incident={incident} />
         </div>
         <div className="space-y-4">
-          <SummaryCard incident={incident} analysis={analysis} />
+          <SummaryCard
+            incident={incident}
+            analysis={analysis}
+            initialFeedback={detail.data?.feedback ?? null}
+          />
           <PathMap incident={incident} />
           {analysis && <EvidencePanel analysis={analysis} />}
           <HealthPanel incident={incident} />

@@ -1,7 +1,10 @@
 import type {
   AnalysisResult,
   AnalyticsResponse,
+  DiagnosisFeedback,
   DiffResponse,
+  FailureCategory,
+  FeedbackVerdict,
   GithubIssue,
   IncidentDetail,
   IncidentListResponse,
@@ -157,6 +160,39 @@ export async function uploadIncident(
     );
   }
   return (await response.json()) as UploadResponse;
+}
+
+export async function submitFeedback(
+  id: string,
+  body: {
+    verdict: FeedbackVerdict;
+    actual_category?: FailureCategory;
+    note?: string;
+  },
+): Promise<DiagnosisFeedback> {
+  let response: Response;
+  try {
+    response = await fetch(
+      `${API_BASE}/api/incidents/${encodeURIComponent(id)}/feedback`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      },
+    );
+  } catch {
+    throw new ApiError(
+      `Cannot reach the BlackBox API at ${API_BASE}. Is the backend running?`,
+      0,
+    );
+  }
+  if (!response.ok) {
+    throw new ApiError(
+      `Feedback rejected (${response.status})`,
+      response.status,
+    );
+  }
+  return (await response.json()) as DiagnosisFeedback;
 }
 
 export async function deleteIncident(id: string): Promise<void> {

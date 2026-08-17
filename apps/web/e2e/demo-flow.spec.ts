@@ -157,6 +157,22 @@ test.describe("fleet features", () => {
     ).toHaveValue("20");
   });
 
+  test("confirming a diagnosis feeds the calibration table", async ({
+    page,
+  }) => {
+    await page.goto(`/incidents/${PRIMARY}`);
+    await page.getByRole("button", { name: /Confirm/ }).click();
+    await expect(page.getByText(/Confirmed by an engineer/)).toBeVisible();
+
+    await page.goto("/analytics");
+    await expect(page.getByText("Diagnosis calibration")).toBeVisible();
+    const calibrationRow = page
+      .getByRole("row")
+      .filter({ hasText: "Persistent obstacle" })
+      .filter({ hasText: "100%" });
+    await expect(calibrationRow.first()).toBeVisible();
+  });
+
   test("upload page rejects malformed json with field errors", async ({
     page,
   }) => {

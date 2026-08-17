@@ -8,6 +8,7 @@ from pathlib import Path
 from blackbox_api.schemas import (
     EventType,
     FailureCategory,
+    FeedbackVerdict,
     Incident,
     Outcome,
     Severity,
@@ -41,6 +42,7 @@ def test_enum_values_match_typescript() -> None:
         ("Subsystem", Subsystem),
         ("EventType", EventType),
         ("TelemetryChannel", TelemetryChannel),
+        ("FeedbackVerdict", FeedbackVerdict),
     ]
     for ts_name, py_enum in pairs:
         assert _ts_union_values(ts_name) == {m.value for m in py_enum}, ts_name

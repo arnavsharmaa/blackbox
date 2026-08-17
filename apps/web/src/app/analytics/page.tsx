@@ -218,6 +218,76 @@ export default function AnalyticsPage() {
             </Panel>
           </div>
 
+          <Panel title="Diagnosis calibration">
+            {data.calibration.length === 0 ? (
+              <p className="text-sm text-ink-faint">
+                No engineer verdicts yet. Confirm or correct a diagnosis on an
+                incident page and measured precision per category will appear
+                here.
+              </p>
+            ) : (
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-edge text-left text-[10px] uppercase tracking-wider text-ink-faint">
+                    <th className="py-1.5 pr-3 font-semibold">
+                      Diagnosed category
+                    </th>
+                    <th className="py-1.5 pr-3 text-right font-semibold">
+                      Reviewed
+                    </th>
+                    <th className="py-1.5 pr-3 text-right font-semibold">
+                      Confirmed
+                    </th>
+                    <th className="py-1.5 pr-3 text-right font-semibold">
+                      Precision
+                    </th>
+                    <th className="py-1.5 font-semibold">Corrections went to</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {data.calibration.map((row) => (
+                    <tr
+                      key={row.category}
+                      className="border-b border-edge/50 last:border-b-0"
+                    >
+                      <td className="py-2 pr-3">
+                        <span className="inline-flex items-center gap-1.5">
+                          <span
+                            aria-hidden
+                            className="h-2 w-2 rounded-full"
+                            style={{
+                              background: CATEGORY_COLORS[row.category],
+                            }}
+                          />
+                          {CATEGORY_LABELS[row.category]}
+                        </span>
+                      </td>
+                      <td className="py-2 pr-3 text-right tabular-nums">
+                        {row.reviewed}
+                      </td>
+                      <td className="py-2 pr-3 text-right tabular-nums">
+                        {row.confirmed}
+                      </td>
+                      <td className="py-2 pr-3 text-right font-mono tabular-nums">
+                        {Math.round(row.precision * 100)}%
+                      </td>
+                      <td className="py-2 text-xs text-ink-dim">
+                        {row.corrected_to.length === 0
+                          ? "—"
+                          : row.corrected_to
+                              .map(
+                                (entry) =>
+                                  `${CATEGORY_LABELS[entry.category]} ×${entry.count}`,
+                              )
+                              .join(", ")}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </Panel>
+
           <Panel title="Outcomes">
             <div className="flex flex-wrap gap-2">
               {data.outcomes.map((entry) => (

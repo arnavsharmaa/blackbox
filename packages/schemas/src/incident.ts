@@ -146,9 +146,22 @@ export interface IncidentSummary {
   confidence: number | null;
 }
 
+export type FeedbackVerdict = "confirmed" | "corrected";
+
+/** An engineer's verdict on a stored diagnosis (one per incident). */
+export interface DiagnosisFeedback {
+  incident_id: string;
+  verdict: FeedbackVerdict;
+  diagnosed_category: FailureCategory;
+  actual_category: FailureCategory | null;
+  note: string;
+  created_at: string;
+}
+
 export interface IncidentDetail {
   incident: Incident;
   analysis: AnalysisResult | null;
+  feedback: DiagnosisFeedback | null;
 }
 
 export interface IncidentListResponse {
@@ -252,6 +265,15 @@ export interface DailyCount {
   count: number;
 }
 
+/** Measured precision of one diagnosed category, from engineer verdicts. */
+export interface CategoryCalibration {
+  category: FailureCategory;
+  reviewed: number;
+  confirmed: number;
+  precision: number;
+  corrected_to: CategoryCount[];
+}
+
 export interface AnalyticsResponse {
   total_incidents: number;
   critical_incidents: number;
@@ -262,6 +284,7 @@ export interface AnalyticsResponse {
   by_software_version: VersionStats[];
   blockage_hotspots: BlockageHotspot[];
   daily: DailyCount[];
+  calibration: CategoryCalibration[];
 }
 
 /** Body of GET /api/incidents/{id}/diff/{baseline_id}. */
