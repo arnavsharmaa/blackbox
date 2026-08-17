@@ -1,6 +1,7 @@
 {
   "name": "blackbox",
   "private": true,
+  "license": "MIT",
   "workspaces": [
     "apps/web",
     "packages/schemas"

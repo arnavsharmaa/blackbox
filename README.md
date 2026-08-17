@@ -398,6 +398,8 @@ Docker smoke, Playwright).
 
 ## Contributing
 
+See [CONTRIBUTING.md](CONTRIBUTING.md). The short version:
+
 - `make setup && make test && make lint` must pass before a PR.
 - The canonical schema changes in three places together: the Pydantic model,
   the TypeScript mirror, and `make schema` for the JSON export —
@@ -407,3 +409,10 @@ Docker smoke, Playwright).
   proving the diagnosis.
 - Keep adapters pure (bytes → `Incident`); persistence and analysis stay in
   the ingestion service.
+- The most valuable contribution of all is a
+  [bag validation report](https://github.com/arnavsharmaa/blackbox/issues/new?template=bag-validation.md)
+  from a real recording.
+
+## License
+
+[MIT](LICENSE) © Arnav Sharma
