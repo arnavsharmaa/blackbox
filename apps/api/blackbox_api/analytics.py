@@ -13,7 +13,13 @@ from collections import Counter, defaultdict
 
 from pydantic import BaseModel, ConfigDict
 
-from blackbox_api.schemas import FailureCategory, IncidentSummary, Outcome
+from blackbox_api.schemas import (
+    DiagnosisFeedback,
+    FailureCategory,
+    FeedbackVerdict,
+    IncidentSummary,
+    Outcome,
+)
 from blackbox_api.storage.repository import IncidentFilters, IncidentRepository
 
 #: Obstacle positions within this grid size (meters) count as one hotspot.
@@ -71,6 +77,18 @@ class DailyCount(BaseModel):
     count: int
 
 
+class CategoryCalibration(BaseModel):
+    """Measured precision of one diagnosed category, from human verdicts."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    category: FailureCategory
+    reviewed: int
+    confirmed: int
+    precision: float
+    corrected_to: list[CategoryCount]
+
+
 class AnalyticsResponse(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -83,6 +101,7 @@ class AnalyticsResponse(BaseModel):
     by_software_version: list[VersionStats]
     blockage_hotspots: list[BlockageHotspot]
     daily: list[DailyCount]
+    calibration: list[CategoryCalibration]
 
 
 def _top_category(
@@ -127,6 +146,44 @@ def _blockage_hotspots(
     ]
     hotspots.sort(key=lambda h: (-h.count, h.facility, h.x, h.y))
     return hotspots
+
+
+def _calibration(
+    feedback: list[DiagnosisFeedback],
+) -> list[CategoryCalibration]:
+    """Per-category precision from engineer verdicts.
+
+    Turns rule-weight confidence into a measurable claim: of the incidents
+    an engineer reviewed, how often was each diagnosed category right?
+    """
+    by_category: dict[FailureCategory, list[DiagnosisFeedback]] = defaultdict(
+        list
+    )
+    for item in feedback:
+        by_category[item.diagnosed_category].append(item)
+
+    calibration = []
+    for category, items in by_category.items():
+        confirmed = sum(
+            1 for i in items if i.verdict is FeedbackVerdict.CONFIRMED
+        )
+        corrections = Counter(
+            i.actual_category for i in items if i.actual_category is not None
+        )
+        calibration.append(CategoryCalibration(
+            category=category,
+            reviewed=len(items),
+            confirmed=confirmed,
+            precision=round(confirmed / len(items), 4),
+            corrected_to=[
+                CategoryCount(category=actual, count=count)
+                for actual, count in sorted(
+                    corrections.items(), key=lambda kv: (-kv[1], kv[0].value)
+                )
+            ],
+        ))
+    calibration.sort(key=lambda c: (-c.reviewed, c.category.value))
+    return calibration
 
 
 def compute_analytics(repo: IncidentRepository) -> AnalyticsResponse:
@@ -199,6 +256,7 @@ def compute_analytics(repo: IncidentRepository) -> AnalyticsResponse:
         by_robot=by_robot,
         by_software_version=by_version,
         blockage_hotspots=_blockage_hotspots(repo, summaries),
+        calibration=_calibration(repo.list_feedback()),
         daily=sorted(
             (
                 DailyCount(date=day, category=category, count=count)
