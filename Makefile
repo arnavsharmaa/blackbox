@@ -1,5 +1,5 @@
 .PHONY: setup dev api web seed test test-api test-web lint lint-api lint-web \
-        typecheck build demo smoke e2e schema demo-bag clean
+        typecheck build demo smoke e2e schema openapi demo-bag clean
 
 PY := .venv/bin/python
 PIP := .venv/bin/pip
@@ -71,6 +71,10 @@ build:
 ## schema: re-export packages/schemas/incident.schema.json from the Pydantic models
 schema:
 	$(PY) scripts/export_schema.py
+
+## openapi: re-export docs/openapi.json from the FastAPI app
+openapi:
+	$(PY) scripts/export_openapi.py
 
 ## demo-bag: generate a demo ROS 2 MCAP bag to try the rosbag2 upload path
 demo-bag:

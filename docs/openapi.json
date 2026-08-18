@@ -1,0 +1,2105 @@
+{
+  "components": {
+    "schemas": {
+      "AlternativeCause": {
+        "additionalProperties": false,
+        "properties": {
+          "category": {
+            "$ref": "#/components/schemas/FailureCategory"
+          },
+          "reason": {
+            "title": "Reason",
+            "type": "string"
+          },
+          "score": {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Score",
+            "type": "number"
+          }
+        },
+        "required": [
+          "category",
+          "score",
+          "reason"
+        ],
+        "title": "AlternativeCause",
+        "type": "object"
+      },
+      "AnalysisResult": {
+        "additionalProperties": false,
+        "properties": {
+          "ai_explanation": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Optional AI-generated summary of the deterministic analysis. Never used to determine the root cause.",
+            "title": "Ai Explanation"
+          },
+          "alternative_causes": {
+            "items": {
+              "$ref": "#/components/schemas/AlternativeCause"
+            },
+            "title": "Alternative Causes",
+            "type": "array"
+          },
+          "analyzed_at": {
+            "format": "date-time",
+            "title": "Analyzed At",
+            "type": "string"
+          },
+          "confidence": {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Confidence",
+            "type": "number"
+          },
+          "engine_version": {
+            "title": "Engine Version",
+            "type": "string"
+          },
+          "evidence": {
+            "items": {
+              "$ref": "#/components/schemas/EvidenceItem"
+            },
+            "title": "Evidence",
+            "type": "array"
+          },
+          "explanation": {
+            "title": "Explanation",
+            "type": "string"
+          },
+          "failure_category": {
+            "$ref": "#/components/schemas/FailureCategory"
+          },
+          "incident_id": {
+            "title": "Incident Id",
+            "type": "string"
+          },
+          "recommended_actions": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Recommended Actions",
+            "type": "array"
+          },
+          "rules_triggered": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Rules Triggered",
+            "type": "array"
+          }
+        },
+        "required": [
+          "incident_id",
+          "engine_version",
+          "failure_category",
+          "confidence",
+          "explanation",
+          "recommended_actions",
+          "evidence",
+          "alternative_causes",
+          "rules_triggered",
+          "analyzed_at"
+        ],
+        "title": "AnalysisResult",
+        "type": "object"
+      },
+      "AnalyticsResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "blockage_hotspots": {
+            "items": {
+              "$ref": "#/components/schemas/BlockageHotspot"
+            },
+            "title": "Blockage Hotspots",
+            "type": "array"
+          },
+          "by_robot": {
+            "items": {
+              "$ref": "#/components/schemas/RobotStats"
+            },
+            "title": "By Robot",
+            "type": "array"
+          },
+          "by_software_version": {
+            "items": {
+              "$ref": "#/components/schemas/VersionStats"
+            },
+            "title": "By Software Version",
+            "type": "array"
+          },
+          "calibration": {
+            "items": {
+              "$ref": "#/components/schemas/CategoryCalibration"
+            },
+            "title": "Calibration",
+            "type": "array"
+          },
+          "categories": {
+            "items": {
+              "$ref": "#/components/schemas/CategoryCount"
+            },
+            "title": "Categories",
+            "type": "array"
+          },
+          "critical_incidents": {
+            "title": "Critical Incidents",
+            "type": "integer"
+          },
+          "daily": {
+            "items": {
+              "$ref": "#/components/schemas/DailyCount"
+            },
+            "title": "Daily",
+            "type": "array"
+          },
+          "outcomes": {
+            "items": {
+              "$ref": "#/components/schemas/OutcomeCount"
+            },
+            "title": "Outcomes",
+            "type": "array"
+          },
+          "total_incidents": {
+            "title": "Total Incidents",
+            "type": "integer"
+          },
+          "total_recovery_attempts": {
+            "title": "Total Recovery Attempts",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "total_incidents",
+          "critical_incidents",
+          "total_recovery_attempts",
+          "categories",
+          "outcomes",
+          "by_robot",
+          "by_software_version",
+          "blockage_hotspots",
+          "daily",
+          "calibration"
+        ],
+        "title": "AnalyticsResponse",
+        "type": "object"
+      },
+      "BlockageHotspot": {
+        "additionalProperties": false,
+        "properties": {
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          },
+          "facility": {
+            "title": "Facility",
+            "type": "string"
+          },
+          "incident_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Incident Ids",
+            "type": "array"
+          },
+          "x": {
+            "title": "X",
+            "type": "number"
+          },
+          "y": {
+            "title": "Y",
+            "type": "number"
+          }
+        },
+        "required": [
+          "facility",
+          "x",
+          "y",
+          "count",
+          "incident_ids"
+        ],
+        "title": "BlockageHotspot",
+        "type": "object"
+      },
+      "Body_upload_incident_api_incidents_upload_post": {
+        "properties": {
+          "file": {
+            "contentMediaType": "application/octet-stream",
+            "title": "File",
+            "type": "string"
+          },
+          "metadata": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Incident metadata JSON \u2014 required for CSV event uploads, optional overrides for JSON uploads",
+            "title": "Metadata"
+          }
+        },
+        "required": [
+          "file"
+        ],
+        "title": "Body_upload_incident_api_incidents_upload_post",
+        "type": "object"
+      },
+      "CategoryCalibration": {
+        "additionalProperties": false,
+        "description": "Measured precision of one diagnosed category, from human verdicts.",
+        "properties": {
+          "category": {
+            "$ref": "#/components/schemas/FailureCategory"
+          },
+          "confirmed": {
+            "title": "Confirmed",
+            "type": "integer"
+          },
+          "corrected_to": {
+            "items": {
+              "$ref": "#/components/schemas/CategoryCount"
+            },
+            "title": "Corrected To",
+            "type": "array"
+          },
+          "precision": {
+            "title": "Precision",
+            "type": "number"
+          },
+          "reviewed": {
+            "title": "Reviewed",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "category",
+          "reviewed",
+          "confirmed",
+          "precision",
+          "corrected_to"
+        ],
+        "title": "CategoryCalibration",
+        "type": "object"
+      },
+      "CategoryCount": {
+        "additionalProperties": false,
+        "properties": {
+          "category": {
+            "$ref": "#/components/schemas/FailureCategory"
+          },
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "category",
+          "count"
+        ],
+        "title": "CategoryCount",
+        "type": "object"
+      },
+      "ChannelDiff": {
+        "additionalProperties": false,
+        "properties": {
+          "channel": {
+            "$ref": "#/components/schemas/TelemetryChannel"
+          },
+          "delta_threshold": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Delta Threshold"
+          },
+          "first_divergence_t": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "First Divergence T"
+          },
+          "max_abs_delta": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Abs Delta"
+          },
+          "max_abs_delta_t": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Abs Delta T"
+          }
+        },
+        "required": [
+          "channel",
+          "delta_threshold",
+          "max_abs_delta",
+          "max_abs_delta_t",
+          "first_divergence_t"
+        ],
+        "title": "ChannelDiff",
+        "type": "object"
+      },
+      "DailyCount": {
+        "additionalProperties": false,
+        "properties": {
+          "category": {
+            "$ref": "#/components/schemas/FailureCategory"
+          },
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          },
+          "date": {
+            "title": "Date",
+            "type": "string"
+          }
+        },
+        "required": [
+          "date",
+          "category",
+          "count"
+        ],
+        "title": "DailyCount",
+        "type": "object"
+      },
+      "DiagnosisFeedback": {
+        "additionalProperties": false,
+        "description": "An engineer's verdict on a stored diagnosis.\n\nThe raw material for confidence calibration: fleet analytics computes\nper-category precision from these, so \"95% confidence\" can be checked\nagainst how often engineers actually agreed.",
+        "properties": {
+          "actual_category": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/FailureCategory"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The human-determined category; required when corrected"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "diagnosed_category": {
+            "$ref": "#/components/schemas/FailureCategory",
+            "description": "What the engine said at the time feedback was given"
+          },
+          "incident_id": {
+            "title": "Incident Id",
+            "type": "string"
+          },
+          "note": {
+            "default": "",
+            "title": "Note",
+            "type": "string"
+          },
+          "verdict": {
+            "$ref": "#/components/schemas/FeedbackVerdict"
+          }
+        },
+        "required": [
+          "incident_id",
+          "verdict",
+          "diagnosed_category",
+          "created_at"
+        ],
+        "title": "DiagnosisFeedback",
+        "type": "object"
+      },
+      "DiffResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "baseline": {
+            "$ref": "#/components/schemas/RunRef"
+          },
+          "channels": {
+            "items": {
+              "$ref": "#/components/schemas/ChannelDiff"
+            },
+            "title": "Channels",
+            "type": "array"
+          },
+          "event_types_only_in_incident": {
+            "items": {
+              "$ref": "#/components/schemas/EventType"
+            },
+            "title": "Event Types Only In Incident",
+            "type": "array"
+          },
+          "events": {
+            "items": {
+              "$ref": "#/components/schemas/EventTypeDelta"
+            },
+            "title": "Events",
+            "type": "array"
+          },
+          "first_divergence_channel": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TelemetryChannel"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "first_divergence_t": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "First Divergence T"
+          },
+          "incident": {
+            "$ref": "#/components/schemas/RunRef"
+          }
+        },
+        "required": [
+          "incident",
+          "baseline",
+          "channels",
+          "first_divergence_t",
+          "first_divergence_channel",
+          "events",
+          "event_types_only_in_incident"
+        ],
+        "title": "DiffResponse",
+        "type": "object"
+      },
+      "EventType": {
+        "enum": [
+          "task_started",
+          "nav_goal_issued",
+          "pose_updated",
+          "velocity_command",
+          "planner_state_changed",
+          "obstacle_distance_updated",
+          "recovery_started",
+          "recovery_completed",
+          "warning_raised",
+          "error_raised",
+          "task_timed_out",
+          "task_failed"
+        ],
+        "title": "EventType",
+        "type": "string"
+      },
+      "EventTypeDelta": {
+        "additionalProperties": false,
+        "properties": {
+          "baseline_count": {
+            "title": "Baseline Count",
+            "type": "integer"
+          },
+          "event_type": {
+            "$ref": "#/components/schemas/EventType"
+          },
+          "incident_count": {
+            "title": "Incident Count",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "event_type",
+          "incident_count",
+          "baseline_count"
+        ],
+        "title": "EventTypeDelta",
+        "type": "object"
+      },
+      "EvidenceItem": {
+        "additionalProperties": false,
+        "properties": {
+          "channel": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TelemetryChannel"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "detail": {
+            "default": "",
+            "title": "Detail",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "summary": {
+            "title": "Summary",
+            "type": "string"
+          },
+          "t": {
+            "description": "Anchor time (s since incident start)",
+            "minimum": 0.0,
+            "title": "T",
+            "type": "number"
+          },
+          "t_end": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "T End"
+          },
+          "tags": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Tags",
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "summary",
+          "t"
+        ],
+        "title": "EvidenceItem",
+        "type": "object"
+      },
+      "FailureCategory": {
+        "enum": [
+          "persistent_obstacle",
+          "localization_failure",
+          "controller_oscillation",
+          "sensor_dropout",
+          "unknown"
+        ],
+        "title": "FailureCategory",
+        "type": "string"
+      },
+      "FeedbackRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "actual_category": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/FailureCategory"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "note": {
+            "default": "",
+            "title": "Note",
+            "type": "string"
+          },
+          "verdict": {
+            "$ref": "#/components/schemas/FeedbackVerdict"
+          }
+        },
+        "required": [
+          "verdict"
+        ],
+        "title": "FeedbackRequest",
+        "type": "object"
+      },
+      "FeedbackVerdict": {
+        "enum": [
+          "confirmed",
+          "corrected"
+        ],
+        "title": "FeedbackVerdict",
+        "type": "string"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+          }
+        },
+        "title": "HTTPValidationError",
+        "type": "object"
+      },
+      "Incident": {
+        "additionalProperties": false,
+        "description": "A complete incident as ingested into BlackBox.",
+        "properties": {
+          "end_time": {
+            "format": "date-time",
+            "title": "End Time",
+            "type": "string"
+          },
+          "environment": {
+            "minLength": 1,
+            "title": "Environment",
+            "type": "string"
+          },
+          "events": {
+            "items": {
+              "$ref": "#/components/schemas/IncidentEvent"
+            },
+            "minItems": 1,
+            "title": "Events",
+            "type": "array"
+          },
+          "facility": {
+            "minLength": 1,
+            "title": "Facility",
+            "type": "string"
+          },
+          "id": {
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9._:-]+$",
+            "title": "Id",
+            "type": "string"
+          },
+          "map_version": {
+            "minLength": 1,
+            "title": "Map Version",
+            "type": "string"
+          },
+          "outcome": {
+            "$ref": "#/components/schemas/Outcome"
+          },
+          "robot_id": {
+            "minLength": 1,
+            "title": "Robot Id",
+            "type": "string"
+          },
+          "robot_model": {
+            "minLength": 1,
+            "title": "Robot Model",
+            "type": "string"
+          },
+          "schema_version": {
+            "default": "1.0",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "severity": {
+            "$ref": "#/components/schemas/Severity"
+          },
+          "software_version": {
+            "minLength": 1,
+            "title": "Software Version",
+            "type": "string"
+          },
+          "start_time": {
+            "format": "date-time",
+            "title": "Start Time",
+            "type": "string"
+          },
+          "summary": {
+            "minLength": 1,
+            "title": "Summary",
+            "type": "string"
+          },
+          "task_goal": {
+            "minLength": 1,
+            "title": "Task Goal",
+            "type": "string"
+          },
+          "task_name": {
+            "minLength": 1,
+            "title": "Task Name",
+            "type": "string"
+          },
+          "telemetry": {
+            "items": {
+              "$ref": "#/components/schemas/TelemetrySeries"
+            },
+            "title": "Telemetry",
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "robot_id",
+          "robot_model",
+          "facility",
+          "task_name",
+          "task_goal",
+          "start_time",
+          "end_time",
+          "outcome",
+          "severity",
+          "software_version",
+          "map_version",
+          "environment",
+          "summary",
+          "events"
+        ],
+        "title": "Incident",
+        "type": "object"
+      },
+      "IncidentDetail": {
+        "additionalProperties": false,
+        "properties": {
+          "analysis": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AnalysisResult"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "feedback": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DiagnosisFeedback"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "incident": {
+            "$ref": "#/components/schemas/Incident"
+          }
+        },
+        "required": [
+          "incident"
+        ],
+        "title": "IncidentDetail",
+        "type": "object"
+      },
+      "IncidentEvent": {
+        "additionalProperties": false,
+        "properties": {
+          "correlation_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Correlation Id"
+          },
+          "event_type": {
+            "$ref": "#/components/schemas/EventType"
+          },
+          "evidence_tags": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Evidence Tags",
+            "type": "array"
+          },
+          "message": {
+            "minLength": 1,
+            "title": "Message",
+            "type": "string"
+          },
+          "payload": {
+            "additionalProperties": true,
+            "title": "Payload",
+            "type": "object"
+          },
+          "severity": {
+            "$ref": "#/components/schemas/Severity",
+            "default": "info"
+          },
+          "subsystem": {
+            "$ref": "#/components/schemas/Subsystem"
+          },
+          "timestamp": {
+            "format": "date-time",
+            "title": "Timestamp",
+            "type": "string"
+          }
+        },
+        "required": [
+          "timestamp",
+          "event_type",
+          "subsystem",
+          "message"
+        ],
+        "title": "IncidentEvent",
+        "type": "object"
+      },
+      "IncidentListResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/IncidentSummary"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "limit": {
+            "title": "Limit",
+            "type": "integer"
+          },
+          "offset": {
+            "title": "Offset",
+            "type": "integer"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "limit",
+          "offset"
+        ],
+        "title": "IncidentListResponse",
+        "type": "object"
+      },
+      "IncidentSummary": {
+        "additionalProperties": false,
+        "description": "Compact incident representation for list views.",
+        "properties": {
+          "confidence": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Confidence"
+          },
+          "duration_s": {
+            "title": "Duration S",
+            "type": "number"
+          },
+          "end_time": {
+            "format": "date-time",
+            "title": "End Time",
+            "type": "string"
+          },
+          "event_count": {
+            "title": "Event Count",
+            "type": "integer"
+          },
+          "facility": {
+            "title": "Facility",
+            "type": "string"
+          },
+          "failure_category": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/FailureCategory"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "outcome": {
+            "$ref": "#/components/schemas/Outcome"
+          },
+          "recovery_attempts": {
+            "title": "Recovery Attempts",
+            "type": "integer"
+          },
+          "robot_id": {
+            "title": "Robot Id",
+            "type": "string"
+          },
+          "robot_model": {
+            "title": "Robot Model",
+            "type": "string"
+          },
+          "severity": {
+            "$ref": "#/components/schemas/Severity"
+          },
+          "software_version": {
+            "title": "Software Version",
+            "type": "string"
+          },
+          "start_time": {
+            "format": "date-time",
+            "title": "Start Time",
+            "type": "string"
+          },
+          "summary": {
+            "title": "Summary",
+            "type": "string"
+          },
+          "task_name": {
+            "title": "Task Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "robot_id",
+          "robot_model",
+          "facility",
+          "task_name",
+          "start_time",
+          "end_time",
+          "duration_s",
+          "outcome",
+          "severity",
+          "software_version",
+          "summary",
+          "event_count",
+          "recovery_attempts"
+        ],
+        "title": "IncidentSummary",
+        "type": "object"
+      },
+      "Outcome": {
+        "enum": [
+          "success",
+          "failed",
+          "timed_out",
+          "aborted"
+        ],
+        "title": "Outcome",
+        "type": "string"
+      },
+      "OutcomeCount": {
+        "additionalProperties": false,
+        "properties": {
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          },
+          "outcome": {
+            "$ref": "#/components/schemas/Outcome"
+          }
+        },
+        "required": [
+          "outcome",
+          "count"
+        ],
+        "title": "OutcomeCount",
+        "type": "object"
+      },
+      "ReanalyzeResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "analysis": {
+            "$ref": "#/components/schemas/AnalysisResult"
+          },
+          "incident_id": {
+            "title": "Incident Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "incident_id",
+          "analysis"
+        ],
+        "title": "ReanalyzeResponse",
+        "type": "object"
+      },
+      "RobotStats": {
+        "additionalProperties": false,
+        "properties": {
+          "critical": {
+            "title": "Critical",
+            "type": "integer"
+          },
+          "incidents": {
+            "title": "Incidents",
+            "type": "integer"
+          },
+          "recovery_attempts": {
+            "title": "Recovery Attempts",
+            "type": "integer"
+          },
+          "robot_id": {
+            "title": "Robot Id",
+            "type": "string"
+          },
+          "robot_model": {
+            "title": "Robot Model",
+            "type": "string"
+          },
+          "top_category": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/FailureCategory"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "robot_id",
+          "robot_model",
+          "incidents",
+          "critical",
+          "recovery_attempts",
+          "top_category"
+        ],
+        "title": "RobotStats",
+        "type": "object"
+      },
+      "RunRef": {
+        "additionalProperties": false,
+        "properties": {
+          "duration_s": {
+            "title": "Duration S",
+            "type": "number"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "outcome": {
+            "$ref": "#/components/schemas/Outcome"
+          },
+          "robot_id": {
+            "title": "Robot Id",
+            "type": "string"
+          },
+          "task_name": {
+            "title": "Task Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "robot_id",
+          "task_name",
+          "outcome",
+          "duration_s"
+        ],
+        "title": "RunRef",
+        "type": "object"
+      },
+      "Severity": {
+        "enum": [
+          "info",
+          "warning",
+          "error",
+          "critical"
+        ],
+        "title": "Severity",
+        "type": "string"
+      },
+      "Subsystem": {
+        "enum": [
+          "task_manager",
+          "navigation",
+          "planner",
+          "controller",
+          "localization",
+          "perception",
+          "system"
+        ],
+        "title": "Subsystem",
+        "type": "string"
+      },
+      "TelemetryChannel": {
+        "enum": [
+          "pos_x",
+          "pos_y",
+          "heading",
+          "linear_velocity",
+          "angular_velocity",
+          "obstacle_distance",
+          "goal_distance",
+          "localization_confidence",
+          "planner_state",
+          "recovery_count",
+          "battery_pct"
+        ],
+        "title": "TelemetryChannel",
+        "type": "string"
+      },
+      "TelemetrySample": {
+        "additionalProperties": false,
+        "properties": {
+          "t": {
+            "description": "Seconds since incident start_time",
+            "minimum": 0.0,
+            "title": "T",
+            "type": "number"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "title": "Value"
+          }
+        },
+        "required": [
+          "t",
+          "value"
+        ],
+        "title": "TelemetrySample",
+        "type": "object"
+      },
+      "TelemetrySeries": {
+        "additionalProperties": false,
+        "properties": {
+          "channel": {
+            "$ref": "#/components/schemas/TelemetryChannel"
+          },
+          "samples": {
+            "items": {
+              "$ref": "#/components/schemas/TelemetrySample"
+            },
+            "title": "Samples",
+            "type": "array"
+          },
+          "unit": {
+            "default": "",
+            "title": "Unit",
+            "type": "string"
+          }
+        },
+        "required": [
+          "channel",
+          "samples"
+        ],
+        "title": "TelemetrySeries",
+        "type": "object"
+      },
+      "UploadResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "confidence": {
+            "title": "Confidence",
+            "type": "number"
+          },
+          "event_count": {
+            "title": "Event Count",
+            "type": "integer"
+          },
+          "failure_category": {
+            "$ref": "#/components/schemas/FailureCategory"
+          },
+          "incident_id": {
+            "title": "Incident Id",
+            "type": "string"
+          },
+          "telemetry_channels": {
+            "title": "Telemetry Channels",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "incident_id",
+          "event_count",
+          "telemetry_channels",
+          "failure_category",
+          "confidence"
+        ],
+        "title": "UploadResponse",
+        "type": "object"
+      },
+      "ValidationError": {
+        "properties": {
+          "ctx": {
+            "title": "Context",
+            "type": "object"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "title": "Location",
+            "type": "array"
+          },
+          "msg": {
+            "title": "Message",
+            "type": "string"
+          },
+          "type": {
+            "title": "Error Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError",
+        "type": "object"
+      },
+      "VersionStats": {
+        "additionalProperties": false,
+        "properties": {
+          "categories": {
+            "items": {
+              "$ref": "#/components/schemas/CategoryCount"
+            },
+            "title": "Categories",
+            "type": "array"
+          },
+          "incidents": {
+            "title": "Incidents",
+            "type": "integer"
+          },
+          "software_version": {
+            "title": "Software Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "software_version",
+          "incidents",
+          "categories"
+        ],
+        "title": "VersionStats",
+        "type": "object"
+      }
+    }
+  },
+  "info": {
+    "description": "Flight recorder and incident reconstruction for autonomous robots.",
+    "title": "BlackBox API",
+    "version": "0.1.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/api/analytics": {
+      "get": {
+        "operationId": "get_analytics_api_analytics_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnalyticsResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Get Analytics",
+        "tags": [
+          "analytics"
+        ]
+      }
+    },
+    "/api/incidents": {
+      "get": {
+        "operationId": "list_incidents_api_incidents_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "robot_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Robot Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "severity",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/Severity"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Severity"
+            }
+          },
+          {
+            "in": "query",
+            "name": "outcome",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/Outcome"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Outcome"
+            }
+          },
+          {
+            "in": "query",
+            "name": "failure_category",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/FailureCategory"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Failure Category"
+            }
+          },
+          {
+            "in": "query",
+            "name": "start_after",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Start After"
+            }
+          },
+          {
+            "in": "query",
+            "name": "start_before",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Start Before"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 50,
+              "maximum": 200,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "minimum": 0,
+              "title": "Offset",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IncidentListResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "List Incidents",
+        "tags": [
+          "incidents"
+        ]
+      }
+    },
+    "/api/incidents/upload": {
+      "post": {
+        "operationId": "upload_incident_api_incidents_upload_post",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_upload_incident_api_incidents_upload_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UploadResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Upload Incident",
+        "tags": [
+          "incidents"
+        ]
+      }
+    },
+    "/api/incidents/{incident_id}": {
+      "delete": {
+        "operationId": "delete_incident_api_incidents__incident_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "incident_id",
+            "required": true,
+            "schema": {
+              "title": "Incident Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Delete Incident",
+        "tags": [
+          "incidents"
+        ]
+      },
+      "get": {
+        "operationId": "get_incident_api_incidents__incident_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "incident_id",
+            "required": true,
+            "schema": {
+              "title": "Incident Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IncidentDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Incident",
+        "tags": [
+          "incidents"
+        ]
+      }
+    },
+    "/api/incidents/{incident_id}/analysis": {
+      "get": {
+        "operationId": "get_analysis_api_incidents__incident_id__analysis_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "incident_id",
+            "required": true,
+            "schema": {
+              "title": "Incident Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Attach an AI-generated summary if an API key is configured. Never affects the deterministic diagnosis.",
+            "in": "query",
+            "name": "ai",
+            "required": false,
+            "schema": {
+              "default": false,
+              "description": "Attach an AI-generated summary if an API key is configured. Never affects the deterministic diagnosis.",
+              "title": "Ai",
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnalysisResult"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Analysis",
+        "tags": [
+          "incidents"
+        ]
+      }
+    },
+    "/api/incidents/{incident_id}/diff/{baseline_id}": {
+      "get": {
+        "description": "Compare an incident against a baseline run of the same task.",
+        "operationId": "diff_incidents_api_incidents__incident_id__diff__baseline_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "incident_id",
+            "required": true,
+            "schema": {
+              "title": "Incident Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "baseline_id",
+            "required": true,
+            "schema": {
+              "title": "Baseline Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DiffResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Diff Incidents",
+        "tags": [
+          "incidents"
+        ]
+      }
+    },
+    "/api/incidents/{incident_id}/events": {
+      "get": {
+        "operationId": "get_events_api_incidents__incident_id__events_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "incident_id",
+            "required": true,
+            "schema": {
+              "title": "Incident Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "event_type",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/EventType"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Event Type"
+            }
+          },
+          {
+            "in": "query",
+            "name": "severity",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/Severity"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Severity"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/IncidentEvent"
+                  },
+                  "title": "Response Get Events Api Incidents  Incident Id  Events Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Events",
+        "tags": [
+          "incidents"
+        ]
+      }
+    },
+    "/api/incidents/{incident_id}/feedback": {
+      "post": {
+        "description": "Record an engineer's verdict on the stored diagnosis.\n\nRe-submitting replaces the previous verdict. These verdicts feed the\ncalibration section of fleet analytics.",
+        "operationId": "submit_feedback_api_incidents__incident_id__feedback_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "incident_id",
+            "required": true,
+            "schema": {
+              "title": "Incident Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FeedbackRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DiagnosisFeedback"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Submit Feedback",
+        "tags": [
+          "incidents"
+        ]
+      }
+    },
+    "/api/incidents/{incident_id}/github-issue": {
+      "get": {
+        "operationId": "get_github_issue_api_incidents__incident_id__github_issue_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "incident_id",
+            "required": true,
+            "schema": {
+              "title": "Incident Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Optional 'owner/repo' used to build a prefilled issue URL",
+            "in": "query",
+            "name": "repo",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Optional 'owner/repo' used to build a prefilled issue URL",
+              "title": "Repo"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response Get Github Issue Api Incidents  Incident Id  Github Issue Get"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Github Issue",
+        "tags": [
+          "incidents"
+        ]
+      }
+    },
+    "/api/incidents/{incident_id}/reanalyze": {
+      "post": {
+        "operationId": "reanalyze_api_incidents__incident_id__reanalyze_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "incident_id",
+            "required": true,
+            "schema": {
+              "title": "Incident Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReanalyzeResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Reanalyze",
+        "tags": [
+          "incidents"
+        ]
+      }
+    },
+    "/api/incidents/{incident_id}/report": {
+      "get": {
+        "operationId": "get_report_api_incidents__incident_id__report_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "incident_id",
+            "required": true,
+            "schema": {
+              "title": "Incident Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "format",
+            "required": false,
+            "schema": {
+              "default": "json",
+              "pattern": "^(json|markdown)$",
+              "title": "Format",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response Get Report Api Incidents  Incident Id  Report Get"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Report",
+        "tags": [
+          "incidents"
+        ]
+      }
+    },
+    "/api/incidents/{incident_id}/telemetry": {
+      "get": {
+        "operationId": "get_telemetry_api_incidents__incident_id__telemetry_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "incident_id",
+            "required": true,
+            "schema": {
+              "title": "Incident Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "channel",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Channel"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/TelemetrySeries"
+                  },
+                  "title": "Response Get Telemetry Api Incidents  Incident Id  Telemetry Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Telemetry",
+        "tags": [
+          "incidents"
+        ]
+      }
+    },
+    "/health": {
+      "get": {
+        "operationId": "health_health_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "integer"
+                      }
+                    ]
+                  },
+                  "title": "Response Health Health Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Health",
+        "tags": [
+          "health"
+        ]
+      }
+    }
+  }
+}

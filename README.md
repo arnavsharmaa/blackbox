@@ -181,6 +181,7 @@ Open **http://localhost:3000**, click into
 | `make smoke` | End-to-end smoke test against a running stack |
 | `make e2e` | Playwright browser tests against a running stack |
 | `make schema` | Re-export the JSON Schema from the Pydantic models |
+| `make openapi` | Re-export `docs/openapi.json` from the FastAPI app |
 
 Copy `.env.example` to `.env` to override defaults (database path, CORS,
 API URL, optional AI key). Database initialization is repeatable: tables are
@@ -203,7 +204,9 @@ runs the end-to-end smoke test against it.
 
 ## API
 
-Interactive docs at http://localhost:8000/docs.
+Interactive docs at http://localhost:8000/docs. A committed OpenAPI spec
+lives at [docs/openapi.json](docs/openapi.json) for client generation and
+contract diffing (`make openapi` regenerates it).
 
 | Endpoint | Description |
 | --- | --- |
