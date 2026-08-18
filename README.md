@@ -1,6 +1,9 @@
 # BlackBox
 
 [![CI](https://github.com/arnavsharmaa/blackbox/actions/workflows/ci.yml/badge.svg)](https://github.com/arnavsharmaa/blackbox/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](apps/api/pyproject.toml)
+[![Node 20+](https://img.shields.io/badge/node-20%2B-brightgreen.svg)](package.json)
 
 **BlackBox reconstructs robot failures from telemetry, planner decisions, sensor streams, and controller actions—then produces a replayable, evidence-backed incident report.**
 

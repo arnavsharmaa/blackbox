@@ -1,0 +1,15 @@
+cff-version: 1.2.0
+message: "If you use BlackBox in your work, please cite it as below."
+title: "BlackBox: flight recorder and incident reconstruction for autonomous robots"
+type: software
+authors:
+  - family-names: Sharma
+    given-names: Arnav
+repository-code: "https://github.com/arnavsharmaa/blackbox"
+license: MIT
+keywords:
+  - robotics
+  - ros2
+  - nav2
+  - root-cause-analysis
+  - incident-reconstruction
