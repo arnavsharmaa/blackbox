@@ -1,8 +1,15 @@
-.PHONY: setup dev api web seed test test-api test-web lint lint-api lint-web \
+.PHONY: help setup dev api web seed test test-api test-web lint lint-api lint-web \
         typecheck build demo smoke e2e schema openapi demo-bag clean
+
+.DEFAULT_GOAL := help
 
 PY := .venv/bin/python
 PIP := .venv/bin/pip
+
+## help: list available targets
+help:
+	@echo "BlackBox — available targets:"
+	@grep -E '^## [a-z0-9-]+:' $(MAKEFILE_LIST) | sed 's/^## /  make /' | sort
 
 ## setup: create the Python venv, install backend + frontend dependencies
 setup:
@@ -36,6 +43,7 @@ dev:
 ## demo: seed the database, then start the full application
 demo: seed dev
 
+## test: backend pytest + frontend vitest
 test: test-api test-web
 
 test-api:
@@ -52,6 +60,7 @@ smoke:
 e2e:
 	cd apps/web && npx playwright test
 
+## lint: ruff + mypy --strict + eslint + tsc --noEmit
 lint: lint-api lint-web typecheck
 
 lint-api:
@@ -80,5 +89,6 @@ openapi:
 demo-bag:
 	$(PY) scripts/make_demo_bag.py
 
+## clean: remove the local database and frontend build output
 clean:
 	rm -rf data/*.db apps/web/.next
