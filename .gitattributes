@@ -1,0 +1,12 @@
+# Normalize line endings; .editorconfig keeps editors on LF.
+* text=auto eol=lf
+
+# Binary assets
+*.png binary
+*.mcap binary
+*.db3 binary
+
+# Generated files: collapse in PR diffs and exclude from language stats.
+docs/openapi.json linguist-generated=true
+packages/schemas/incident.schema.json linguist-generated=true
+packages/sample-data/incidents/*.json linguist-generated=true
