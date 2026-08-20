@@ -7,6 +7,7 @@ from typing import Any
 from sqlalchemy.orm import Session
 
 from blackbox_api.analysis.engine import analyze_incident
+from blackbox_api.config import get_settings
 from blackbox_api.ingestion.base import IncidentAdapter, IngestError
 from blackbox_api.ingestion.csv_adapter import CsvIncidentAdapter
 from blackbox_api.ingestion.json_adapter import JsonIncidentAdapter
@@ -23,7 +24,6 @@ ADAPTERS: tuple[IncidentAdapter, ...] = (
     Rosbag2Adapter(),
 )
 
-MAX_UPLOAD_BYTES = 20 * 1024 * 1024
 
 
 def adapter_for_filename(filename: str) -> IncidentAdapter:
@@ -44,10 +44,9 @@ def ingest_incident(
     metadata: dict[str, Any] | None = None,
 ) -> tuple[Incident, AnalysisResult]:
     """Parse, validate, persist and analyze an incident payload."""
-    if len(raw) > MAX_UPLOAD_BYTES:
-        raise IngestError(
-            f"upload exceeds the {MAX_UPLOAD_BYTES // (1024 * 1024)} MB limit"
-        )
+    max_mb = get_settings().max_upload_mb
+    if len(raw) > max_mb * 1024 * 1024:
+        raise IngestError(f"upload exceeds the {max_mb} MB limit")
     if not raw.strip():
         raise IngestError("uploaded file is empty")
 

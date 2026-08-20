@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 from datetime import datetime
 
+import pytest
 from fastapi.testclient import TestClient
 
 
@@ -199,6 +200,30 @@ def test_upload_schema_violation_lists_fields(client: TestClient) -> None:
     detail = response.json()["detail"]
     assert detail["message"] == "incident failed schema validation"
     assert any(e["field"] == "robot_id" for e in detail["errors"])
+
+
+def test_upload_size_limit_is_configurable(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from blackbox_api.config import get_settings
+
+    monkeypatch.setenv("BLACKBOX_MAX_UPLOAD_MB", "1")
+    get_settings.cache_clear()
+    try:
+        response = client.post(
+            "/api/incidents/upload",
+            files={
+                "file": (
+                    "big.json",
+                    b"x" * (1024 * 1024 + 1),
+                    "application/json",
+                )
+            },
+        )
+        assert response.status_code == 422
+        assert "exceeds the 1 MB limit" in response.json()["detail"]["message"]
+    finally:
+        get_settings.cache_clear()
 
 
 def test_upload_unsupported_extension(client: TestClient) -> None:

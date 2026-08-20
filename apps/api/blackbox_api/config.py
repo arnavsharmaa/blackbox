@@ -14,6 +14,8 @@ class Settings(BaseSettings):
     cors_origins: str = "http://localhost:3000"
     api_host: str = "0.0.0.0"
     api_port: int = 8000
+    #: Upload size cap in megabytes; long recordings may need more.
+    max_upload_mb: int = 20
 
     @property
     def cors_origin_list(self) -> list[str]:
