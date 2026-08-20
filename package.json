@@ -2,6 +2,9 @@
   "name": "blackbox",
   "private": true,
   "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
   "workspaces": [
     "apps/web",
     "packages/schemas"
