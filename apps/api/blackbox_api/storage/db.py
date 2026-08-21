@@ -4,12 +4,15 @@ from collections.abc import Iterator
 from contextlib import contextmanager
 from pathlib import Path
 
-from sqlalchemy import create_engine, event
+from alembic import command
+from alembic.config import Config
+from sqlalchemy import create_engine, event, inspect
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session, sessionmaker
 
 from blackbox_api.config import get_settings
-from blackbox_api.storage.models import Base
+
+MIGRATIONS_DIR = Path(__file__).resolve().parent.parent / "migrations"
 
 _engine: Engine | None = None
 _session_factory: sessionmaker[Session] | None = None
@@ -44,9 +47,29 @@ def get_engine() -> Engine:
     return _engine
 
 
+def _alembic_config(engine: Engine) -> Config:
+    config = Config()
+    config.set_main_option("script_location", str(MIGRATIONS_DIR))
+    config.set_main_option(
+        "sqlalchemy.url", engine.url.render_as_string(hide_password=False)
+    )
+    return config
+
+
 def init_db(engine: Engine | None = None) -> None:
-    """Repeatable database initialization: creates any missing tables."""
-    Base.metadata.create_all(engine or get_engine())
+    """Repeatable database initialization via Alembic migrations.
+
+    Databases created by the pre-Alembic create_all() bootstrap are
+    stamped to the initial revision first, then upgraded like any other.
+    """
+    eng = engine or get_engine()
+    inspector = inspect(eng)
+    config = _alembic_config(eng)
+    if inspector.has_table("incidents") and not inspector.has_table(
+        "alembic_version"
+    ):
+        command.stamp(config, "0001")
+    command.upgrade(config, "head")
 
 
 def get_session_factory() -> sessionmaker[Session]:

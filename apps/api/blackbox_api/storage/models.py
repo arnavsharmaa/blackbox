@@ -2,7 +2,15 @@ from __future__ import annotations
 
 from datetime import datetime
 
-from sqlalchemy import Float, ForeignKey, Index, Integer, String, Text
+from sqlalchemy import (
+    DateTime,
+    Float,
+    ForeignKey,
+    Index,
+    Integer,
+    String,
+    Text,
+)
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 
@@ -20,8 +28,10 @@ class IncidentRow(Base):
     facility: Mapped[str] = mapped_column(String(128))
     task_name: Mapped[str] = mapped_column(String(256))
     task_goal: Mapped[str] = mapped_column(Text)
-    start_time: Mapped[datetime] = mapped_column(index=True)
-    end_time: Mapped[datetime]
+    start_time: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), index=True
+    )
+    end_time: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     duration_s: Mapped[float] = mapped_column(Float)
     outcome: Mapped[str] = mapped_column(String(32), index=True)
     severity: Mapped[str] = mapped_column(String(32), index=True)
@@ -29,7 +39,7 @@ class IncidentRow(Base):
     map_version: Mapped[str] = mapped_column(String(64))
     environment: Mapped[str] = mapped_column(String(256))
     summary: Mapped[str] = mapped_column(Text)
-    created_at: Mapped[datetime]
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
 
     events: Mapped[list[EventRow]] = relationship(
         back_populates="incident",
@@ -55,7 +65,7 @@ class EventRow(Base):
         ForeignKey("incidents.id", ondelete="CASCADE"), index=True
     )
     idx: Mapped[int] = mapped_column(Integer)
-    timestamp: Mapped[datetime]
+    timestamp: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     event_type: Mapped[str] = mapped_column(String(48), index=True)
     subsystem: Mapped[str] = mapped_column(String(48))
     severity: Mapped[str] = mapped_column(String(32))
@@ -92,7 +102,7 @@ class AnalysisRow(Base):
     )
     engine_version: Mapped[str] = mapped_column(String(32))
     result_json: Mapped[str] = mapped_column(Text)
-    analyzed_at: Mapped[datetime]
+    analyzed_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
 
     incident: Mapped[IncidentRow] = relationship(back_populates="analysis")
 
@@ -111,6 +121,6 @@ class FeedbackRow(Base):
         String(48), nullable=True
     )
     note: Mapped[str] = mapped_column(Text, default="")
-    created_at: Mapped[datetime]
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
 
     incident: Mapped[IncidentRow] = relationship(back_populates="feedback")
