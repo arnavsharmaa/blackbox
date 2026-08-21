@@ -47,6 +47,10 @@ against a running stack.
 - **Adapters stay pure** (bytes → `Incident`); persistence and analysis
   belong to the ingestion service.
 - Thresholds are configuration (`BLACKBOX_RULE_*`), not magic numbers.
+- **Database changes need a migration.** Edit the models, then generate a
+  revision with `cd apps/api && alembic -c alembic.ini revision
+  --autogenerate -m "..."` — `test_migrations.py` fails if migrations and
+  models drift, and CI runs the suite on both SQLite and Postgres.
 
 ## Commit style
 

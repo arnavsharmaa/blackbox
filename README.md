@@ -346,8 +346,10 @@ validation — and runs in CI against the production build.
 
 ## Limitations
 
-- SQLite + `create_all` initialization — right for a local MVP; a real
-  deployment would want Postgres and migrations (see the roadmap).
+- SQLite is the zero-config default; Postgres is supported (set
+  `BLACKBOX_DATABASE_URL=postgresql+psycopg://…` and install
+  `apps/api[postgres]`) and the full backend suite runs against Postgres
+  in CI, but no production deployment has exercised it yet.
 - Telemetry is stored row-per-sample; fine at demo scale, but long incidents
   would warrant chunked storage.
 - rosbag2 ingestion supports the MCAP storage format and all seven core
@@ -380,8 +382,9 @@ Where BlackBox is heading, in the order the work should land.
 
 ### Next — production deployment
 
-- [ ] **Postgres + Alembic migrations** — swap `create_all` for real
-  migrations behind the existing repository interface; SQLite stays the
+- [x] **Postgres + Alembic migrations** — shipped: `init_db` runs Alembic
+  migrations (legacy databases are stamped automatically), and CI runs the
+  backend suite against a real Postgres service. SQLite stays the
   zero-config default.
 - [ ] **Auth & multi-tenancy** — API tokens per fleet, so one BlackBox
   instance can serve multiple facilities without seeing each other's data.
