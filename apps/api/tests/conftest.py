@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import sys
 from collections.abc import Iterator
 from pathlib import Path
@@ -36,19 +37,44 @@ def parsed_incidents(sample_incidents: dict[str, dict]) -> dict[str, Incident]:
     }
 
 
+def _reset_external_database(url: str) -> None:
+    """Drop all BlackBox tables so each test starts from an empty schema.
+
+    Only used for non-SQLite databases (e.g. the Postgres CI job); SQLite
+    tests get a fresh file per test instead.
+    """
+    from sqlalchemy import create_engine, text
+
+    from blackbox_api.storage.models import Base
+
+    engine = create_engine(url)
+    Base.metadata.drop_all(engine)
+    with engine.begin() as connection:
+        connection.execute(text("DROP TABLE IF EXISTS alembic_version"))
+    engine.dispose()
+
+
 @pytest.fixture()
 def client(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> Iterator[TestClient]:
-    """TestClient backed by a fresh temporary SQLite database."""
+    """TestClient backed by a fresh database.
+
+    Defaults to a temporary SQLite file; set BLACKBOX_TEST_DATABASE_URL
+    (e.g. postgresql+psycopg://...) to run the whole suite against another
+    database, as the Postgres CI job does.
+    """
     from blackbox_api.config import get_settings
     from blackbox_api.storage import db as db_module
 
-    monkeypatch.setenv(
-        "BLACKBOX_DATABASE_URL", f"sqlite:///{tmp_path}/test.db"
+    url = os.environ.get(
+        "BLACKBOX_TEST_DATABASE_URL", f"sqlite:///{tmp_path}/test.db"
     )
+    monkeypatch.setenv("BLACKBOX_DATABASE_URL", url)
     get_settings.cache_clear()
     db_module.reset_engine_for_tests()
+    if not url.startswith("sqlite"):
+        _reset_external_database(url)
 
     from blackbox_api.main import create_app
 

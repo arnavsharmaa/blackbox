@@ -33,6 +33,38 @@ jobs:
         working-directory: apps/api
         run: pytest -q
 
+  backend-postgres:
+    name: Backend on Postgres
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: blackbox
+          POSTGRES_PASSWORD: blackbox
+          POSTGRES_DB: blackbox_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U blackbox"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install
+        run: pip install -e "apps/api[dev,postgres]"
+      - name: Test against Postgres
+        working-directory: apps/api
+        env:
+          BLACKBOX_TEST_DATABASE_URL: postgresql+psycopg://blackbox:blackbox@localhost:5432/blackbox_test
+        run: pytest -q
+
   frontend:
     name: Frontend (vitest, eslint, tsc, build)
     runs-on: ubuntu-latest
