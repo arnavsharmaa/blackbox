@@ -15,6 +15,16 @@ import type {
 export const API_BASE =
   process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
+/**
+ * Auth header for deployments with BLACKBOX_API_TOKENS configured.
+ * Note this is a public (build-time) value: it keeps strangers on the
+ * network out of the API, it does not hide the token from app users.
+ */
+function authHeaders(): Record<string, string> {
+  const token = process.env.NEXT_PUBLIC_BLACKBOX_API_TOKEN;
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
 export class ApiError extends Error {
   constructor(
     message: string,
@@ -30,7 +40,7 @@ async function request<T>(path: string): Promise<T> {
   let response: Response;
   try {
     response = await fetch(`${API_BASE}${path}`, {
-      headers: { Accept: "application/json" },
+      headers: { Accept: "application/json", ...authHeaders() },
     });
   } catch {
     throw new ApiError(
@@ -138,6 +148,7 @@ export async function uploadIncident(
   try {
     response = await fetch(`${API_BASE}/api/incidents/upload`, {
       method: "POST",
+      headers: authHeaders(),
       body: form,
     });
   } catch {
@@ -176,7 +187,7 @@ export async function submitFeedback(
       `${API_BASE}/api/incidents/${encodeURIComponent(id)}/feedback`,
       {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...authHeaders() },
         body: JSON.stringify(body),
       },
     );
@@ -200,7 +211,7 @@ export async function deleteIncident(id: string): Promise<void> {
   try {
     response = await fetch(
       `${API_BASE}/api/incidents/${encodeURIComponent(id)}`,
-      { method: "DELETE" },
+      { method: "DELETE", headers: authHeaders() },
     );
   } catch {
     throw new ApiError(
