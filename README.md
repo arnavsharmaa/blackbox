@@ -356,7 +356,9 @@ validation — and runs in CI against the production build.
   Nav2 topics; the sqlite3 (`.db3`) storage plugin is not handled, and it
   has been validated against synthetic bags, not hardware recordings. The
   live recorder node is an example, untested against real hardware.
-- No authentication — BlackBox assumes a trusted network.
+- Auth is a single tier: optional API tokens (`BLACKBOX_API_TOKENS`)
+  gate the whole API, with no per-user identity or per-fleet isolation
+  yet. Unset, BlackBox assumes a trusted network.
 
 ## Roadmap
 
@@ -386,8 +388,10 @@ Where BlackBox is heading, in the order the work should land.
   migrations (legacy databases are stamped automatically), and CI runs the
   backend suite against a real Postgres service. SQLite stays the
   zero-config default.
-- [ ] **Auth & multi-tenancy** — API tokens per fleet, so one BlackBox
-  instance can serve multiple facilities without seeing each other's data.
+- [ ] **Auth & multi-tenancy** — optional API tokens shipped
+  (`BLACKBOX_API_TOKENS` gates every `/api` route; `/health` stays open);
+  still open: per-fleet tokens and tenant isolation so one instance can
+  serve multiple facilities without seeing each other's data.
 - [ ] **Chunked telemetry storage** — column-oriented blobs per channel
   instead of row-per-sample, for hour-long incidents at full sample rates.
 - [ ] **Live streaming ingestion** — a WebSocket endpoint with rolling

@@ -9,10 +9,13 @@ within a week.
 
 ## Scope and threat model
 
-BlackBox currently assumes a **trusted network**: there is no
-authentication, and the API will ingest any well-formed upload. Do not
-expose an instance to the public internet — deploy it behind a VPN or
-reverse-proxy auth until first-party auth lands (see the roadmap).
+By default BlackBox assumes a **trusted network**: with
+`BLACKBOX_API_TOKENS` unset there is no authentication and the API will
+ingest any well-formed upload. Setting `BLACKBOX_API_TOKENS` requires a
+bearer token (or `X-API-Key`) on every `/api` route — but tokens are
+shared, not per-user, and there is no tenant isolation. Treat an
+internet-exposed instance as experimental; a VPN or reverse proxy in
+front remains the recommended deployment.
 
 Reports most useful right now:
 
@@ -23,9 +26,12 @@ Reports most useful right now:
 - Cross-site scripting in the web UI (incident fields render
   operator-supplied text).
 
+- Bypasses of the token check itself (timing, header parsing, routes
+  that should be gated but aren't).
+
 Denial-of-service reports that require uploading very large files to an
-unauthenticated instance are out of scope until auth exists — that
-limitation is documented and by design for the MVP.
+instance with auth disabled are out of scope — that deployment mode is
+documented as trusted-network only.
 
 ## Supported versions
 
