@@ -16,10 +16,17 @@ class Settings(BaseSettings):
     api_port: int = 8000
     #: Upload size cap in megabytes; long recordings may need more.
     max_upload_mb: int = 20
+    #: Comma-separated API tokens. Empty (the default) disables auth,
+    #: matching the documented trusted-network deployment model.
+    api_tokens: str = ""
 
     @property
     def cors_origin_list(self) -> list[str]:
         return [o.strip() for o in self.cors_origins.split(",") if o.strip()]
+
+    @property
+    def api_token_list(self) -> list[str]:
+        return [t.strip() for t in self.api_tokens.split(",") if t.strip()]
 
 
 @lru_cache

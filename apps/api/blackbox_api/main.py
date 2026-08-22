@@ -4,9 +4,10 @@ import logging
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from blackbox_api.api.auth import require_api_token
 from blackbox_api.api.routes_analytics import router as analytics_router
 from blackbox_api.api.routes_health import router as health_router
 from blackbox_api.api.routes_incidents import router as incidents_router
@@ -40,9 +41,15 @@ def create_app() -> FastAPI:
         allow_methods=["*"],
         allow_headers=["*"],
     )
+    # /health stays open for probes; everything under /api requires a
+    # token once BLACKBOX_API_TOKENS is configured (open by default).
     app.include_router(health_router)
-    app.include_router(incidents_router)
-    app.include_router(analytics_router)
+    app.include_router(
+        incidents_router, dependencies=[Depends(require_api_token)]
+    )
+    app.include_router(
+        analytics_router, dependencies=[Depends(require_api_token)]
+    )
     return app
 
 
