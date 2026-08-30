@@ -19,6 +19,8 @@ class Settings(BaseSettings):
     #: Comma-separated API tokens. Empty (the default) disables auth,
     #: matching the documented trusted-network deployment model.
     api_tokens: str = ""
+    #: Rolling pre-failure window kept per streaming robot, in seconds.
+    stream_window_s: float = 600.0
 
     @property
     def cors_origin_list(self) -> list[str]:

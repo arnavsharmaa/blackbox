@@ -11,6 +11,7 @@ from blackbox_api.api.auth import require_api_token
 from blackbox_api.api.routes_analytics import router as analytics_router
 from blackbox_api.api.routes_health import router as health_router
 from blackbox_api.api.routes_incidents import router as incidents_router
+from blackbox_api.api.routes_stream import router as stream_router
 from blackbox_api.config import get_settings
 from blackbox_api.logging import configure_logging, log
 from blackbox_api.storage.db import init_db
@@ -50,6 +51,8 @@ def create_app() -> FastAPI:
     app.include_router(
         analytics_router, dependencies=[Depends(require_api_token)]
     )
+    # WebSocket auth happens inside the handler (headers or ?token=).
+    app.include_router(stream_router)
     return app
 
 
