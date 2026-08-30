@@ -52,8 +52,14 @@ def ingest_incident(
 
     adapter = adapter_for_filename(filename)
     incident = adapter.parse(raw, metadata=metadata)
-    analysis = analyze_incident(incident)
+    return incident, store_incident(session, incident, source=adapter.name)
 
+
+def store_incident(
+    session: Session, incident: Incident, source: str
+) -> AnalysisResult:
+    """Analyze and persist an already-validated incident."""
+    analysis = analyze_incident(incident)
     repo = IncidentRepository(session)
     repo.upsert_incident(incident)
     repo.save_analysis(analysis)
@@ -62,8 +68,8 @@ def ingest_incident(
         logging.INFO,
         "incident ingested",
         incident_id=incident.id,
-        adapter=adapter.name,
+        adapter=source,
         events=len(incident.events),
         category=analysis.failure_category.value,
     )
-    return incident, analysis
+    return analysis
