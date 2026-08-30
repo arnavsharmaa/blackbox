@@ -114,6 +114,10 @@ and guarded against drift by
   uploads (drag-and-drop on the Upload page, or the API) are validated
   against the canonical schema; malformed input returns field-level errors
   (HTTP 422), never a stack trace.
+- **Live streaming ingestion** — robots stream events and telemetry over
+  a WebSocket; BlackBox keeps only a rolling pre-failure window and cuts
+  it into a fully analyzed incident the moment a task fails, so nothing
+  is stored for the runs that succeed.
 - **Fleet analytics** — a cross-incident dashboard: failure-category and
   outcome mix, per-robot and per-software-version stats, recurring blockage
   hotspots, and a daily trend.
@@ -227,6 +231,7 @@ contract diffing (`make openapi` regenerates it).
 | `GET /api/incidents/{id}/github-issue` | Issue title/body/labels (`?repo=owner/repo` adds a prefilled URL) |
 | `GET /api/analytics` | Fleet analytics: category/outcome mix, per-robot and per-software-version stats, blockage hotspots, daily trend |
 | `POST /api/incidents/upload` | Multipart upload of `.json` (full incident), `.csv` (events + `metadata` form field), or `.mcap` (ROS 2 bag + `metadata` with at least `id` and `robot_id`) |
+| `WS /api/stream/{robot_id}` | Live streaming ingestion: rolling pre-failure buffer, auto-cut on terminal events, explicit `cut` for near-misses (see [stream.py](apps/api/blackbox_api/ingestion/stream.py) for the message contract) |
 
 Invalid uploads return `422` with `{"message", "errors": [{field, error, input_preview}]}`.
 
@@ -394,10 +399,12 @@ Where BlackBox is heading, in the order the work should land.
   serve multiple facilities without seeing each other's data.
 - [ ] **Chunked telemetry storage** — column-oriented blobs per channel
   instead of row-per-sample, for hour-long incidents at full sample rates.
-- [ ] **Live streaming ingestion** — a WebSocket endpoint with rolling
-  pre-failure ring buffers, so robots stream continuously and BlackBox cuts
-  an incident automatically when a task fails (the live recorder node
-  becomes a supported client instead of an example).
+- [x] **Live streaming ingestion** — shipped: robots stream events and
+  telemetry to `ws://…/api/stream/{robot_id}`; a rolling pre-failure
+  buffer (`BLACKBOX_STREAM_WINDOW_S`, default 10 min) is cut into a
+  normal analyzed incident on `task_failed`/`task_timed_out`, or on an
+  explicit `cut` message for operator-flagged near-misses. Still open:
+  porting the example ROS 2 recorder node to this endpoint.
 
 ### Later — deeper analysis
 
