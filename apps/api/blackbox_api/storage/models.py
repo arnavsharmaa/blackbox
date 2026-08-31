@@ -46,8 +46,9 @@ class IncidentRow(Base):
         cascade="all, delete-orphan",
         order_by="EventRow.idx",
     )
-    telemetry: Mapped[list[TelemetrySampleRow]] = relationship(
+    telemetry: Mapped[list[TelemetrySeriesRow]] = relationship(
         cascade="all, delete-orphan",
+        order_by="TelemetrySeriesRow.id",
     )
     analysis: Mapped[AnalysisRow | None] = relationship(
         back_populates="incident", cascade="all, delete-orphan"
@@ -77,10 +78,22 @@ class EventRow(Base):
     incident: Mapped[IncidentRow] = relationship(back_populates="events")
 
 
-class TelemetrySampleRow(Base):
-    __tablename__ = "telemetry_samples"
+class TelemetrySeriesRow(Base):
+    """One telemetry channel stored as a single chunk.
+
+    Samples are a JSON array of [t, value] pairs sorted by t. Chunked
+    storage keeps hour-long incidents at full sample rates to one row
+    per channel instead of one row per sample.
+    """
+
+    __tablename__ = "telemetry_series"
     __table_args__ = (
-        Index("ix_telemetry_incident_channel_t", "incident_id", "channel", "t"),
+        Index(
+            "ix_telemetry_series_incident_channel",
+            "incident_id",
+            "channel",
+            unique=True,
+        ),
     )
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
@@ -89,9 +102,7 @@ class TelemetrySampleRow(Base):
     )
     channel: Mapped[str] = mapped_column(String(48))
     unit: Mapped[str] = mapped_column(String(24), default="")
-    t: Mapped[float] = mapped_column(Float)
-    value_num: Mapped[float | None] = mapped_column(Float, nullable=True)
-    value_str: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    samples_json: Mapped[str] = mapped_column(Text)
 
 
 class AnalysisRow(Base):

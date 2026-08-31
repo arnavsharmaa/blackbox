@@ -23,7 +23,7 @@ from blackbox_api.storage.models import (
     EventRow,
     FeedbackRow,
     IncidentRow,
-    TelemetrySampleRow,
+    TelemetrySeriesRow,
 )
 
 
@@ -91,20 +91,15 @@ class IncidentRepository:
                 )
             )
         for series in incident.telemetry:
-            for s in series.samples:
-                row.telemetry.append(
-                    TelemetrySampleRow(
-                        channel=series.channel.value,
-                        unit=series.unit,
-                        t=s.t,
-                        value_num=(
-                            s.value
-                            if isinstance(s.value, (int, float))
-                            else None
-                        ),
-                        value_str=s.value if isinstance(s.value, str) else None,
-                    )
+            row.telemetry.append(
+                TelemetrySeriesRow(
+                    channel=series.channel.value,
+                    unit=series.unit,
+                    samples_json=json.dumps(
+                        [[s.t, s.value] for s in series.samples]
+                    ),
                 )
+            )
         self.session.add(row)
 
     def save_analysis(self, result: AnalysisResult) -> None:
@@ -283,28 +278,16 @@ class IncidentRepository:
             )
             for ev in row.events
         ]
-        by_channel: dict[str, list[TelemetrySampleRow]] = {}
-        units: dict[str, str] = {}
-        for s in row.telemetry:
-            by_channel.setdefault(s.channel, []).append(s)
-            units[s.channel] = s.unit
         telemetry = [
             TelemetrySeries(
-                channel=channel,  # type: ignore[arg-type]
-                unit=units[channel],
+                channel=series.channel,  # type: ignore[arg-type]
+                unit=series.unit,
                 samples=[
-                    TelemetrySample(
-                        t=s.t,
-                        value=(
-                            s.value_str
-                            if s.value_str is not None
-                            else (s.value_num or 0.0)
-                        ),
-                    )
-                    for s in sorted(samples, key=lambda x: x.t)
+                    TelemetrySample(t=t, value=value)
+                    for t, value in json.loads(series.samples_json)
                 ],
             )
-            for channel, samples in by_channel.items()
+            for series in row.telemetry
         ]
         return Incident(
             schema_version=row.schema_version,

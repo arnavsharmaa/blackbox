@@ -68,7 +68,11 @@ def init_db(engine: Engine | None = None) -> None:
     if inspector.has_table("incidents") and not inspector.has_table(
         "alembic_version"
     ):
-        command.stamp(config, "0001")
+        # Pre-Alembic databases still carry the row-per-sample telemetry
+        # table and must replay the 0002 data migration; a database built
+        # by create_all() from current models already matches head.
+        legacy = inspector.has_table("telemetry_samples")
+        command.stamp(config, "0001" if legacy else "head")
     command.upgrade(config, "head")
 
 
