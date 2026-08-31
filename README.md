@@ -355,8 +355,6 @@ validation — and runs in CI against the production build.
   `BLACKBOX_DATABASE_URL=postgresql+psycopg://…` and install
   `apps/api[postgres]`) and the full backend suite runs against Postgres
   in CI, but no production deployment has exercised it yet.
-- Telemetry is stored row-per-sample; fine at demo scale, but long incidents
-  would warrant chunked storage.
 - rosbag2 ingestion supports the MCAP storage format and all seven core
   Nav2 topics; the sqlite3 (`.db3`) storage plugin is not handled, and it
   has been validated against synthetic bags, not hardware recordings. The
@@ -397,8 +395,10 @@ Where BlackBox is heading, in the order the work should land.
   (`BLACKBOX_API_TOKENS` gates every `/api` route; `/health` stays open);
   still open: per-fleet tokens and tenant isolation so one instance can
   serve multiple facilities without seeing each other's data.
-- [ ] **Chunked telemetry storage** — column-oriented blobs per channel
-  instead of row-per-sample, for hour-long incidents at full sample rates.
+- [x] **Chunked telemetry storage** — shipped: telemetry is stored as one
+  sorted chunk per channel instead of row-per-sample, so hour-long
+  incidents at full sample rates stay a handful of rows; migration 0002
+  converts existing databases in place.
 - [x] **Live streaming ingestion** — shipped: robots stream events and
   telemetry to `ws://…/api/stream/{robot_id}`; a rolling pre-failure
   buffer (`BLACKBOX_STREAM_WINDOW_S`, default 10 min) is cut into a
