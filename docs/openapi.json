@@ -1025,6 +1025,28 @@
         "title": "OutcomeCount",
         "type": "object"
       },
+      "PruneResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "deleted": {
+            "title": "Deleted",
+            "type": "integer"
+          },
+          "incident_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Incident Ids",
+            "type": "array"
+          }
+        },
+        "required": [
+          "deleted",
+          "incident_ids"
+        ],
+        "title": "PruneResponse",
+        "type": "object"
+      },
       "ReanalyzeResponse": {
         "additionalProperties": false,
         "properties": {
@@ -1390,6 +1412,82 @@
       }
     },
     "/api/incidents": {
+      "delete": {
+        "description": "Retention pruning: remove incidents older than a cutoff.",
+        "operationId": "prune_incidents_api_incidents_delete",
+        "parameters": [
+          {
+            "description": "Delete incidents that started before this time",
+            "in": "query",
+            "name": "before",
+            "required": true,
+            "schema": {
+              "description": "Delete incidents that started before this time",
+              "format": "date-time",
+              "title": "Before",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-api-key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Api-Key"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PruneResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Prune Incidents",
+        "tags": [
+          "incidents"
+        ]
+      },
       "get": {
         "operationId": "list_incidents_api_incidents_get",
         "parameters": [

@@ -162,6 +162,36 @@ def diff_incidents(
     return compute_diff(incident, baseline)
 
 
+class PruneResponse(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    deleted: int
+    incident_ids: list[str]
+
+
+@router.delete("", response_model=PruneResponse)
+def prune_incidents(
+    db: Annotated[Session, Depends(get_db)],
+    before: Annotated[
+        datetime,
+        Query(description="Delete incidents that started before this time"),
+    ],
+) -> PruneResponse:
+    """Retention pruning: remove incidents older than a cutoff."""
+    repo = IncidentRepository(db)
+    deleted = repo.delete_incidents_before(before)
+    db.commit()
+    if deleted:
+        log(
+            logger,
+            logging.INFO,
+            "incidents pruned",
+            before=before.isoformat(),
+            deleted=len(deleted),
+        )
+    return PruneResponse(deleted=len(deleted), incident_ids=sorted(deleted))
+
+
 @router.delete("/{incident_id}", status_code=204)
 def delete_incident(
     incident_id: str, db: Annotated[Session, Depends(get_db)]

@@ -136,6 +136,19 @@ class IncidentRepository:
             )
         )
 
+    def delete_incidents_before(self, cutoff: datetime) -> list[str]:
+        """Delete incidents started before the cutoff; returns their ids.
+
+        ORM-level deletes so events, telemetry, analyses, and feedback
+        cascade regardless of database FK enforcement.
+        """
+        rows = self.session.scalars(
+            select(IncidentRow).where(IncidentRow.start_time < cutoff)
+        ).all()
+        for row in rows:
+            self.session.delete(row)
+        return [row.id for row in rows]
+
     def delete_incident(self, incident_id: str) -> bool:
         row = self.session.get(IncidentRow, incident_id)
         if row is None:

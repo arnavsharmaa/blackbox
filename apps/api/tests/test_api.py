@@ -202,6 +202,29 @@ def test_upload_schema_violation_lists_fields(client: TestClient) -> None:
     assert any(e["field"] == "robot_id" for e in detail["errors"])
 
 
+def test_prune_removes_incidents_before_cutoff(
+    seeded_client: TestClient,
+) -> None:
+    response = seeded_client.delete(
+        "/api/incidents", params={"before": "2026-07-28T00:00:00Z"}
+    )
+    assert response.status_code == 200
+    body = response.json()
+    # Only the successful baseline run predates the failures.
+    assert body == {"deleted": 1, "incident_ids": ["INC-2026-0721-BASE"]}
+    assert seeded_client.get("/api/incidents").json()["total"] == 4
+
+    # Pruning again with the same cutoff is a no-op.
+    again = seeded_client.delete(
+        "/api/incidents", params={"before": "2026-07-28T00:00:00Z"}
+    ).json()
+    assert again["deleted"] == 0
+
+
+def test_prune_requires_a_cutoff(seeded_client: TestClient) -> None:
+    assert seeded_client.delete("/api/incidents").status_code == 422
+
+
 def test_upload_size_limit_is_configurable(
     client: TestClient, monkeypatch: pytest.MonkeyPatch
 ) -> None:
