@@ -7,7 +7,8 @@ import type {
   FailureCategory,
   Incident,
 } from "@blackbox/schemas";
-import { submitFeedback } from "@/lib/api";
+import { fetchAnalytics, submitFeedback } from "@/lib/api";
+import { useApi } from "@/lib/useApi";
 import { CATEGORY_LABELS } from "@/lib/format";
 
 export function SummaryCard({
@@ -50,6 +51,7 @@ export function SummaryCard({
                 {analysis.rules_triggered.join(", ") || "none"} · engine v
                 {analysis.engine_version}
               </p>
+              <MeasuredPrecision category={analysis.failure_category} />
             </div>
             <div>
               <h3 className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-ink-faint">
@@ -99,6 +101,32 @@ export function SummaryCard({
 }
 
 const ALL_CATEGORIES = Object.keys(CATEGORY_LABELS) as FailureCategory[];
+
+/**
+ * How often engineers agreed with this category's diagnoses — measured
+ * from feedback verdicts, so the engine's confidence can be checked
+ * against reality. Renders nothing until calibration data exists.
+ */
+function MeasuredPrecision({ category }: { category: FailureCategory }) {
+  const analytics = useApi(fetchAnalytics, []);
+  const entry = analytics.data?.calibration?.find(
+    (item) => item.category === category,
+  );
+  if (!entry || entry.reviewed === 0) return null;
+  return (
+    <p className="mt-1 text-xs text-ink-faint">
+      Measured precision: engineers confirmed{" "}
+      <span className="tabular-nums">
+        {entry.confirmed}/{entry.reviewed}
+      </span>{" "}
+      {CATEGORY_LABELS[category]} diagnoses (
+      <span className="tabular-nums">
+        {Math.round(entry.precision * 100)}%
+      </span>
+      ).
+    </p>
+  );
+}
 
 /**
  * "Was this diagnosis right?" — engineer verdicts feed the calibration

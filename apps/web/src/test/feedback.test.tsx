@@ -43,12 +43,16 @@ describe("diagnosis feedback", () => {
     expect(
       await screen.findByText(/Confirmed by an engineer/),
     ).toBeTruthy();
-    const [url, init] = fetchMock.mock.calls[0] as unknown as [
-      string,
-      RequestInit,
-    ];
-    expect(url).toContain(`/api/incidents/${testIncident.id}/feedback`);
-    expect(JSON.parse(String(init.body))).toEqual({ verdict: "confirmed" });
+    // The card also fetches analytics for measured precision — find the
+    // feedback POST by URL instead of assuming call order.
+    const call = (
+      fetchMock.mock.calls as unknown as [string, RequestInit][]
+    ).find((c) => String(c[0]).includes("/feedback"))!;
+    expect(call).toBeTruthy();
+    expect(call[0]).toContain(`/api/incidents/${testIncident.id}/feedback`);
+    expect(JSON.parse(String(call[1].body))).toEqual({
+      verdict: "confirmed",
+    });
   });
 
   it("corrects the diagnosis with a category and note", async () => {
@@ -76,11 +80,10 @@ describe("diagnosis feedback", () => {
     expect(
       await screen.findByText(/Corrected to Sensor dropout/),
     ).toBeTruthy();
-    const [, init] = fetchMock.mock.calls[0] as unknown as [
-      string,
-      RequestInit,
-    ];
-    expect(JSON.parse(String(init.body))).toEqual({
+    const call = (
+      fetchMock.mock.calls as unknown as [string, RequestInit][]
+    ).find((c) => String(c[0]).includes("/feedback"))!;
+    expect(JSON.parse(String(call[1].body))).toEqual({
       verdict: "corrected",
       actual_category: "sensor_dropout",
       note: "Lidar cable was loose.",
@@ -101,5 +104,32 @@ describe("diagnosis feedback", () => {
 
     await user.click(screen.getByRole("button", { name: "Change verdict" }));
     expect(screen.getByRole("button", { name: /Confirm/ })).toBeTruthy();
+  });
+
+  it("shows measured precision when calibration data exists", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (input: RequestInfo | URL) => {
+        const body = String(input).includes("/api/analytics")
+          ? {
+              calibration: [{
+                category: "persistent_obstacle",
+                reviewed: 13,
+                confirmed: 12,
+                precision: 0.9231,
+                corrected_to: [],
+              }],
+            }
+          : {};
+        return new Response(JSON.stringify(body), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        });
+      }),
+    );
+    render(<SummaryCard incident={testIncident} analysis={testAnalysis} />);
+    expect(await screen.findByText(/Measured precision/)).toBeTruthy();
+    expect(screen.getByText("12/13")).toBeTruthy();
+    expect(screen.getByText("92%")).toBeTruthy();
   });
 });
