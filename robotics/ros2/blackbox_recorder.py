@@ -1,9 +1,15 @@
 #!/usr/bin/env python3
-"""Example ROS 2 recorder node that ships failed navigation tasks to BlackBox.
+"""Example ROS 2 node that live-streams to BlackBox over WebSocket.
 
-Requires a ROS 2 environment (rclpy + Nav2 message packages) and `requests`.
-Outside ROS this file only documents the integration — it exits with a clear
-message instead of crashing. See robotics/ros2/README.md.
+Converts Nav2 topics to canonical events/samples and streams them to
+``/api/stream/{robot_id}``; the server keeps the rolling pre-failure
+buffer and cuts an analyzed incident the moment a task fails, so the
+node holds no incident state of its own.
+
+Requires a ROS 2 environment (rclpy + Nav2 message packages) and the
+``websockets`` package. Outside ROS this file only documents the
+integration — it exits with a clear message instead of crashing. See
+robotics/ros2/README.md.
 """
 
 from __future__ import annotations
@@ -11,7 +17,8 @@ from __future__ import annotations
 import argparse
 import json
 import sys
-from datetime import datetime, timedelta, timezone
+import threading
+from datetime import datetime, timezone
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "adapters"))
@@ -34,23 +41,38 @@ except ImportError:
     rclpy = None
     Node = object  # type: ignore[assignment,misc]
 
+try:
+    from websockets.sync.client import connect as ws_connect
+except ImportError:
+    ws_connect = None
 
+#: Per-channel downsampling: at most one sample per period.
 SAMPLE_PERIOD_S = 0.2
-BUFFER_S = 180.0
 
 
-class BlackboxRecorder(Node):  # type: ignore[misc]
-    """Rolling recorder: converts topics to canonical samples, uploads on failure."""
+class BlackboxStreamer(Node):  # type: ignore[misc]
+    """Thin streaming client: topics in, WebSocket frames out."""
 
-    def __init__(self, api: str, robot_id: str, facility: str) -> None:
+    def __init__(self, ws_url: str, robot_id: str, facility: str) -> None:
         super().__init__("blackbox_recorder")
-        self.api = api
-        self.robot_id = robot_id
-        self.facility = facility
-        self.samples: dict[str, list[dict]] = {}
-        self.events: list[dict] = []
-        self.task_started_at: datetime | None = None
+        self.ws = ws_connect(ws_url)
+        ready = json.loads(self.ws.recv())
+        self.get_logger().info(
+            f"streaming to BlackBox (server window {ready.get('window_s')} s)"
+        )
+        self._send({
+            "type": "hello",
+            "meta": {
+                "facility": facility,
+                "task_name": "navigate_to_pose",
+                "task_goal": "Nav2 navigate_to_pose goal",
+                "software_version": "ros2-live",
+                "environment": "live capture",
+            },
+        })
+        self._lock = threading.Lock()
         self._last_sample: dict[str, float] = {}
+        threading.Thread(target=self._read_replies, daemon=True).start()
 
         self.create_subscription(Odometry, "/odom", self.on_odom, 20)
         self.create_subscription(Twist, "/cmd_vel", self.on_cmd_vel, 20)
@@ -63,48 +85,67 @@ class BlackboxRecorder(Node):  # type: ignore[misc]
             self.on_goal_status, 10,
         )
 
-    # -- topic handlers convert with the pure mapping helpers ----------------
+    def _read_replies(self) -> None:
+        """Log incident/error frames the server pushes back."""
+        for raw in self.ws:
+            frame = json.loads(raw)
+            if frame.get("type") == "incident":
+                self.get_logger().info(
+                    f"BlackBox cut incident {frame['incident_id']}: "
+                    f"{frame['failure_category']} "
+                    f"({frame['confidence']:.0%} confidence)"
+                )
+            elif frame.get("type") == "error":
+                self.get_logger().warning(f"BlackBox: {frame['detail']}")
 
-    def _now(self) -> datetime:
-        return datetime.now(timezone.utc)
+    def _now(self) -> float:
+        return datetime.now(timezone.utc).timestamp()
 
-    def _record(self, channel: str, value: float) -> None:
-        t = self._now().timestamp()
-        buf = self.samples.setdefault(channel, [])
-        if buf and t - buf[-1]["abs_t"] < SAMPLE_PERIOD_S:
+    def _send(self, frame: dict) -> None:
+        with self._lock:
+            self.ws.send(json.dumps(frame))
+
+    def _sample(self, channel: str, value: float) -> None:
+        t = self._now()
+        if t - self._last_sample.get(channel, 0.0) < SAMPLE_PERIOD_S:
             return
-        buf.append({"abs_t": t, "value": round(float(value), 4)})
-        cutoff = t - BUFFER_S
-        while buf and buf[0]["abs_t"] < cutoff:
-            buf.pop(0)
+        self._last_sample[channel] = t
+        self._send({
+            "type": "sample", "t": t, "channel": channel,
+            "value": round(float(value), 4),
+        })
+
+    def _event(self, event_type: str, subsystem: str, message: str,
+               severity: str = "info", payload: dict | None = None) -> None:
+        self._send({
+            "type": "event", "t": self._now(), "event_type": event_type,
+            "subsystem": subsystem, "severity": severity,
+            "message": message, "payload": payload or {},
+        })
+
+    # -- topic handlers convert with the pure mapping helpers ----------------
 
     def on_odom(self, msg: object) -> None:
         for channel, value in odom_to_samples(_msg_to_dict(msg)).items():
-            self._record(channel, value)
+            self._sample(channel, value)
 
     def on_cmd_vel(self, msg: object) -> None:
         data = _msg_to_dict(msg)
-        self.events.append({
-            "timestamp": self._now().isoformat(),
-            "event_type": "velocity_command",
-            "subsystem": "controller",
-            "severity": "info",
-            "message": "cmd_vel from /cmd_vel",
-            "payload": {
+        self._event(
+            "velocity_command", "controller", "cmd_vel from /cmd_vel",
+            payload={
                 "linear": data["linear"]["x"],
                 "angular": data["angular"]["z"],
             },
-            "correlation_id": None,
-            "evidence_tags": [],
-        })
+        )
 
     def on_scan(self, msg: object) -> None:
-        self._record(
+        self._sample(
             "obstacle_distance", scan_to_obstacle_distance(_msg_to_dict(msg))
         )
 
     def on_amcl(self, msg: object) -> None:
-        self._record(
+        self._sample(
             "localization_confidence", amcl_to_confidence(_msg_to_dict(msg))
         )
 
@@ -113,63 +154,15 @@ class BlackboxRecorder(Node):  # type: ignore[misc]
         if not statuses:
             return
         code = int(statuses[-1]["status"])
-        event_type, outcome = GOAL_STATUS_TO_EVENT.get(code, (None, "success"))
-        if event_type == "nav_goal_issued" and self.task_started_at is None:
-            self.task_started_at = self._now()
-        if event_type == "task_failed" and self.task_started_at is not None:
-            self.upload_incident(outcome)
-            self.task_started_at = None
-
-    # -- incident assembly ---------------------------------------------------
-
-    def upload_incident(self, outcome: str) -> None:
-        import requests
-
-        start = self.task_started_at or self._now() - timedelta(seconds=60)
-        end = self._now()
-        start_ts = start.timestamp()
-        telemetry = [
-            {
-                "channel": channel,
-                "unit": "",
-                "samples": [
-                    {"t": round(s["abs_t"] - start_ts, 3), "value": s["value"]}
-                    for s in buf
-                    if s["abs_t"] >= start_ts
-                ],
-            }
-            for channel, buf in self.samples.items()
-        ]
-        incident = {
-            "id": f"INC-{end:%Y%m%d-%H%M%S}-{self.robot_id}",
-            "robot_id": self.robot_id,
-            "robot_model": "unknown",
-            "facility": self.facility,
-            "task_name": "navigate_to_pose",
-            "task_goal": "Nav2 navigate_to_pose goal",
-            "start_time": start.isoformat(),
-            "end_time": end.isoformat(),
-            "outcome": outcome,
-            "severity": "error",
-            "software_version": "ros2-live",
-            "map_version": "unknown",
-            "environment": "live capture",
-            "summary": f"Live-captured {outcome} navigation task on "
-                       f"{self.robot_id}",
-            "events": [
-                e for e in self.events
-                if datetime.fromisoformat(e["timestamp"]) >= start
-            ],
-            "telemetry": [s for s in telemetry if s["samples"]],
-        }
-        response = requests.post(
-            f"{self.api}/api/incidents/upload",
-            files={"file": ("live.json", json.dumps(incident).encode(),
-                            "application/json")},
-            timeout=30,
-        )
-        self.get_logger().info(
-            f"uploaded incident: {response.status_code} {response.text[:200]}"
+        event_type, _outcome = GOAL_STATUS_TO_EVENT.get(code, (None, ""))
+        if event_type is None:
+            return
+        severity = "critical" if event_type == "task_failed" else "info"
+        # A terminal event makes the server cut and analyze the incident.
+        self._event(
+            event_type, "navigation",
+            f"Nav2 goal status {code}", severity=severity,
+            payload={"goal_status": code},
         )
 
 
@@ -184,9 +177,12 @@ def _msg_to_dict(msg: object) -> dict:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--api", default="http://localhost:8000")
+    parser.add_argument("--api", default="ws://localhost:8000",
+                        help="BlackBox WebSocket origin (ws:// or wss://)")
     parser.add_argument("--robot-id", default="R-001")
     parser.add_argument("--facility", default="unknown")
+    parser.add_argument("--token", default=None,
+                        help="API token when BLACKBOX_API_TOKENS is set")
     args = parser.parse_args()
 
     if rclpy is None:
@@ -196,14 +192,23 @@ def main() -> int:
             file=sys.stderr,
         )
         return 1
+    if ws_connect is None:
+        print("pip install websockets to use the streaming recorder.",
+              file=sys.stderr)
+        return 1
+
+    url = f"{args.api}/api/stream/{args.robot_id}"
+    if args.token:
+        url += f"?token={args.token}"
 
     rclpy.init()
-    node = BlackboxRecorder(args.api, args.robot_id, args.facility)
+    node = BlackboxStreamer(url, args.robot_id, args.facility)
     try:
         rclpy.spin(node)
     except KeyboardInterrupt:
         pass
     finally:
+        node.ws.close()
         node.destroy_node()
         rclpy.shutdown()
     return 0

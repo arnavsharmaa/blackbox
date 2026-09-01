@@ -11,19 +11,24 @@ that:
 
 1. subscribes to the topics in the
    [adapter mapping](../adapters/README.md#ros-2-topic-mapping),
-2. keeps a rolling in-memory buffer of canonical telemetry samples and events
-   (converted with the pure helpers in
-   `robotics/adapters/ros2_topic_mapping.py`),
-3. on a terminal `navigate_to_pose` status (aborted/canceled), assembles a
-   canonical incident JSON and POSTs it to `/api/incidents/upload`.
+2. converts each message with the pure helpers in
+   `robotics/adapters/ros2_topic_mapping.py` and streams it immediately
+   to BlackBox's live WebSocket endpoint (`/api/stream/{robot_id}`),
+3. lets the **server** keep the rolling pre-failure buffer and cut an
+   analyzed incident when a terminal `navigate_to_pose` status arrives —
+   the node holds no incident state, and the diagnosis is logged back
+   over the same socket.
 
 Run it inside any ROS 2 Humble+ environment that has a Nav2 stack running:
 
 ```bash
-pip install requests            # the only non-ROS dependency
-python3 robotics/ros2/blackbox_recorder.py --api http://localhost:8000 \
+pip install websockets          # the only non-ROS dependency
+python3 robotics/ros2/blackbox_recorder.py --api ws://localhost:8000 \
     --robot-id W-104 --facility "Warehouse 3"
 ```
+
+If the BlackBox instance has `BLACKBOX_API_TOKENS` configured, pass
+`--token <token>`.
 
 The node degrades gracefully: if `rclpy` is not importable it prints an
 explanation and exits instead of crashing, so it is safe to keep in the repo
