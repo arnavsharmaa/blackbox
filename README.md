@@ -226,6 +226,7 @@ contract diffing (`make openapi` regenerates it).
 | `POST /api/incidents/{id}/reanalyze` | Re-run the rules engine |
 | `POST /api/incidents/{id}/feedback` | Record an engineer's verdict (confirmed / corrected + actual category); feeds calibration |
 | `DELETE /api/incidents/{id}` | Remove an incident and its events, telemetry, and analysis |
+| `DELETE /api/incidents?before=…` | Retention pruning: remove incidents that started before the cutoff |
 | `GET /api/incidents/{id}/diff/{baseline_id}` | Compare two runs: per-channel deltas, first sustained divergence, event-type comparison |
 | `GET /api/incidents/{id}/report` | Structured report + Markdown |
 | `GET /api/incidents/{id}/github-issue` | Issue title/body/labels (`?repo=owner/repo` adds a prefilled URL) |
@@ -234,6 +235,19 @@ contract diffing (`make openapi` regenerates it).
 | `WS /api/stream/{robot_id}` | Live streaming ingestion: rolling pre-failure buffer, auto-cut on terminal events, explicit `cut` for near-misses (see [stream.py](apps/api/blackbox_api/ingestion/stream.py) for the message contract) |
 
 Invalid uploads return `422` with `{"message", "errors": [{field, error, input_preview}]}`.
+
+### Command line
+
+`pip install -e apps/api` provides a `blackbox` console script that talks
+to a running instance (`--api` / `BLACKBOX_API_URL`, `--token` /
+`BLACKBOX_API_TOKEN`):
+
+```bash
+blackbox list --robot W-104
+blackbox show INC-2026-0728-001
+blackbox upload flight.mcap --metadata '{"id": "INC-1", "robot_id": "W-1"}'
+blackbox prune --days 90 --yes
+```
 
 ## Incident schema
 
@@ -319,8 +333,9 @@ Nav2 failure in Gazebo and run it through the pipeline — is in
    [ros2_mapping.py](apps/api/blackbox_api/ros2_mapping.py) (re-exported for
    ROS environments via `robotics/adapters/ros2_topic_mapping.py`).
 4. **Live recorder** — [robotics/ros2/blackbox_recorder.py](robotics/ros2/blackbox_recorder.py)
-   is an example `rclpy` node that buffers canonical samples and POSTs an
-   incident when a Nav2 goal aborts.
+   is an example `rclpy` node that streams converted topics straight to
+   the live WebSocket endpoint; the server keeps the pre-failure buffer
+   and cuts an analyzed incident when a Nav2 goal aborts.
 
 ## Testing
 
