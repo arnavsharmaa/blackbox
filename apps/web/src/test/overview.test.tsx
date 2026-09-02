@@ -9,9 +9,15 @@ function mockFetch() {
     const url = new URL(String(input));
     const robot = url.searchParams.get("robot_id");
     const severity = url.searchParams.get("severity");
+    const q = url.searchParams.get("q")?.toLowerCase();
     let items = testSummaries;
     if (robot) items = items.filter((i) => i.robot_id === robot);
     if (severity) items = items.filter((i) => i.severity === severity);
+    if (q) {
+      items = items.filter((i) =>
+        `${i.id} ${i.task_name} ${i.summary}`.toLowerCase().includes(q),
+      );
+    }
     return new Response(JSON.stringify(listResponse(items)), {
       status: 200,
       headers: { "Content-Type": "application/json" },
@@ -47,6 +53,30 @@ describe("incident overview", () => {
       expect(screen.queryByText("Deliver pallet to Loading Bay B")).toBeNull();
     });
     expect(screen.getByText("Return to charging dock")).toBeTruthy();
+  });
+
+  it("free-text search narrows the table after the debounce", async () => {
+    const user = userEvent.setup();
+    render(<OverviewPage />);
+    await screen.findByText("Deliver pallet to Loading Bay B");
+
+    await user.type(
+      screen.getByLabelText("Search incidents"),
+      "charging dock",
+    );
+    await waitFor(() => {
+      expect(screen.queryByText("Deliver pallet to Loading Bay B")).toBeNull();
+    });
+    expect(screen.getByText("Return to charging dock")).toBeTruthy();
+
+    // Clear filters resets the search box too.
+    await user.click(screen.getByRole("button", { name: "Clear filters" }));
+    expect(
+      (screen.getByLabelText("Search incidents") as HTMLInputElement).value,
+    ).toBe("");
+    expect(
+      await screen.findByText("Deliver pallet to Loading Bay B"),
+    ).toBeTruthy();
   });
 
   it("shows an empty state when no incidents match", async () => {

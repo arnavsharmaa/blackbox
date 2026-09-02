@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import type { IncidentSummary } from "@blackbox/schemas";
 import { fetchIncidents } from "@/lib/api";
@@ -30,6 +30,7 @@ interface Filters {
   failure_category: string;
   outcome: string;
   start_after: string;
+  q: string;
 }
 
 const EMPTY_FILTERS: Filters = {
@@ -38,10 +39,21 @@ const EMPTY_FILTERS: Filters = {
   failure_category: "",
   outcome: "",
   start_after: "",
+  q: "",
 };
 
 export default function OverviewPage() {
   const [filters, setFilters] = useState<Filters>(EMPTY_FILTERS);
+  const [searchText, setSearchText] = useState("");
+
+  // Debounce free-text search so we don't refetch per keystroke.
+  useEffect(() => {
+    const handle = setTimeout(
+      () => setFilters((current) => ({ ...current, q: searchText.trim() })),
+      300,
+    );
+    return () => clearTimeout(handle);
+  }, [searchText]);
 
   // One unfiltered fetch powers the fleet/stat panels; the filtered fetch
   // powers the table. Both are cheap against the local API.
@@ -57,6 +69,7 @@ export default function OverviewPage() {
         start_after: filters.start_after
           ? new Date(filters.start_after).toISOString()
           : undefined,
+        q: filters.q || undefined,
       }),
     [filters],
   );
@@ -142,7 +155,13 @@ export default function OverviewPage() {
               <FilterBar
                 filters={filters}
                 robotIds={robotIds}
+                searchText={searchText}
+                onSearch={setSearchText}
                 onChange={setFilters}
+                onClear={() => {
+                  setSearchText("");
+                  setFilters(EMPTY_FILTERS);
+                }}
               />
               {filtered.error ? (
                 <ErrorState error={filtered.error} onRetry={filtered.refetch} />
@@ -181,19 +200,37 @@ function avgRecoveries(items: IncidentSummary[]): string {
 function FilterBar({
   filters,
   robotIds,
+  searchText,
+  onSearch,
   onChange,
+  onClear,
 }: {
   filters: Filters;
   robotIds: string[];
+  searchText: string;
+  onSearch: (text: string) => void;
   onChange: (filters: Filters) => void;
+  onClear: () => void;
 }) {
   const set = (patch: Partial<Filters>) => onChange({ ...filters, ...patch });
-  const active = Object.values(filters).some((v) => v !== "");
+  const active =
+    searchText !== "" || Object.values(filters).some((v) => v !== "");
   const selectClass =
     "rounded border border-edge bg-surface-2 px-2 py-1.5 text-sm text-ink " +
     "focus:border-accent";
   return (
     <div className="flex flex-wrap items-center gap-2">
+      <label className="sr-only" htmlFor="filter-search">
+        Search incidents
+      </label>
+      <input
+        id="filter-search"
+        type="search"
+        placeholder="Search id, task, summary…"
+        className={`${selectClass} min-w-[210px] flex-1`}
+        value={searchText}
+        onChange={(e) => onSearch(e.target.value)}
+      />
       <label className="sr-only" htmlFor="filter-robot">
         Robot
       </label>
@@ -272,7 +309,7 @@ function FilterBar({
       {active && (
         <button
           type="button"
-          onClick={() => onChange(EMPTY_FILTERS)}
+          onClick={onClear}
           className="rounded border border-edge px-2 py-1.5 text-sm text-ink-dim hover:border-edge-strong hover:text-ink"
         >
           Clear filters

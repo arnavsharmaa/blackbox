@@ -71,6 +71,7 @@ export interface IncidentListParams {
   failure_category?: string;
   start_after?: string;
   start_before?: string;
+  q?: string;
   limit?: number;
   offset?: number;
 }
