@@ -57,6 +57,14 @@ def list_incidents(
     failure_category: FailureCategory | None = None,
     start_after: datetime | None = None,
     start_before: datetime | None = None,
+    q: Annotated[
+        str | None,
+        Query(
+            max_length=200,
+            description="Case-insensitive substring match on incident id, "
+            "task name, summary, and robot id",
+        ),
+    ] = None,
     limit: int = Query(default=50, ge=1, le=200),
     offset: int = Query(default=0, ge=0),
 ) -> IncidentListResponse:
@@ -69,6 +77,7 @@ def list_incidents(
             failure_category=failure_category,
             start_after=start_after,
             start_before=start_before,
+            q=q,
         ),
         limit=limit,
         offset=offset,

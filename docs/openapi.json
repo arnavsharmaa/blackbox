@@ -1590,6 +1590,25 @@
             }
           },
           {
+            "description": "Case-insensitive substring match on incident id, task name, summary, and robot id",
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 200,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Case-insensitive substring match on incident id, task name, summary, and robot id",
+              "title": "Q"
+            }
+          },
+          {
             "in": "query",
             "name": "limit",
             "required": false,

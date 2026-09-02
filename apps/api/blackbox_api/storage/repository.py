@@ -36,6 +36,7 @@ class IncidentFilters:
         failure_category: FailureCategory | None = None,
         start_after: datetime | None = None,
         start_before: datetime | None = None,
+        q: str | None = None,
     ) -> None:
         self.robot_id = robot_id
         self.severity = severity
@@ -43,6 +44,7 @@ class IncidentFilters:
         self.failure_category = failure_category
         self.start_after = start_after
         self.start_before = start_before
+        self.q = q
 
 
 class IncidentRepository:
@@ -214,6 +216,17 @@ class IncidentRepository:
             conditions.append(IncidentRow.start_time >= filters.start_after)
         if filters.start_before:
             conditions.append(IncidentRow.start_time <= filters.start_before)
+        if filters.q:
+            # Case-insensitive substring search across the fields an
+            # engineer would paste or remember (ilike works on both
+            # SQLite and Postgres).
+            needle = f"%{filters.q.strip()}%"
+            conditions.append(
+                IncidentRow.id.ilike(needle)
+                | IncidentRow.task_name.ilike(needle)
+                | IncidentRow.summary.ilike(needle)
+                | IncidentRow.robot_id.ilike(needle)
+            )
         if filters.failure_category:
             cat_ids = select(AnalysisRow.incident_id).where(
                 AnalysisRow.result_json.like(

@@ -202,6 +202,37 @@ def test_upload_schema_violation_lists_fields(client: TestClient) -> None:
     assert any(e["field"] == "robot_id" for e in detail["errors"])
 
 
+def test_list_incidents_free_text_search(seeded_client: TestClient) -> None:
+    # Matches the task name, case-insensitively.
+    by_task = seeded_client.get(
+        "/api/incidents", params={"q": "loading bay"}
+    ).json()
+    assert by_task["total"] == 2  # the failure and its baseline run
+    assert {i["task_name"] for i in by_task["items"]} == {
+        "Deliver pallet to Loading Bay B"
+    }
+
+    # Matches a pasted incident id fragment.
+    by_id = seeded_client.get(
+        "/api/incidents", params={"q": "0721-base"}
+    ).json()
+    assert [i["id"] for i in by_id["items"]] == ["INC-2026-0721-BASE"]
+
+    # Matches summary text, and composes with structured filters.
+    by_summary = seeded_client.get(
+        "/api/incidents",
+        params={"q": "pallet", "outcome": "timed_out"},
+    ).json()
+    assert [i["id"] for i in by_summary["items"]] == ["INC-2026-0728-001"]
+
+    assert (
+        seeded_client.get(
+            "/api/incidents", params={"q": "no-such-incident"}
+        ).json()["total"]
+        == 0
+    )
+
+
 def test_prune_removes_incidents_before_cutoff(
     seeded_client: TestClient,
 ) -> None:
