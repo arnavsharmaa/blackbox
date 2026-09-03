@@ -21,6 +21,8 @@ class Settings(BaseSettings):
     api_tokens: str = ""
     #: Rolling pre-failure window kept per streaming robot, in seconds.
     stream_window_s: float = 600.0
+    #: Optional webhook POSTed for every ingested incident (best-effort).
+    webhook_url: str = ""
 
     @property
     def cors_origin_list(self) -> list[str]:

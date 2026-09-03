@@ -13,6 +13,7 @@ from blackbox_api.ingestion.csv_adapter import CsvIncidentAdapter
 from blackbox_api.ingestion.json_adapter import JsonIncidentAdapter
 from blackbox_api.ingestion.rosbag2_adapter import Rosbag2Adapter
 from blackbox_api.logging import log
+from blackbox_api.notify import notify_incident
 from blackbox_api.schemas import AnalysisResult, Incident
 from blackbox_api.storage.repository import IncidentRepository
 
@@ -63,6 +64,7 @@ def store_incident(
     repo = IncidentRepository(session)
     repo.upsert_incident(incident)
     repo.save_analysis(analysis)
+    notify_incident(incident, analysis)
     log(
         logger,
         logging.INFO,
