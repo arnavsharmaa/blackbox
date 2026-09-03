@@ -19,6 +19,9 @@ class Settings(BaseSettings):
     #: Comma-separated API tokens. Empty (the default) disables auth,
     #: matching the documented trusted-network deployment model.
     api_tokens: str = ""
+    #: Comma-separated tokens limited to read-only (GET) routes — for
+    #: wallboards and dashboards that should not be able to mutate data.
+    readonly_tokens: str = ""
     #: Rolling pre-failure window kept per streaming robot, in seconds.
     stream_window_s: float = 600.0
     #: Optional webhook POSTed for every ingested incident (best-effort).
@@ -31,6 +34,12 @@ class Settings(BaseSettings):
     @property
     def api_token_list(self) -> list[str]:
         return [t.strip() for t in self.api_tokens.split(",") if t.strip()]
+
+    @property
+    def readonly_api_token_list(self) -> list[str]:
+        return [
+            t.strip() for t in self.readonly_tokens.split(",") if t.strip()
+        ]
 
 
 @lru_cache

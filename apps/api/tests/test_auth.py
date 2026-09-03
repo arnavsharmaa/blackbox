@@ -55,6 +55,44 @@ def test_health_stays_open_with_tokens(tokened_client: TestClient) -> None:
     assert tokened_client.get("/health").status_code == 200
 
 
+def test_readonly_token_reads_but_cannot_write(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setenv("BLACKBOX_API_TOKENS", "sekret-1")
+    monkeypatch.setenv("BLACKBOX_READONLY_TOKENS", "viewer-1")
+    get_settings.cache_clear()
+    headers = {"Authorization": "Bearer viewer-1"}
+
+    assert client.get("/api/incidents", headers=headers).status_code == 200
+    assert client.get("/api/analytics", headers=headers).status_code == 200
+
+    denied = client.delete("/api/incidents/INC-X", headers=headers)
+    assert denied.status_code == 403
+    assert "read-only" in denied.json()["detail"]
+    assert (
+        client.post(
+            "/api/incidents/upload",
+            headers=headers,
+            files={"file": ("x.json", b"{}", "application/json")},
+        ).status_code
+        == 403
+    )
+
+
+def test_readonly_tokens_alone_still_enable_auth(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setenv("BLACKBOX_READONLY_TOKENS", "viewer-1")
+    get_settings.cache_clear()
+    assert client.get("/api/incidents").status_code == 401
+    assert (
+        client.get(
+            "/api/incidents", headers={"X-API-Key": "viewer-1"}
+        ).status_code
+        == 200
+    )
+
+
 def test_writes_require_the_token_too(tokened_client: TestClient) -> None:
     assert (
         tokened_client.delete("/api/incidents/INC-NOPE").status_code == 401
