@@ -246,8 +246,22 @@ to a running instance (`--api` / `BLACKBOX_API_URL`, `--token` /
 blackbox list --robot W-104
 blackbox show INC-2026-0728-001
 blackbox upload flight.mcap --metadata '{"id": "INC-1", "robot_id": "W-1"}'
+blackbox replay incident.json --speed 10   # robot simulator over WebSocket
 blackbox prune --days 90 --yes
 ```
+
+`replay` streams a canonical incident file through the live streaming
+endpoint exactly as a robot would (`pip install websockets`) — useful for
+exercising the streaming path without hardware.
+
+### Operations
+
+- **Webhook notifications** — set `BLACKBOX_WEBHOOK_URL` and every
+  ingested incident (uploads and stream cuts alike) POSTs a
+  Slack-compatible JSON payload there. Delivery is best-effort: a down
+  webhook never fails an ingest.
+- **Read-only tokens** — `BLACKBOX_READONLY_TOKENS` grants GET-only
+  access for wallboards and dashboards; mutating routes return 403.
 
 ## Incident schema
 
