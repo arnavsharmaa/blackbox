@@ -90,6 +90,50 @@ describe("incident overview", () => {
     ).toBeTruthy();
   });
 
+  it("pages through a large incident list", async () => {
+    const base = testSummaries[0]!;
+    const many = Array.from({ length: 30 }, (_, i) => ({
+      ...base,
+      id: `INC-PAGE-${String(i).padStart(3, "0")}`,
+      task_name: `Paged task ${i}`,
+    }));
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (input: RequestInfo | URL) => {
+        const url = new URL(String(input));
+        const limit = Number(url.searchParams.get("limit") ?? 50);
+        const offset = Number(url.searchParams.get("offset") ?? 0);
+        return new Response(
+          JSON.stringify({
+            items: many.slice(offset, offset + limit),
+            total: many.length,
+            limit,
+            offset,
+          }),
+          { status: 200, headers: { "Content-Type": "application/json" } },
+        );
+      }),
+    );
+
+    const user = userEvent.setup();
+    render(<OverviewPage />);
+    expect(await screen.findByText("Showing 1–25 of 30")).toBeTruthy();
+    expect(screen.getByText("Paged task 0")).toBeTruthy();
+    expect(screen.queryByText("Paged task 25")).toBeNull();
+    expect(
+      (screen.getByRole("button", { name: "← Prev" }) as HTMLButtonElement)
+        .disabled,
+    ).toBe(true);
+
+    await user.click(screen.getByRole("button", { name: "Next →" }));
+    expect(await screen.findByText("Showing 26–30 of 30")).toBeTruthy();
+    expect(screen.getByText("Paged task 25")).toBeTruthy();
+    expect(
+      (screen.getByRole("button", { name: "Next →" }) as HTMLButtonElement)
+        .disabled,
+    ).toBe(true);
+  });
+
   it("shows an error state when the API is unreachable", async () => {
     vi.stubGlobal(
       "fetch",

@@ -42,6 +42,8 @@ const EMPTY_FILTERS: Filters = {
   q: "",
 };
 
+const PAGE_SIZE = 25;
+
 export default function OverviewPage() {
   const [filters, setFilters] = useState<Filters>(EMPTY_FILTERS);
   const [searchText, setSearchText] = useState("");
@@ -55,13 +57,18 @@ export default function OverviewPage() {
     return () => clearTimeout(handle);
   }, [searchText]);
 
+  // Back to the first page whenever the filters change.
+  const [offset, setOffset] = useState(0);
+  useEffect(() => setOffset(0), [filters]);
+
   // One unfiltered fetch powers the fleet/stat panels; the filtered fetch
   // powers the table. Both are cheap against the local API.
   const all = useApi(() => fetchIncidents({ limit: 200 }), []);
   const filtered = useApi(
     () =>
       fetchIncidents({
-        limit: 100,
+        limit: PAGE_SIZE,
+        offset,
         robot_id: filters.robot_id || undefined,
         severity: filters.severity || undefined,
         failure_category: filters.failure_category || undefined,
@@ -71,7 +78,7 @@ export default function OverviewPage() {
           : undefined,
         q: filters.q || undefined,
       }),
-    [filters],
+    [filters, offset],
   );
 
   const stats = useMemo(() => {
@@ -168,7 +175,15 @@ export default function OverviewPage() {
               ) : filtered.loading ? (
                 <LoadingState label="Loading incidents…" />
               ) : filtered.data && filtered.data.items.length > 0 ? (
-                <IncidentTable items={filtered.data.items} />
+                <>
+                  <IncidentTable items={filtered.data.items} />
+                  <Pager
+                    total={filtered.data.total}
+                    offset={offset}
+                    count={filtered.data.items.length}
+                    onPage={setOffset}
+                  />
+                </>
               ) : (
                 <EmptyState
                   title="No incidents match these filters"
@@ -187,6 +202,48 @@ export default function OverviewPage() {
           </div>
         </>
       )}
+    </div>
+  );
+}
+
+function Pager({
+  total,
+  offset,
+  count,
+  onPage,
+}: {
+  total: number;
+  offset: number;
+  count: number;
+  onPage: (offset: number) => void;
+}) {
+  if (total <= PAGE_SIZE && offset === 0) return null;
+  const buttonClass =
+    "rounded border border-edge-strong bg-surface-2 px-2.5 py-1 text-sm " +
+    "hover:border-accent disabled:opacity-40 disabled:hover:border-edge-strong";
+  return (
+    <div className="flex items-center justify-between text-sm text-ink-dim">
+      <span className="tabular-nums">
+        Showing {offset + 1}–{offset + count} of {total}
+      </span>
+      <div className="flex gap-1.5">
+        <button
+          type="button"
+          className={buttonClass}
+          disabled={offset === 0}
+          onClick={() => onPage(Math.max(0, offset - PAGE_SIZE))}
+        >
+          ← Prev
+        </button>
+        <button
+          type="button"
+          className={buttonClass}
+          disabled={offset + count >= total}
+          onClick={() => onPage(offset + PAGE_SIZE)}
+        >
+          Next →
+        </button>
+      </div>
     </div>
   );
 }
