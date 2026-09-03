@@ -142,3 +142,37 @@ def test_missing_file_is_a_clean_error(
     monkeypatch.setattr(cli, "_request", FakeApi({}))
     assert cli.main(["upload", "/nope/missing.json"]) == 1
     assert "no such file" in capsys.readouterr().err
+
+
+def test_incident_to_frames_orders_and_rebases(
+    sample_incidents: dict[str, dict[str, Any]],
+) -> None:
+    incident = sample_incidents["obstacle"]
+    frames = cli.incident_to_frames(incident)
+
+    assert frames[0]["type"] == "hello"
+    assert frames[0]["meta"]["task_name"] == "Deliver pallet to Loading Bay B"
+
+    body = frames[1:]
+    events = [f for f in body if f["type"] == "event"]
+    samples = [f for f in body if f["type"] == "sample"]
+    assert len(samples) > 100
+    # Time-ordered absolute timestamps throughout.
+    times = [f["t"] for f in body]
+    assert times == sorted(times)
+    # The replay stops at the FIRST terminal event (the server cuts
+    # there; later frames would start a spurious second incident).
+    assert body[-1]["type"] == "event"
+    assert body[-1]["event_type"] == "task_timed_out"
+    assert len(events) == len(incident["events"]) - 1
+    assert all(f["type"] != "cut" for f in body)
+
+
+def test_incident_to_frames_appends_cut_for_success_runs(
+    sample_incidents: dict[str, dict[str, Any]],
+) -> None:
+    frames = cli.incident_to_frames(sample_incidents["baseline"])
+    cut = frames[-1]
+    assert cut["type"] == "cut"
+    assert cut["id"] == "INC-2026-0721-BASE"
+    assert cut["outcome"] == "success"
