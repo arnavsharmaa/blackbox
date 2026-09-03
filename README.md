@@ -218,7 +218,7 @@ contract diffing (`make openapi` regenerates it).
 | Endpoint | Description |
 | --- | --- |
 | `GET /health` | Service, schema, and engine status |
-| `GET /api/incidents` | Paginated list; filters: `robot_id`, `severity`, `outcome`, `failure_category`, `start_after`, `start_before`, `limit`, `offset` |
+| `GET /api/incidents` | Paginated list; filters: `robot_id`, `severity`, `outcome`, `failure_category`, `start_after`, `start_before`, `q` (free-text over id/task/summary/robot), `limit`, `offset` |
 | `GET /api/incidents/{id}` | Full incident + stored analysis |
 | `GET /api/incidents/{id}/events` | Events; filters: `event_type`, `severity` |
 | `GET /api/incidents/{id}/telemetry` | Telemetry series; filter: `channel` |
