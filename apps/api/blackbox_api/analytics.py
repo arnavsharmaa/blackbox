@@ -186,8 +186,12 @@ def _calibration(
     return calibration
 
 
-def compute_analytics(repo: IncidentRepository) -> AnalyticsResponse:
-    summaries, _total = repo.list_incidents(IncidentFilters(), limit=1000)
+def compute_analytics(
+    repo: IncidentRepository, facility: str | None = None
+) -> AnalyticsResponse:
+    summaries, _total = repo.list_incidents(
+        IncidentFilters(facility=facility), limit=1000
+    )
 
     category_counts = Counter(
         s.failure_category for s in summaries if s.failure_category
@@ -256,7 +260,7 @@ def compute_analytics(repo: IncidentRepository) -> AnalyticsResponse:
         by_robot=by_robot,
         by_software_version=by_version,
         blockage_hotspots=_blockage_hotspots(repo, summaries),
-        calibration=_calibration(repo.list_feedback()),
+        calibration=_calibration(repo.list_feedback(facility)),
         daily=sorted(
             (
                 DailyCount(date=day, category=category, count=count)

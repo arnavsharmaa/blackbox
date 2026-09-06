@@ -191,8 +191,15 @@ class IncidentRepository:
             return None
         return self._row_to_feedback(row)
 
-    def list_feedback(self) -> list[DiagnosisFeedback]:
-        rows = self.session.scalars(select(FeedbackRow)).all()
+    def list_feedback(
+        self, facility: str | None = None
+    ) -> list[DiagnosisFeedback]:
+        stmt = select(FeedbackRow)
+        if facility is not None:
+            stmt = stmt.join(
+                IncidentRow, FeedbackRow.incident_id == IncidentRow.id
+            ).where(IncidentRow.facility == facility)
+        rows = self.session.scalars(stmt).all()
         return [self._row_to_feedback(row) for row in rows]
 
     def _row_to_feedback(self, row: FeedbackRow) -> DiagnosisFeedback:

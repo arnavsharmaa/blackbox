@@ -1348,8 +1348,25 @@
   "paths": {
     "/api/analytics": {
       "get": {
+        "description": "Fleet analytics, scoped to the token's facility when limited.",
         "operationId": "get_analytics_api_analytics_get",
         "parameters": [
+          {
+            "in": "query",
+            "name": "facility",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Facility"
+            }
+          },
           {
             "in": "header",
             "name": "authorization",

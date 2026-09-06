@@ -195,3 +195,31 @@ def test_stream_rejects_readonly_and_stamps_facility(
         f"/api/incidents/{cut['incident_id']}", headers=ADMIN_TOK
     ).json()
     assert detail["incident"]["facility"] == CHICAGO
+
+
+def test_analytics_are_scoped_to_the_token_facility(
+    tenants: TestClient,
+) -> None:
+    tenants.post(
+        "/api/incidents/INC-CHI-001/feedback",
+        headers=CHICAGO_TOK,
+        json={"verdict": "confirmed"},
+    )
+    chicago = tenants.get("/api/analytics", headers=CHICAGO_TOK).json()
+    assert chicago["total_incidents"] == 1
+    assert chicago["by_robot"][0]["robot_id"] == "W-231"
+    assert [c["category"] for c in chicago["calibration"]] == [
+        "controller_oscillation"
+    ]
+
+    fremont = tenants.get("/api/analytics", headers=FREMONT_TOK).json()
+    assert fremont["total_incidents"] == 5
+    assert fremont["calibration"] == []
+
+    # Full tokens can still slice by facility explicitly.
+    sliced = tenants.get(
+        "/api/analytics",
+        headers=ADMIN_TOK,
+        params={"facility": "Warehouse 7 — Chicago"},
+    ).json()
+    assert sliced["total_incidents"] == 1
