@@ -9,13 +9,19 @@ within a week.
 
 ## Scope and threat model
 
-By default BlackBox assumes a **trusted network**: with
-`BLACKBOX_API_TOKENS` unset there is no authentication and the API will
-ingest any well-formed upload. Setting `BLACKBOX_API_TOKENS` requires a
-bearer token (or `X-API-Key`) on every `/api` route — but tokens are
-shared, not per-user, and there is no tenant isolation. Treat an
-internet-exposed instance as experimental; a VPN or reverse proxy in
-front remains the recommended deployment.
+By default BlackBox assumes a **trusted network**: with no token lists
+configured there is no authentication and the API will ingest any
+well-formed upload. Three token tiers exist once configured: full
+(`BLACKBOX_API_TOKENS`), read-only (`BLACKBOX_READONLY_TOKENS`), and
+facility-scoped (`BLACKBOX_FACILITY_TOKENS`), which isolates each
+tenant's incidents — cross-facility ids are indistinguishable from
+missing ones. Tokens are still shared secrets rather than per-user
+identities. Treat an internet-exposed instance as experimental; a VPN
+or reverse proxy in front remains the recommended deployment.
+
+Facility-isolation bypasses (reading, writing, or inferring another
+tenant's data with a facility-scoped token) are squarely in scope for
+reports.
 
 Reports most useful right now:
 

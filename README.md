@@ -388,9 +388,10 @@ validation — and runs in CI against the production build.
   Nav2 topics; the sqlite3 (`.db3`) storage plugin is not handled, and it
   has been validated against synthetic bags, not hardware recordings. The
   live recorder node is an example, untested against real hardware.
-- Auth is a single tier: optional API tokens (`BLACKBOX_API_TOKENS`)
-  gate the whole API, with no per-user identity or per-fleet isolation
-  yet. Unset, BlackBox assumes a trusted network.
+- Auth is token-based with three tiers — full, read-only, and
+  facility-scoped (per-fleet isolation) — but there is no per-user
+  identity or token management UI; tokens live in environment
+  configuration. Unset, BlackBox assumes a trusted network.
 
 ## Roadmap
 
@@ -420,10 +421,12 @@ Where BlackBox is heading, in the order the work should land.
   migrations (legacy databases are stamped automatically), and CI runs the
   backend suite against a real Postgres service. SQLite stays the
   zero-config default.
-- [ ] **Auth & multi-tenancy** — optional API tokens shipped
-  (`BLACKBOX_API_TOKENS` gates every `/api` route; `/health` stays open);
-  still open: per-fleet tokens and tenant isolation so one instance can
-  serve multiple facilities without seeing each other's data.
+- [x] **Auth & multi-tenancy** — shipped: `BLACKBOX_API_TOKENS` (full),
+  `BLACKBOX_READONLY_TOKENS` (GET-only), and `BLACKBOX_FACILITY_TOKENS`
+  (a JSON token→facility map giving each fleet an isolated view of one
+  shared instance — cross-facility ids 404, uploads and stream cuts are
+  pinned to the token's facility, analytics and pruning stay inside it).
+  Still open: per-user identity and token management beyond env config.
 - [x] **Chunked telemetry storage** — shipped: telemetry is stored as one
   sorted chunk per channel instead of row-per-sample, so hour-long
   incidents at full sample rates stay a handful of rows; migration 0002
