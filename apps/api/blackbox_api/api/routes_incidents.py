@@ -11,6 +11,7 @@ from sqlalchemy.orm import Session
 
 from blackbox_api.ai.explain import ai_available, generate_ai_explanation
 from blackbox_api.analysis.engine import analyze_incident
+from blackbox_api.api.auth import TokenScope, get_token_scope
 from blackbox_api.diff import DiffResponse, compute_diff
 from blackbox_api.ingestion.base import IngestError
 from blackbox_api.ingestion.service import ingest_incident
@@ -38,10 +39,20 @@ logger = logging.getLogger("blackbox.api")
 
 router = APIRouter(prefix="/api/incidents", tags=["incidents"])
 
+#: FastAPI caches the dependency per request, so routes see the same
+#: scope the router-level auth gate resolved.
+Scope = Annotated[TokenScope, Depends(get_token_scope)]
 
-def _get_incident_or_404(repo: IncidentRepository, incident_id: str) -> Incident:
+
+def _get_incident_or_404(
+    repo: IncidentRepository, incident_id: str, scope: TokenScope
+) -> Incident:
     incident = repo.get_incident(incident_id)
-    if incident is None:
+    if incident is None or (
+        scope.facility is not None and incident.facility != scope.facility
+    ):
+        # A cross-facility id is indistinguishable from a missing one,
+        # so tenants cannot probe for each other's incident ids.
         raise HTTPException(
             status_code=404, detail=f"incident '{incident_id}' not found"
         )
@@ -50,7 +61,7 @@ def _get_incident_or_404(repo: IncidentRepository, incident_id: str) -> Incident
 
 @router.get("", response_model=IncidentListResponse)
 def list_incidents(
-    db: Annotated[Session, Depends(get_db)],
+    db: Annotated[Session, Depends(get_db)], scope: Scope,
     robot_id: str | None = None,
     facility: str | None = None,
     severity: Severity | None = None,
@@ -79,7 +90,7 @@ def list_incidents(
             start_after=start_after,
             start_before=start_before,
             q=q,
-            facility=facility,
+            facility=scope.facility or facility,
         ),
         limit=limit,
         offset=offset,
@@ -89,10 +100,10 @@ def list_incidents(
 
 @router.get("/{incident_id}", response_model=IncidentDetail)
 def get_incident(
-    incident_id: str, db: Annotated[Session, Depends(get_db)]
+    incident_id: str, db: Annotated[Session, Depends(get_db)], scope: Scope
 ) -> IncidentDetail:
     repo = IncidentRepository(db)
-    incident = _get_incident_or_404(repo, incident_id)
+    incident = _get_incident_or_404(repo, incident_id, scope)
     return IncidentDetail(
         incident=incident,
         analysis=repo.get_analysis(incident_id),
@@ -103,12 +114,12 @@ def get_incident(
 @router.get("/{incident_id}/events", response_model=list[IncidentEvent])
 def get_events(
     incident_id: str,
-    db: Annotated[Session, Depends(get_db)],
+    db: Annotated[Session, Depends(get_db)], scope: Scope,
     event_type: EventType | None = None,
     severity: Severity | None = None,
 ) -> list[IncidentEvent]:
     repo = IncidentRepository(db)
-    incident = _get_incident_or_404(repo, incident_id)
+    incident = _get_incident_or_404(repo, incident_id, scope)
     events = incident.events
     if event_type is not None:
         events = [e for e in events if e.event_type == event_type]
@@ -120,11 +131,11 @@ def get_events(
 @router.get("/{incident_id}/telemetry", response_model=list[TelemetrySeries])
 def get_telemetry(
     incident_id: str,
-    db: Annotated[Session, Depends(get_db)],
+    db: Annotated[Session, Depends(get_db)], scope: Scope,
     channel: str | None = None,
 ) -> list[TelemetrySeries]:
     repo = IncidentRepository(db)
-    incident = _get_incident_or_404(repo, incident_id)
+    incident = _get_incident_or_404(repo, incident_id, scope)
     series = incident.telemetry
     if channel is not None:
         series = [s for s in series if s.channel.value == channel]
@@ -134,7 +145,7 @@ def get_telemetry(
 @router.get("/{incident_id}/analysis", response_model=AnalysisResult)
 def get_analysis(
     incident_id: str,
-    db: Annotated[Session, Depends(get_db)],
+    db: Annotated[Session, Depends(get_db)], scope: Scope,
     ai: bool = Query(
         default=False,
         description="Attach an AI-generated summary if an API key is configured. "
@@ -142,7 +153,7 @@ def get_analysis(
     ),
 ) -> AnalysisResult:
     repo = IncidentRepository(db)
-    incident = _get_incident_or_404(repo, incident_id)
+    incident = _get_incident_or_404(repo, incident_id, scope)
     analysis = repo.get_analysis(incident_id)
     if analysis is None:
         analysis = analyze_incident(incident)
@@ -159,7 +170,10 @@ def get_analysis(
 
 @router.get("/{incident_id}/diff/{baseline_id}", response_model=DiffResponse)
 def diff_incidents(
-    incident_id: str, baseline_id: str, db: Annotated[Session, Depends(get_db)]
+    incident_id: str,
+    baseline_id: str,
+    db: Annotated[Session, Depends(get_db)],
+    scope: Scope,
 ) -> DiffResponse:
     """Compare an incident against a baseline run of the same task."""
     if incident_id == baseline_id:
@@ -168,8 +182,8 @@ def diff_incidents(
             detail="cannot diff an incident against itself",
         )
     repo = IncidentRepository(db)
-    incident = _get_incident_or_404(repo, incident_id)
-    baseline = _get_incident_or_404(repo, baseline_id)
+    incident = _get_incident_or_404(repo, incident_id, scope)
+    baseline = _get_incident_or_404(repo, baseline_id, scope)
     return compute_diff(incident, baseline)
 
 
@@ -182,7 +196,7 @@ class PruneResponse(BaseModel):
 
 @router.delete("", response_model=PruneResponse)
 def prune_incidents(
-    db: Annotated[Session, Depends(get_db)],
+    db: Annotated[Session, Depends(get_db)], scope: Scope,
     before: Annotated[
         datetime,
         Query(description="Delete incidents that started before this time"),
@@ -205,7 +219,7 @@ def prune_incidents(
 
 @router.delete("/{incident_id}", status_code=204)
 def delete_incident(
-    incident_id: str, db: Annotated[Session, Depends(get_db)]
+    incident_id: str, db: Annotated[Session, Depends(get_db)], scope: Scope
 ) -> None:
     repo = IncidentRepository(db)
     if not repo.delete_incident(incident_id):
@@ -232,7 +246,7 @@ class FeedbackRequest(BaseModel):
 def submit_feedback(
     incident_id: str,
     body: FeedbackRequest,
-    db: Annotated[Session, Depends(get_db)],
+    db: Annotated[Session, Depends(get_db)], scope: Scope,
 ) -> DiagnosisFeedback:
     """Record an engineer's verdict on the stored diagnosis.
 
@@ -240,7 +254,7 @@ def submit_feedback(
     calibration section of fleet analytics.
     """
     repo = IncidentRepository(db)
-    _get_incident_or_404(repo, incident_id)
+    _get_incident_or_404(repo, incident_id, scope)
     analysis = repo.get_analysis(incident_id)
     if analysis is None:
         raise HTTPException(
@@ -294,10 +308,10 @@ class ReanalyzeResponse(BaseModel):
 
 @router.post("/{incident_id}/reanalyze", response_model=ReanalyzeResponse)
 def reanalyze(
-    incident_id: str, db: Annotated[Session, Depends(get_db)]
+    incident_id: str, db: Annotated[Session, Depends(get_db)], scope: Scope
 ) -> ReanalyzeResponse:
     repo = IncidentRepository(db)
-    incident = _get_incident_or_404(repo, incident_id)
+    incident = _get_incident_or_404(repo, incident_id, scope)
     analysis = analyze_incident(incident)
     repo.save_analysis(analysis)
     db.commit()
@@ -308,11 +322,11 @@ def reanalyze(
 @router.get("/{incident_id}/report")
 def get_report(
     incident_id: str,
-    db: Annotated[Session, Depends(get_db)],
+    db: Annotated[Session, Depends(get_db)], scope: Scope,
     format: str = Query(default="json", pattern="^(json|markdown)$"),
 ) -> Any:
     repo = IncidentRepository(db)
-    incident = _get_incident_or_404(repo, incident_id)
+    incident = _get_incident_or_404(repo, incident_id, scope)
     analysis = repo.get_analysis(incident_id)
     if format == "markdown":
         return {"markdown": report_markdown(incident, analysis)}
@@ -324,7 +338,7 @@ def get_report(
 @router.get("/{incident_id}/github-issue")
 def get_github_issue(
     incident_id: str,
-    db: Annotated[Session, Depends(get_db)],
+    db: Annotated[Session, Depends(get_db)], scope: Scope,
     repo_name: str | None = Query(
         default=None,
         alias="repo",
@@ -332,7 +346,7 @@ def get_github_issue(
     ),
 ) -> Any:
     repo = IncidentRepository(db)
-    incident = _get_incident_or_404(repo, incident_id)
+    incident = _get_incident_or_404(repo, incident_id, scope)
     analysis = repo.get_analysis(incident_id)
     return build_github_issue(incident, analysis, repo=repo_name)
 
@@ -349,7 +363,7 @@ class UploadResponse(BaseModel):
 
 @router.post("/upload", response_model=UploadResponse, status_code=201)
 async def upload_incident(
-    db: Annotated[Session, Depends(get_db)],
+    db: Annotated[Session, Depends(get_db)], scope: Scope,
     file: UploadFile,
     metadata: Annotated[
         str | None,
