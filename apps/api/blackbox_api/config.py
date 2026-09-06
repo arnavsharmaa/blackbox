@@ -22,6 +22,9 @@ class Settings(BaseSettings):
     #: Comma-separated tokens limited to read-only (GET) routes — for
     #: wallboards and dashboards that should not be able to mutate data.
     readonly_tokens: str = ""
+    #: JSON object mapping token -> facility name; each token reads and
+    #: writes only that facility's incidents (per-fleet isolation).
+    facility_tokens: str = ""
     #: Rolling pre-failure window kept per streaming robot, in seconds.
     stream_window_s: float = 600.0
     #: Optional webhook POSTed for every ingested incident (best-effort).
@@ -40,6 +43,29 @@ class Settings(BaseSettings):
         return [
             t.strip() for t in self.readonly_tokens.split(",") if t.strip()
         ]
+
+    @property
+    def facility_token_map(self) -> dict[str, str]:
+        if not self.facility_tokens.strip():
+            return {}
+        import json
+
+        try:
+            parsed = json.loads(self.facility_tokens)
+        except json.JSONDecodeError as exc:
+            raise ValueError(
+                "BLACKBOX_FACILITY_TOKENS must be a JSON object mapping "
+                "token to facility name"
+            ) from exc
+        if not isinstance(parsed, dict) or not all(
+            isinstance(k, str) and isinstance(v, str) and k and v
+            for k, v in parsed.items()
+        ):
+            raise ValueError(
+                "BLACKBOX_FACILITY_TOKENS must map non-empty token strings "
+                "to non-empty facility names"
+            )
+        return parsed
 
 
 @lru_cache

@@ -93,6 +93,46 @@ def test_readonly_tokens_alone_still_enable_auth(
     )
 
 
+def test_facility_token_resolves_to_a_scope(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from blackbox_api.api.auth import resolve_token
+
+    monkeypatch.setenv("BLACKBOX_API_TOKENS", "sekret-1")
+    monkeypatch.setenv(
+        "BLACKBOX_FACILITY_TOKENS",
+        '{"fremont-tok": "Warehouse 3 — Fremont"}',
+    )
+    get_settings.cache_clear()
+
+    assert resolve_token("sekret-1") is not None
+    assert resolve_token("sekret-1").facility is None  # type: ignore[union-attr]
+    scoped = resolve_token("fremont-tok")
+    assert scoped is not None
+    assert scoped.facility == "Warehouse 3 — Fremont"
+    assert scoped.readonly is False
+    assert resolve_token("nope") is None
+
+    # A facility token authenticates over HTTP like any other.
+    assert (
+        client.get(
+            "/api/incidents", headers={"X-API-Key": "fremont-tok"}
+        ).status_code
+        == 200
+    )
+    assert client.get("/api/incidents").status_code == 401
+
+
+def test_malformed_facility_tokens_fail_loudly(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("BLACKBOX_FACILITY_TOKENS", "not json")
+    get_settings.cache_clear()
+    with pytest.raises(ValueError, match="JSON object"):
+        _ = get_settings().facility_token_map
+    get_settings.cache_clear()
+
+
 def test_writes_require_the_token_too(tokened_client: TestClient) -> None:
     assert (
         tokened_client.delete("/api/incidents/INC-NOPE").status_code == 401
