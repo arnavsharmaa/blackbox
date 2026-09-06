@@ -10,8 +10,10 @@ function mockFetch() {
     const robot = url.searchParams.get("robot_id");
     const severity = url.searchParams.get("severity");
     const q = url.searchParams.get("q")?.toLowerCase();
+    const facility = url.searchParams.get("facility");
     let items = testSummaries;
     if (robot) items = items.filter((i) => i.robot_id === robot);
+    if (facility) items = items.filter((i) => i.facility === facility);
     if (severity) items = items.filter((i) => i.severity === severity);
     if (q) {
       items = items.filter((i) =>
@@ -88,6 +90,48 @@ describe("incident overview", () => {
     expect(
       await screen.findByText("No incidents match these filters"),
     ).toBeTruthy();
+  });
+
+  it("facility filter appears only for multi-site fleets and narrows", async () => {
+    // Single facility in the fixtures: no dropdown.
+    render(<OverviewPage />);
+    await screen.findByText("Deliver pallet to Loading Bay B");
+    expect(screen.queryByLabelText("Facility")).toBeNull();
+  });
+
+  it("filters by facility on a multi-site fleet", async () => {
+    const chicago = {
+      ...testSummaries[1]!,
+      id: "INC-CHI-9",
+      facility: "Warehouse 7 — Chicago",
+    };
+    const multi = [...testSummaries, chicago];
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (input: RequestInfo | URL) => {
+        const url = new URL(String(input));
+        const facility = url.searchParams.get("facility");
+        const items = facility
+          ? multi.filter((i) => i.facility === facility)
+          : multi;
+        return new Response(JSON.stringify(listResponse(items)), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        });
+      }),
+    );
+    const user = userEvent.setup();
+    render(<OverviewPage />);
+    await screen.findByText("Deliver pallet to Loading Bay B");
+
+    await user.selectOptions(
+      screen.getByLabelText("Facility"),
+      "Warehouse 7 — Chicago",
+    );
+    await waitFor(() => {
+      expect(screen.queryByText("Deliver pallet to Loading Bay B")).toBeNull();
+    });
+    expect(screen.getByText("INC-CHI-9")).toBeTruthy();
   });
 
   it("pages through a large incident list", async () => {

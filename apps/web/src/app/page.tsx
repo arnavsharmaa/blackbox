@@ -26,6 +26,7 @@ import type { FailureCategory } from "@blackbox/schemas";
 
 interface Filters {
   robot_id: string;
+  facility: string;
   severity: string;
   failure_category: string;
   outcome: string;
@@ -35,6 +36,7 @@ interface Filters {
 
 const EMPTY_FILTERS: Filters = {
   robot_id: "",
+  facility: "",
   severity: "",
   failure_category: "",
   outcome: "",
@@ -70,6 +72,7 @@ export default function OverviewPage() {
         limit: PAGE_SIZE,
         offset,
         robot_id: filters.robot_id || undefined,
+        facility: filters.facility || undefined,
         severity: filters.severity || undefined,
         failure_category: filters.failure_category || undefined,
         outcome: filters.outcome || undefined,
@@ -102,7 +105,8 @@ export default function OverviewPage() {
       list.push(item);
       robots.set(item.robot_id, list);
     }
-    return { items, critical, byCategory, topCategory, robots };
+    const facilities = [...new Set(items.map((i) => i.facility))].sort();
+    return { items, critical, byCategory, topCategory, robots, facilities };
   }, [all.data]);
 
   const robotIds = useMemo(
@@ -162,6 +166,7 @@ export default function OverviewPage() {
               <FilterBar
                 filters={filters}
                 robotIds={robotIds}
+                facilities={stats.facilities}
                 searchText={searchText}
                 onSearch={setSearchText}
                 onChange={setFilters}
@@ -257,6 +262,7 @@ function avgRecoveries(items: IncidentSummary[]): string {
 function FilterBar({
   filters,
   robotIds,
+  facilities,
   searchText,
   onSearch,
   onChange,
@@ -264,6 +270,7 @@ function FilterBar({
 }: {
   filters: Filters;
   robotIds: string[];
+  facilities: string[];
   searchText: string;
   onSearch: (text: string) => void;
   onChange: (filters: Filters) => void;
@@ -304,6 +311,26 @@ function FilterBar({
           </option>
         ))}
       </select>
+      {facilities.length > 1 && (
+        <>
+          <label className="sr-only" htmlFor="filter-facility">
+            Facility
+          </label>
+          <select
+            id="filter-facility"
+            className={selectClass}
+            value={filters.facility}
+            onChange={(e) => set({ facility: e.target.value })}
+          >
+            <option value="">All facilities</option>
+            {facilities.map((facility) => (
+              <option key={facility} value={facility}>
+                {facility}
+              </option>
+            ))}
+          </select>
+        </>
+      )}
       <label className="sr-only" htmlFor="filter-severity">
         Severity
       </label>

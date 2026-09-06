@@ -66,6 +66,7 @@ async function request<T>(path: string): Promise<T> {
 
 export interface IncidentListParams {
   robot_id?: string;
+  facility?: string;
   severity?: string;
   outcome?: string;
   failure_category?: string;
