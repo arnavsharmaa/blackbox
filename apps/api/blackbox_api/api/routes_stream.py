@@ -9,11 +9,11 @@ message). See blackbox_api.ingestion.stream for the message contract.
 from __future__ import annotations
 
 import logging
-import secrets
 from typing import Any
 
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 
+from blackbox_api.api.auth import OPEN_SCOPE, TokenScope, resolve_token
 from blackbox_api.config import get_settings
 from blackbox_api.ingestion.service import store_incident
 from blackbox_api.ingestion.stream import RobotStream, StreamError
@@ -29,10 +29,19 @@ router = APIRouter(tags=["stream"])
 UNAUTHORIZED_CLOSE = 4401
 
 
-def _authorized(websocket: WebSocket) -> bool:
-    tokens = get_settings().api_token_list
-    if not tokens:
-        return True
+def _resolve_scope(websocket: WebSocket) -> TokenScope | None:
+    """Authenticate the socket; None means reject.
+
+    Streaming is a write path, so read-only tokens are refused. A
+    facility token streams only for its own facility.
+    """
+    settings = get_settings()
+    if (
+        not settings.api_token_list
+        and not settings.readonly_api_token_list
+        and not settings.facility_token_map
+    ):
+        return OPEN_SCOPE
     provided = websocket.headers.get("x-api-key")
     if provided is None:
         authorization = websocket.headers.get("authorization", "")
@@ -43,8 +52,11 @@ def _authorized(websocket: WebSocket) -> bool:
         # Browser WebSocket clients cannot set headers.
         provided = websocket.query_params.get("token")
     if not provided:
-        return False
-    return any(secrets.compare_digest(provided, token) for token in tokens)
+        return None
+    scope = resolve_token(provided)
+    if scope is None or scope.readonly:
+        return None
+    return scope
 
 
 def _cut_and_store(
@@ -75,15 +87,19 @@ def _cut_and_store(
 
 @router.websocket("/api/stream/{robot_id}")
 async def stream_robot(websocket: WebSocket, robot_id: str) -> None:
-    if not _authorized(websocket):
+    scope = _resolve_scope(websocket)
+    if scope is None:
         await websocket.close(
-            code=UNAUTHORIZED_CLOSE, reason="missing or invalid API token"
+            code=UNAUTHORIZED_CLOSE,
+            reason="missing, invalid, or read-only API token",
         )
         return
     await websocket.accept()
 
     window_s = get_settings().stream_window_s
     stream = RobotStream(robot_id=robot_id, window_s=window_s)
+    if scope.facility is not None:
+        stream.meta["facility"] = scope.facility
     await websocket.send_json({"type": "ready", "window_s": window_s})
     log(logger, logging.INFO, "stream connected", robot_id=robot_id)
 
@@ -94,6 +110,9 @@ async def stream_robot(websocket: WebSocket, robot_id: str) -> None:
                 kind = message.get("type")
                 if kind == "hello":
                     stream.update_meta(message.get("meta") or {})
+                    if scope.facility is not None:
+                        # A facility token cannot restamp the tenant.
+                        stream.meta["facility"] = scope.facility
                     await websocket.send_json(
                         {"type": "ready", "window_s": window_s}
                     )

@@ -99,3 +99,99 @@ def test_diff_cannot_cross_facilities(tenants: TestClient) -> None:
         f"/api/incidents/INC-CHI-001/diff/{PRIMARY}", headers=CHICAGO_TOK
     )
     assert response.status_code == 404
+
+
+def test_upload_is_pinned_to_the_token_facility(
+    tenants: TestClient, sample_incidents: dict[str, Any]
+) -> None:
+    foreign = copy.deepcopy(sample_incidents["sensor_dropout"])
+    foreign["id"] = "INC-SNEAK-001"
+    # Facility stays Fremont — a Chicago token may not upload it.
+    response = tenants.post(
+        "/api/incidents/upload",
+        headers=CHICAGO_TOK,
+        files={
+            "file": (
+                "sneak.json",
+                json.dumps(foreign).encode(),
+                "application/json",
+            )
+        },
+    )
+    assert response.status_code == 403
+    assert "Warehouse 7 — Chicago" in response.json()["detail"]
+    assert (
+        tenants.get("/api/incidents/INC-SNEAK-001", headers=ADMIN_TOK).status_code
+        == 404
+    )
+
+
+def test_delete_and_feedback_cannot_cross_facilities(
+    tenants: TestClient,
+) -> None:
+    assert (
+        tenants.delete(
+            f"/api/incidents/{PRIMARY}", headers=CHICAGO_TOK
+        ).status_code
+        == 404
+    )
+    assert (
+        tenants.post(
+            f"/api/incidents/{PRIMARY}/feedback",
+            headers=CHICAGO_TOK,
+            json={"verdict": "confirmed"},
+        ).status_code
+        == 404
+    )
+    # The incident is untouched for its own tenant.
+    assert (
+        tenants.get(f"/api/incidents/{PRIMARY}", headers=FREMONT_TOK).status_code
+        == 200
+    )
+
+
+def test_prune_is_scoped_to_the_token_facility(tenants: TestClient) -> None:
+    # A Chicago token pruning everything only removes Chicago incidents.
+    result = tenants.delete(
+        "/api/incidents",
+        headers=CHICAGO_TOK,
+        params={"before": "2030-01-01T00:00:00Z"},
+    ).json()
+    assert result == {"deleted": 1, "incident_ids": ["INC-CHI-001"]}
+    assert (
+        tenants.get("/api/incidents", headers=ADMIN_TOK).json()["total"] == 5
+    )
+
+
+def test_stream_rejects_readonly_and_stamps_facility(
+    tenants: TestClient, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from starlette.websockets import WebSocketDisconnect
+
+    monkeypatch.setenv("BLACKBOX_READONLY_TOKENS", "viewer-1")
+    get_settings.cache_clear()
+
+    with pytest.raises(WebSocketDisconnect) as excinfo, \
+            tenants.websocket_connect("/api/stream/W-900?token=viewer-1"):
+        pass
+    assert excinfo.value.code == 4401
+
+    # A facility token streams, and its cut is stamped with its facility
+    # even when the hello claims another one.
+    with tenants.websocket_connect(
+        "/api/stream/W-900?token=chicago-tok"
+    ) as ws:
+        assert ws.receive_json()["type"] == "ready"
+        ws.send_json({"type": "hello", "meta": {"facility": FREMONT}})
+        assert ws.receive_json()["type"] == "ready"
+        ws.send_json({
+            "type": "event", "t": 1_785_000_000.0,
+            "event_type": "task_failed", "subsystem": "task_manager",
+            "severity": "critical", "message": "failed",
+        })
+        cut = ws.receive_json()
+    assert cut["type"] == "incident"
+    detail = tenants.get(
+        f"/api/incidents/{cut['incident_id']}", headers=ADMIN_TOK
+    ).json()
+    assert detail["incident"]["facility"] == CHICAGO

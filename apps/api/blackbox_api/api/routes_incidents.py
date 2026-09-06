@@ -14,7 +14,10 @@ from blackbox_api.analysis.engine import analyze_incident
 from blackbox_api.api.auth import TokenScope, get_token_scope
 from blackbox_api.diff import DiffResponse, compute_diff
 from blackbox_api.ingestion.base import IngestError
-from blackbox_api.ingestion.service import ingest_incident
+from blackbox_api.ingestion.service import (
+    FacilityMismatchError,
+    ingest_incident,
+)
 from blackbox_api.logging import log
 from blackbox_api.reports.github_issue import build_github_issue
 from blackbox_api.reports.report import build_report, report_markdown
@@ -204,7 +207,7 @@ def prune_incidents(
 ) -> PruneResponse:
     """Retention pruning: remove incidents older than a cutoff."""
     repo = IncidentRepository(db)
-    deleted = repo.delete_incidents_before(before)
+    deleted = repo.delete_incidents_before(before, facility=scope.facility)
     db.commit()
     if deleted:
         log(
@@ -222,10 +225,8 @@ def delete_incident(
     incident_id: str, db: Annotated[Session, Depends(get_db)], scope: Scope
 ) -> None:
     repo = IncidentRepository(db)
-    if not repo.delete_incident(incident_id):
-        raise HTTPException(
-            status_code=404, detail=f"incident '{incident_id}' not found"
-        )
+    _get_incident_or_404(repo, incident_id, scope)
+    repo.delete_incident(incident_id)
     db.commit()
     log(logger, logging.INFO, "incident deleted", incident_id=incident_id)
 
@@ -398,9 +399,16 @@ async def upload_incident(
     raw = await file.read()
     try:
         incident, analysis = ingest_incident(
-            db, raw, file.filename or "upload.json", metadata=meta_dict
+            db,
+            raw,
+            file.filename or "upload.json",
+            metadata=meta_dict,
+            required_facility=scope.facility,
         )
         db.commit()
+    except FacilityMismatchError as exc:
+        db.rollback()
+        raise HTTPException(status_code=403, detail=exc.message) from exc
     except IngestError as exc:
         db.rollback()
         raise HTTPException(

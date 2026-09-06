@@ -38,11 +38,16 @@ def adapter_for_filename(filename: str) -> IncidentAdapter:
     )
 
 
+class FacilityMismatchError(IngestError):
+    """The authenticated token may not write to this incident's facility."""
+
+
 def ingest_incident(
     session: Session,
     raw: bytes,
     filename: str,
     metadata: dict[str, Any] | None = None,
+    required_facility: str | None = None,
 ) -> tuple[Incident, AnalysisResult]:
     """Parse, validate, persist and analyze an incident payload."""
     max_mb = get_settings().max_upload_mb
@@ -53,6 +58,14 @@ def ingest_incident(
 
     adapter = adapter_for_filename(filename)
     incident = adapter.parse(raw, metadata=metadata)
+    if (
+        required_facility is not None
+        and incident.facility != required_facility
+    ):
+        raise FacilityMismatchError(
+            f"this token may only ingest incidents for facility "
+            f"'{required_facility}'"
+        )
     return incident, store_incident(session, incident, source=adapter.name)
 
 
