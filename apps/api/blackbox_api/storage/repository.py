@@ -37,6 +37,7 @@ class IncidentFilters:
         start_after: datetime | None = None,
         start_before: datetime | None = None,
         q: str | None = None,
+        facility: str | None = None,
     ) -> None:
         self.robot_id = robot_id
         self.severity = severity
@@ -45,6 +46,7 @@ class IncidentFilters:
         self.start_after = start_after
         self.start_before = start_before
         self.q = q
+        self.facility = facility
 
 
 class IncidentRepository:
@@ -208,6 +210,8 @@ class IncidentRepository:
         conditions = []
         if filters.robot_id:
             conditions.append(IncidentRow.robot_id == filters.robot_id)
+        if filters.facility:
+            conditions.append(IncidentRow.facility == filters.facility)
         if filters.severity:
             conditions.append(IncidentRow.severity == filters.severity.value)
         if filters.outcome:

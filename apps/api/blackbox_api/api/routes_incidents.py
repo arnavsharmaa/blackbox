@@ -52,6 +52,7 @@ def _get_incident_or_404(repo: IncidentRepository, incident_id: str) -> Incident
 def list_incidents(
     db: Annotated[Session, Depends(get_db)],
     robot_id: str | None = None,
+    facility: str | None = None,
     severity: Severity | None = None,
     outcome: Outcome | None = None,
     failure_category: FailureCategory | None = None,
@@ -78,6 +79,7 @@ def list_incidents(
             start_after=start_after,
             start_before=start_before,
             q=q,
+            facility=facility,
         ),
         limit=limit,
         offset=offset,

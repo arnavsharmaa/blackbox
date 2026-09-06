@@ -1509,6 +1509,22 @@
           },
           {
             "in": "query",
+            "name": "facility",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Facility"
+            }
+          },
+          {
+            "in": "query",
             "name": "severity",
             "required": false,
             "schema": {

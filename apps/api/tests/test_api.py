@@ -202,6 +202,23 @@ def test_upload_schema_violation_lists_fields(client: TestClient) -> None:
     assert any(e["field"] == "robot_id" for e in detail["errors"])
 
 
+def test_list_incidents_facility_filter(seeded_client: TestClient) -> None:
+    # All five samples share one facility; the filter is exact-match.
+    fremont = seeded_client.get(
+        "/api/incidents", params={"facility": "Warehouse 3 — Fremont"}
+    ).json()
+    assert fremont["total"] == 5
+    assert {i["facility"] for i in fremont["items"]} == {
+        "Warehouse 3 — Fremont"
+    }
+    assert (
+        seeded_client.get(
+            "/api/incidents", params={"facility": "Nowhere"}
+        ).json()["total"]
+        == 0
+    )
+
+
 def test_list_incidents_free_text_search(seeded_client: TestClient) -> None:
     # Matches the task name, case-insensitively.
     by_task = seeded_client.get(
