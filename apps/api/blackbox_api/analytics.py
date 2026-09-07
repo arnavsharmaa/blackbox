@@ -10,6 +10,7 @@ SQLite/MVP scale; a warehouse-sized deployment would precompute these.
 from __future__ import annotations
 
 from collections import Counter, defaultdict
+from datetime import datetime
 
 from pydantic import BaseModel, ConfigDict
 
@@ -236,10 +237,18 @@ def _calibration(
 
 
 def compute_analytics(
-    repo: IncidentRepository, facility: str | None = None
+    repo: IncidentRepository,
+    facility: str | None = None,
+    start_after: datetime | None = None,
+    start_before: datetime | None = None,
 ) -> AnalyticsResponse:
     summaries, _total = repo.list_incidents(
-        IncidentFilters(facility=facility), limit=1000
+        IncidentFilters(
+            facility=facility,
+            start_after=start_after,
+            start_before=start_before,
+        ),
+        limit=1000,
     )
 
     category_counts = Counter(

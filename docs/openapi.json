@@ -1401,7 +1401,7 @@
   "paths": {
     "/api/analytics": {
       "get": {
-        "description": "Fleet analytics, scoped to the token's facility when limited.",
+        "description": "Fleet analytics, scoped to the token's facility when limited.\n\nstart_after/start_before window the aggregation (e.g. \"this week\"),\nexcept calibration, which always reflects all engineer verdicts.",
         "operationId": "get_analytics_api_analytics_get",
         "parameters": [
           {
@@ -1418,6 +1418,40 @@
                 }
               ],
               "title": "Facility"
+            }
+          },
+          {
+            "in": "query",
+            "name": "start_after",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Start After"
+            }
+          },
+          {
+            "in": "query",
+            "name": "start_before",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Start Before"
             }
           },
           {

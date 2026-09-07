@@ -118,3 +118,19 @@ def test_failure_signatures_surface_repeat_failures(
     assert signature["count"] == 2
     assert signature["robot_ids"] == ["W-104", "W-207"]
     assert signature["last_seen"] == "2026-08-04"
+
+
+def test_analytics_time_window(seeded_client: TestClient) -> None:
+    # Only the two incidents on/after Jul 30 fall inside this window.
+    windowed = seeded_client.get(
+        "/api/analytics", params={"start_after": "2026-07-30T00:00:00Z"}
+    ).json()
+    assert windowed["total_incidents"] == 2
+    assert {c["category"] for c in windowed["categories"]} == {
+        "controller_oscillation",
+        "sensor_dropout",
+    }
+    before = seeded_client.get(
+        "/api/analytics", params={"start_before": "2026-07-25T00:00:00Z"}
+    ).json()
+    assert before["total_incidents"] == 1  # just the baseline run
