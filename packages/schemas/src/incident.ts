@@ -274,6 +274,16 @@ export interface CategoryCalibration {
   corrected_to: CategoryCount[];
 }
 
+export interface FailureSignature {
+  task_name: string;
+  category: FailureCategory;
+  count: number;
+  robot_ids: string[];
+  facilities: string[];
+  /** ISO date of the most recent occurrence. */
+  last_seen: string;
+}
+
 export interface AnalyticsResponse {
   total_incidents: number;
   critical_incidents: number;
@@ -285,6 +295,7 @@ export interface AnalyticsResponse {
   blockage_hotspots: BlockageHotspot[];
   daily: DailyCount[];
   calibration: CategoryCalibration[];
+  failure_signatures: FailureSignature[];
 }
 
 /** Body of GET /api/incidents/{id}/diff/{baseline_id}. */

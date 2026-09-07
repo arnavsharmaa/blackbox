@@ -62,6 +62,16 @@ const analytics: AnalyticsResponse = {
       corrected_to: [{ category: "sensor_dropout", count: 1 }],
     },
   ],
+  failure_signatures: [
+    {
+      task_name: "Deliver pallet to Loading Bay B",
+      category: "persistent_obstacle",
+      count: 3,
+      robot_ids: ["W-104", "W-207"],
+      facilities: ["Warehouse 3 — Fremont"],
+      last_seen: "2026-08-04",
+    },
+  ],
 };
 
 function stubFetch(body: AnalyticsResponse) {
@@ -122,6 +132,22 @@ describe("analytics page", () => {
     expect(await screen.findByText("Diagnosis calibration")).toBeTruthy();
     expect(screen.getByText("75%")).toBeTruthy();
     expect(screen.getByText("Sensor dropout ×1")).toBeTruthy();
+  });
+
+  it("lists recurring failure signatures", async () => {
+    render(<AnalyticsPage />);
+    expect(await screen.findByText("Recurring failures")).toBeTruthy();
+    expect(screen.getByText("×3")).toBeTruthy();
+    expect(screen.getByText("W-104, W-207")).toBeTruthy();
+    expect(screen.getByText("2026-08-04")).toBeTruthy();
+  });
+
+  it("shows a one-off note when nothing recurs", async () => {
+    stubFetch({ ...analytics, failure_signatures: [] });
+    render(<AnalyticsPage />);
+    expect(
+      await screen.findByText(/every diagnosed failure so\s*far is a one-off/),
+    ).toBeTruthy();
   });
 
   it("prompts for verdicts when none exist yet", async () => {

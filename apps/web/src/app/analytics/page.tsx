@@ -218,6 +218,64 @@ export default function AnalyticsPage() {
             </Panel>
           </div>
 
+          <Panel title="Recurring failures">
+            {data.failure_signatures.length === 0 ? (
+              <p className="text-sm text-ink-faint">
+                No repeated failure signatures — every diagnosed failure so
+                far is a one-off.
+              </p>
+            ) : (
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-edge text-left text-[10px] uppercase tracking-wider text-ink-faint">
+                    <th className="py-1.5 pr-3 font-semibold">Task</th>
+                    <th className="py-1.5 pr-3 font-semibold">Root cause</th>
+                    <th className="py-1.5 pr-3 text-right font-semibold">
+                      Times
+                    </th>
+                    <th className="py-1.5 pr-3 font-semibold">Robots</th>
+                    <th className="py-1.5 text-right font-semibold">
+                      Last seen
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {data.failure_signatures.map((signature) => (
+                    <tr
+                      key={`${signature.task_name}-${signature.category}`}
+                      className="border-b border-edge/50 last:border-b-0"
+                    >
+                      <td className="py-2 pr-3">{signature.task_name}</td>
+                      <td className="py-2 pr-3">
+                        <span className="inline-flex items-center gap-1.5">
+                          <span
+                            aria-hidden
+                            className="h-2 w-2 rounded-full"
+                            style={{
+                              background: CATEGORY_COLORS[signature.category],
+                            }}
+                          />
+                          {CATEGORY_LABELS[signature.category]}
+                        </span>
+                      </td>
+                      <td className="py-2 pr-3 text-right">
+                        <Badge className="border-amber-500/30 bg-amber-500/10 text-amber-300">
+                          ×{signature.count}
+                        </Badge>
+                      </td>
+                      <td className="py-2 pr-3 font-mono text-xs">
+                        {signature.robot_ids.join(", ")}
+                      </td>
+                      <td className="py-2 text-right text-xs text-ink-dim">
+                        {signature.last_seen}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </Panel>
+
           <Panel title="Diagnosis calibration">
             {data.calibration.length === 0 ? (
               <p className="text-sm text-ink-faint">
