@@ -7,7 +7,9 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 COPY apps/api/pyproject.toml apps/api/
 COPY apps/api/blackbox_api apps/api/blackbox_api
-RUN pip install --no-cache-dir ./apps/api
+# The postgres extra ships in the image so the same build runs against
+# SQLite (default) or Postgres (docker-compose.postgres.yml override).
+RUN pip install --no-cache-dir "./apps/api[postgres]"
 
 COPY packages/sample-data packages/sample-data
 COPY scripts/seed.py scripts/seed.py

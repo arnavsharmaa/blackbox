@@ -209,6 +209,12 @@ Data persists in the `blackbox-data` volume. The compose setup is exercised
 in CI on every push: the docker job builds both images, boots the stack, and
 runs the end-to-end smoke test against it.
 
+To run on Postgres instead of SQLite, layer the override:
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.postgres.yml up --build
+```
+
 ## API
 
 Interactive docs at http://localhost:8000/docs. A committed OpenAPI spec
@@ -230,7 +236,7 @@ contract diffing (`make openapi` regenerates it).
 | `GET /api/incidents/{id}/diff/{baseline_id}` | Compare two runs: per-channel deltas, first sustained divergence, event-type comparison |
 | `GET /api/incidents/{id}/report` | Structured report + Markdown |
 | `GET /api/incidents/{id}/github-issue` | Issue title/body/labels (`?repo=owner/repo` adds a prefilled URL) |
-| `GET /api/analytics` | Fleet analytics: category/outcome mix, per-robot and per-software-version stats, blockage hotspots, daily trend |
+| `GET /api/analytics` | Fleet analytics: category/outcome mix, per-robot and per-software-version stats, blockage hotspots, recurring failure signatures, diagnosis calibration, daily trend; filters: `facility`, `start_after`, `start_before` |
 | `POST /api/incidents/upload` | Multipart upload of `.json` (full incident), `.csv` (events + `metadata` form field), or `.mcap` (ROS 2 bag + `metadata` with at least `id` and `robot_id`) |
 | `WS /api/stream/{robot_id}` | Live streaming ingestion: rolling pre-failure buffer, auto-cut on terminal events, explicit `cut` for near-misses (see [stream.py](apps/api/blackbox_api/ingestion/stream.py) for the message contract) |
 
@@ -440,9 +446,11 @@ Where BlackBox is heading, in the order the work should land.
 
 ### Later — deeper analysis
 
-- [ ] **Cross-incident rule mining** — surface recurring patterns the
-  per-incident rules can't see (e.g. the same shelf edge degrading
-  localization across dozens of near-misses that never became incidents).
+- [ ] **Cross-incident rule mining** — first cut shipped: recurring
+  failure signatures (the same task failing the same way repeatedly)
+  appear in fleet analytics. Still open: patterns the per-incident rules
+  can't see at all, like the same shelf edge degrading localization
+  across dozens of near-misses that never became incidents.
 - [ ] **Community rule registry** — a home for shared
   [`BLACKBOX_EXTRA_RULES` plug-ins](apps/api/blackbox_api/analysis/plugins.py)
   (battery sag, wheel slip, motor-current anomalies) with fixture incidents

@@ -1,0 +1,32 @@
+# Postgres-backed override:
+#
+#   docker compose -f docker-compose.yml -f docker-compose.postgres.yml up --build
+#
+# Swaps the api service onto a postgres:16 sidecar; migrations run on
+# startup exactly as with SQLite. Data lives in the blackbox-pgdata
+# volume. Change the credentials for anything beyond local use.
+
+services:
+  api:
+    environment:
+      BLACKBOX_DATABASE_URL: postgresql+psycopg://blackbox:blackbox@db:5432/blackbox
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: blackbox
+      POSTGRES_PASSWORD: blackbox
+      POSTGRES_DB: blackbox
+    volumes:
+      - blackbox-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U blackbox"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  blackbox-pgdata:
