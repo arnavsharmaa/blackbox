@@ -160,6 +160,13 @@
             "title": "Daily",
             "type": "array"
           },
+          "failure_signatures": {
+            "items": {
+              "$ref": "#/components/schemas/FailureSignature"
+            },
+            "title": "Failure Signatures",
+            "type": "array"
+          },
           "outcomes": {
             "items": {
               "$ref": "#/components/schemas/OutcomeCount"
@@ -186,7 +193,8 @@
           "by_software_version",
           "blockage_hotspots",
           "daily",
-          "calibration"
+          "calibration",
+          "failure_signatures"
         ],
         "title": "AnalyticsResponse",
         "type": "object"
@@ -613,6 +621,51 @@
         ],
         "title": "FailureCategory",
         "type": "string"
+      },
+      "FailureSignature": {
+        "additionalProperties": false,
+        "description": "The same task failing the same way, more than once.",
+        "properties": {
+          "category": {
+            "$ref": "#/components/schemas/FailureCategory"
+          },
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          },
+          "facilities": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Facilities",
+            "type": "array"
+          },
+          "last_seen": {
+            "title": "Last Seen",
+            "type": "string"
+          },
+          "robot_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Robot Ids",
+            "type": "array"
+          },
+          "task_name": {
+            "title": "Task Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "task_name",
+          "category",
+          "count",
+          "robot_ids",
+          "facilities",
+          "last_seen"
+        ],
+        "title": "FailureSignature",
+        "type": "object"
       },
       "FeedbackRequest": {
         "additionalProperties": false,

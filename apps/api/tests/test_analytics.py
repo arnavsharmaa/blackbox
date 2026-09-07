@@ -70,3 +70,51 @@ def test_analytics_daily_trend(seeded_client: TestClient) -> None:
     assert len(daily) == 5
     assert [d["date"] for d in daily] == sorted(d["date"] for d in daily)
     assert {d["count"] for d in daily} == {1}
+
+
+def test_failure_signatures_need_recurrence(seeded_client: TestClient) -> None:
+    # Every seeded task fails exactly once — no signature yet.
+    assert (
+        seeded_client.get("/api/analytics").json()["failure_signatures"] == []
+    )
+
+
+def test_failure_signatures_surface_repeat_failures(
+    seeded_client: TestClient,
+) -> None:
+    import copy
+    import json
+
+    # A second robot fails the same delivery the same way a week later.
+    base = seeded_client.get("/api/incidents/INC-2026-0728-001").json()[
+        "incident"
+    ]
+    repeat = copy.deepcopy(base)
+    repeat["id"] = "INC-2026-0804-009"
+    repeat["robot_id"] = "W-207"
+    repeat["start_time"] = "2026-08-04T09:14:03+00:00"
+    repeat["end_time"] = "2026-08-04T09:15:35+00:00"
+    for event in repeat["events"]:
+        event["timestamp"] = event["timestamp"].replace("-07-28", "-08-04")
+    response = seeded_client.post(
+        "/api/incidents/upload",
+        files={
+            "file": (
+                "repeat.json",
+                json.dumps(repeat).encode(),
+                "application/json",
+            )
+        },
+    )
+    assert response.status_code == 201, response.text
+
+    signatures = seeded_client.get("/api/analytics").json()[
+        "failure_signatures"
+    ]
+    assert len(signatures) == 1
+    signature = signatures[0]
+    assert signature["task_name"] == "Deliver pallet to Loading Bay B"
+    assert signature["category"] == "persistent_obstacle"
+    assert signature["count"] == 2
+    assert signature["robot_ids"] == ["W-104", "W-207"]
+    assert signature["last_seen"] == "2026-08-04"

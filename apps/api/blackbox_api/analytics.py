@@ -77,6 +77,19 @@ class DailyCount(BaseModel):
     count: int
 
 
+class FailureSignature(BaseModel):
+    """The same task failing the same way, more than once."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    task_name: str
+    category: FailureCategory
+    count: int
+    robot_ids: list[str]
+    facilities: list[str]
+    last_seen: str  # ISO date of the most recent occurrence
+
+
 class CategoryCalibration(BaseModel):
     """Measured precision of one diagnosed category, from human verdicts."""
 
@@ -102,6 +115,7 @@ class AnalyticsResponse(BaseModel):
     blockage_hotspots: list[BlockageHotspot]
     daily: list[DailyCount]
     calibration: list[CategoryCalibration]
+    failure_signatures: list[FailureSignature]
 
 
 def _top_category(
@@ -146,6 +160,41 @@ def _blockage_hotspots(
     ]
     hotspots.sort(key=lambda h: (-h.count, h.facility, h.x, h.y))
     return hotspots
+
+
+def _failure_signatures(
+    summaries: list[IncidentSummary],
+) -> list[FailureSignature]:
+    """Cross-incident mining, first cut: repeated (task, category) pairs.
+
+    A signature is the same task failing with the same diagnosed category
+    more than once — the strongest signal that a failure is systemic
+    (a blocked aisle, a bad map region, a regression) rather than a
+    one-off.
+    """
+    groups: dict[tuple[str, FailureCategory], list[IncidentSummary]] = (
+        defaultdict(list)
+    )
+    for summary in summaries:
+        category = summary.failure_category
+        if category is None or category is FailureCategory.UNKNOWN:
+            continue
+        groups[(summary.task_name, category)].append(summary)
+
+    signatures = [
+        FailureSignature(
+            task_name=task_name,
+            category=category,
+            count=len(items),
+            robot_ids=sorted({s.robot_id for s in items}),
+            facilities=sorted({s.facility for s in items}),
+            last_seen=max(s.start_time for s in items).date().isoformat(),
+        )
+        for (task_name, category), items in groups.items()
+        if len(items) >= 2
+    ]
+    signatures.sort(key=lambda s: (-s.count, s.task_name, s.category.value))
+    return signatures
 
 
 def _calibration(
@@ -261,6 +310,7 @@ def compute_analytics(
         by_software_version=by_version,
         blockage_hotspots=_blockage_hotspots(repo, summaries),
         calibration=_calibration(repo.list_feedback(facility)),
+        failure_signatures=_failure_signatures(summaries),
         daily=sorted(
             (
                 DailyCount(date=day, category=category, count=count)
