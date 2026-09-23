@@ -14,6 +14,9 @@ def test_health(client: TestClient) -> None:
     assert body["status"] == "ok"
     assert body["incidents"] == 0
     assert "engine_version" in body
+    # The migration revision the database is actually at.
+    assert body["db_revision"] == "0002"
+    assert body["version"]
 
 
 def test_list_incidents_shape_and_pagination(seeded_client: TestClient) -> None:
