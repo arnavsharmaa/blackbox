@@ -127,6 +127,14 @@ def main() -> int:
     check("invalid upload rejected with 422",
           bad is not None and bad.code == 422)
 
+    csv_export = get(f"{API}/api/incidents/export.csv", as_json=False)
+    assert isinstance(csv_export, str)
+    check(
+        "CSV export lists the incidents",
+        csv_export.startswith("id,robot_id")
+        and len(csv_export.strip().splitlines()) >= 5,
+    )
+
     for path, label in [
         ("/", "web overview page"),
         (f"/incidents/{PRIMARY}", "web incident detail page"),
