@@ -365,3 +365,20 @@ def test_delete_incident(seeded_client: TestClient) -> None:
 
 def test_delete_missing_incident_404(client: TestClient) -> None:
     assert client.delete("/api/incidents/NOPE").status_code == 404
+
+
+def test_export_csv(seeded_client: TestClient) -> None:
+    response = seeded_client.get("/api/incidents/export.csv")
+    assert response.status_code == 200
+    assert response.headers["content-type"].startswith("text/csv")
+    assert "incidents.csv" in response.headers["content-disposition"]
+    lines = response.text.strip().splitlines()
+    assert lines[0].startswith("id,robot_id,robot_model,facility")
+    assert len(lines) == 6  # header + five incidents
+    assert any("persistent_obstacle" in line for line in lines[1:])
+
+    # The same filters as the list endpoint apply.
+    filtered = seeded_client.get(
+        "/api/incidents/export.csv", params={"q": "charging dock"}
+    )
+    assert len(filtered.text.strip().splitlines()) == 2

@@ -6,6 +6,7 @@ from datetime import UTC, datetime
 from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends, Form, HTTPException, Query, UploadFile
+from fastapi.responses import PlainTextResponse
 from pydantic import BaseModel, ConfigDict, ValidationError
 from sqlalchemy.orm import Session
 
@@ -99,6 +100,74 @@ def list_incidents(
         offset=offset,
     )
     return IncidentListResponse(items=items, total=total, limit=limit, offset=offset)
+
+
+_CSV_COLUMNS = (
+    "id", "robot_id", "robot_model", "facility", "task_name", "start_time",
+    "end_time", "duration_s", "outcome", "severity", "software_version",
+    "failure_category", "confidence", "event_count", "recovery_attempts",
+    "summary",
+)
+
+
+@router.get(
+    "/export.csv",
+    response_class=PlainTextResponse,
+    responses={200: {"content": {"text/csv": {}}}},
+)
+def export_incidents_csv(
+    db: Annotated[Session, Depends(get_db)],
+    scope: Scope,
+    robot_id: str | None = None,
+    facility: str | None = None,
+    severity: Severity | None = None,
+    outcome: Outcome | None = None,
+    failure_category: FailureCategory | None = None,
+    start_after: datetime | None = None,
+    start_before: datetime | None = None,
+    q: Annotated[str | None, Query(max_length=200)] = None,
+) -> PlainTextResponse:
+    """The incident list as CSV, honoring the same filters as the list.
+
+    For spreadsheets and notebooks; capped at 10 000 rows.
+    """
+    import csv
+    import io
+
+    repo = IncidentRepository(db)
+    items, _total = repo.list_incidents(
+        IncidentFilters(
+            robot_id=robot_id,
+            severity=severity,
+            outcome=outcome,
+            failure_category=failure_category,
+            start_after=start_after,
+            start_before=start_before,
+            q=q,
+            facility=scope.facility or facility,
+        ),
+        limit=10_000,
+    )
+    buffer = io.StringIO()
+    writer = csv.writer(buffer)
+    writer.writerow(_CSV_COLUMNS)
+    for item in items:
+        writer.writerow([
+            item.id, item.robot_id, item.robot_model, item.facility,
+            item.task_name, item.start_time.isoformat(),
+            item.end_time.isoformat(), item.duration_s, item.outcome.value,
+            item.severity.value, item.software_version,
+            item.failure_category.value if item.failure_category else "",
+            item.confidence if item.confidence is not None else "",
+            item.event_count, item.recovery_attempts, item.summary,
+        ])
+    return PlainTextResponse(
+        buffer.getvalue(),
+        media_type="text/csv",
+        headers={
+            "Content-Disposition": 'attachment; filename="incidents.csv"'
+        },
+    )
 
 
 @router.get("/{incident_id}", response_model=IncidentDetail)

@@ -223,3 +223,14 @@ def test_analytics_are_scoped_to_the_token_facility(
         params={"facility": "Warehouse 7 — Chicago"},
     ).json()
     assert sliced["total_incidents"] == 1
+
+
+def test_export_csv_is_scoped_to_the_token_facility(
+    tenants: TestClient,
+) -> None:
+    body = tenants.get(
+        "/api/incidents/export.csv", headers=FREMONT_TOK
+    ).text.strip()
+    rows = body.splitlines()[1:]
+    assert len(rows) == 5
+    assert all(FREMONT in row for row in rows)
