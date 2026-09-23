@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import type { AnalyticsResponse } from "@blackbox/schemas";
 import AnalyticsPage from "@/app/analytics/page";
 
@@ -156,5 +157,48 @@ describe("analytics page", () => {
     expect(
       await screen.findByText(/No engineer verdicts yet/),
     ).toBeTruthy();
+  });
+});
+
+describe("analytics date window", () => {
+  it("passes the selected range to the API and can reset", async () => {
+    const fetchMock = vi.fn<(input: RequestInfo | URL) => Promise<Response>>(
+      async () =>
+        new Response(JSON.stringify(analytics), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        }),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+    const user = userEvent.setup();
+    render(<AnalyticsPage />);
+    await screen.findByText("Fleet analytics");
+    expect(String(fetchMock.mock.calls[0]?.[0])).not.toContain("start_after");
+
+    fireEvent.change(screen.getByLabelText("From"), {
+      target: { value: "2026-07-29" },
+    });
+    await waitFor(() => {
+      const urls = fetchMock.mock.calls.map((call) => String(call[0]));
+      expect(urls.some((u) => u.includes("start_after=2026-07-29"))).toBe(
+        true,
+      );
+    });
+
+    fireEvent.change(screen.getByLabelText("To"), {
+      target: { value: "2026-07-30" },
+    });
+    await waitFor(() => {
+      const urls = fetchMock.mock.calls.map((call) => String(call[0]));
+      expect(
+        urls.some((u) => u.includes("start_before=2026-07-30T23%3A59%3A59")),
+      ).toBe(true);
+    });
+
+    await user.click(screen.getByRole("button", { name: "All time" }));
+    await waitFor(() => {
+      const last = String(fetchMock.mock.calls.at(-1)?.[0]);
+      expect(last).not.toContain("start_after");
+    });
   });
 });

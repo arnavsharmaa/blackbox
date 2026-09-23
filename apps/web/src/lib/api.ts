@@ -127,8 +127,15 @@ export function fetchGithubIssue(
   );
 }
 
-export function fetchAnalytics(): Promise<AnalyticsResponse> {
-  return request<AnalyticsResponse>("/api/analytics");
+export function fetchAnalytics(window?: {
+  start_after?: string;
+  start_before?: string;
+}): Promise<AnalyticsResponse> {
+  const query = new URLSearchParams();
+  if (window?.start_after) query.set("start_after", window.start_after);
+  if (window?.start_before) query.set("start_before", window.start_before);
+  const suffix = query.toString() ? `?${query.toString()}` : "";
+  return request<AnalyticsResponse>(`/api/analytics${suffix}`);
 }
 
 export function fetchDiff(

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import {
   Bar,
@@ -30,7 +30,21 @@ import {
 const ALL_CATEGORIES = Object.keys(CATEGORY_LABELS) as FailureCategory[];
 
 export default function AnalyticsPage() {
-  const analytics = useApi(fetchAnalytics, []);
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
+  const analytics = useApi(
+    () =>
+      fetchAnalytics({
+        start_after: fromDate
+          ? new Date(fromDate).toISOString()
+          : undefined,
+        // Make the "to" date inclusive: filter to the end of that day.
+        start_before: toDate
+          ? new Date(`${toDate}T23:59:59.999Z`).toISOString()
+          : undefined,
+      }),
+    [fromDate, toDate],
+  );
 
   if (analytics.loading) return <LoadingState label="Crunching fleet data…" />;
   if (analytics.error)
@@ -38,20 +52,55 @@ export default function AnalyticsPage() {
   const data = analytics.data;
   if (!data) return null;
 
+  const dateClass =
+    "rounded border border-edge bg-surface-2 px-2 py-1.5 text-sm text-ink " +
+    "focus:border-accent";
+
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-xl font-semibold">Fleet analytics</h1>
-        <p className="mt-1 text-sm text-ink-dim">
-          Cross-incident trends: what fails, where, on which robots and
-          software versions.
-        </p>
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 className="text-xl font-semibold">Fleet analytics</h1>
+          <p className="mt-1 text-sm text-ink-dim">
+            Cross-incident trends: what fails, where, on which robots and
+            software versions.
+          </p>
+        </div>
+        <div className="flex items-center gap-2 text-sm text-ink-dim">
+          <label htmlFor="analytics-from">From</label>
+          <input
+            id="analytics-from"
+            type="date"
+            className={dateClass}
+            value={fromDate}
+            onChange={(e) => setFromDate(e.target.value)}
+          />
+          <label htmlFor="analytics-to">To</label>
+          <input
+            id="analytics-to"
+            type="date"
+            className={dateClass}
+            value={toDate}
+            onChange={(e) => setToDate(e.target.value)}
+          />
+          {(fromDate || toDate) && (
+            <button
+              type="button"
+              onClick={() => {
+                setFromDate("");
+                setToDate("");
+              }}
+              className="rounded border border-edge px-2 py-1.5 hover:border-edge-strong hover:text-ink"
+            >
+              All time
+            </button>
+          )}
+        </div>
       </div>
-
       {data.total_incidents === 0 ? (
         <EmptyState
           title="No incidents recorded yet"
-          hint="Seed the demo data with `make seed`, or upload an incident."
+          hint="Seed the demo data with `make seed`, upload an incident, or widen the date range."
         />
       ) : (
         <>
