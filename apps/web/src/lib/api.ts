@@ -77,15 +77,28 @@ export interface IncidentListParams {
   offset?: number;
 }
 
-export function fetchIncidents(
-  params: IncidentListParams = {},
-): Promise<IncidentListResponse> {
+function listQuery(params: IncidentListParams): string {
   const query = new URLSearchParams();
   for (const [key, value] of Object.entries(params)) {
     if (value !== undefined && value !== "") query.set(key, String(value));
   }
-  const suffix = query.toString() ? `?${query.toString()}` : "";
-  return request<IncidentListResponse>(`/api/incidents${suffix}`);
+  return query.toString() ? `?${query.toString()}` : "";
+}
+
+export function fetchIncidents(
+  params: IncidentListParams = {},
+): Promise<IncidentListResponse> {
+  return request<IncidentListResponse>(`/api/incidents${listQuery(params)}`);
+}
+
+/** URL for the CSV download of the (filtered) incident list. */
+export function incidentsExportUrl(
+  params: IncidentListParams = {},
+): string {
+  const rest = { ...params };
+  delete rest.limit;
+  delete rest.offset;
+  return `${API_BASE}/api/incidents/export.csv${listQuery(rest)}`;
 }
 
 export function fetchIncidentDetail(id: string): Promise<IncidentDetail> {

@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import type { IncidentSummary } from "@blackbox/schemas";
-import { fetchIncidents } from "@/lib/api";
+import { fetchIncidents, incidentsExportUrl } from "@/lib/api";
 import { useApi } from "@/lib/useApi";
 import {
   CATEGORY_COLORS,
@@ -63,25 +63,27 @@ export default function OverviewPage() {
   const [offset, setOffset] = useState(0);
   useEffect(() => setOffset(0), [filters]);
 
+  const filterParams = useMemo(
+    () => ({
+      robot_id: filters.robot_id || undefined,
+      facility: filters.facility || undefined,
+      severity: filters.severity || undefined,
+      failure_category: filters.failure_category || undefined,
+      outcome: filters.outcome || undefined,
+      start_after: filters.start_after
+        ? new Date(filters.start_after).toISOString()
+        : undefined,
+      q: filters.q || undefined,
+    }),
+    [filters],
+  );
+
   // One unfiltered fetch powers the fleet/stat panels; the filtered fetch
   // powers the table. Both are cheap against the local API.
   const all = useApi(() => fetchIncidents({ limit: 200 }), []);
   const filtered = useApi(
-    () =>
-      fetchIncidents({
-        limit: PAGE_SIZE,
-        offset,
-        robot_id: filters.robot_id || undefined,
-        facility: filters.facility || undefined,
-        severity: filters.severity || undefined,
-        failure_category: filters.failure_category || undefined,
-        outcome: filters.outcome || undefined,
-        start_after: filters.start_after
-          ? new Date(filters.start_after).toISOString()
-          : undefined,
-        q: filters.q || undefined,
-      }),
-    [filters, offset],
+    () => fetchIncidents({ ...filterParams, limit: PAGE_SIZE, offset }),
+    [filterParams, offset],
   );
 
   const stats = useMemo(() => {
@@ -182,12 +184,23 @@ export default function OverviewPage() {
               ) : filtered.data && filtered.data.items.length > 0 ? (
                 <>
                   <IncidentTable items={filtered.data.items} />
-                  <Pager
-                    total={filtered.data.total}
-                    offset={offset}
-                    count={filtered.data.items.length}
-                    onPage={setOffset}
-                  />
+                  <div className="flex items-center justify-between gap-3">
+                    <a
+                      href={incidentsExportUrl(filterParams)}
+                      download="incidents.csv"
+                      className="text-sm text-ink-dim hover:text-accent"
+                    >
+                      ⤓ Export CSV
+                    </a>
+                    <div className="flex-1">
+                      <Pager
+                        total={filtered.data.total}
+                        offset={offset}
+                        count={filtered.data.items.length}
+                        onPage={setOffset}
+                      />
+                    </div>
+                  </div>
                 </>
               ) : (
                 <EmptyState

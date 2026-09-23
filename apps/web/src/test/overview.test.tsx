@@ -134,6 +134,24 @@ describe("incident overview", () => {
     expect(screen.getByText("INC-CHI-9")).toBeTruthy();
   });
 
+  it("export link carries the active filters", async () => {
+    const user = userEvent.setup();
+    render(<OverviewPage />);
+    await screen.findByText("Deliver pallet to Loading Bay B");
+
+    const link = () =>
+      screen.getByRole("link", { name: /Export CSV/ }) as HTMLAnchorElement;
+    expect(link().href).toContain("/api/incidents/export.csv");
+    expect(link().href).not.toContain("robot_id");
+
+    await user.selectOptions(screen.getByLabelText("Robot"), "W-087");
+    await waitFor(() => {
+      expect(link().href).toContain("robot_id=W-087");
+    });
+    // Pagination params never leak into the export.
+    expect(link().href).not.toContain("limit=");
+  });
+
   it("pages through a large incident list", async () => {
     const base = testSummaries[0]!;
     const many = Array.from({ length: 30 }, (_, i) => ({
