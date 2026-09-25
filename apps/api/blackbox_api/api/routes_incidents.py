@@ -32,6 +32,7 @@ from blackbox_api.schemas import (
     IncidentDetail,
     IncidentEvent,
     IncidentListResponse,
+    IncidentSummary,
     Outcome,
     Severity,
     TelemetrySeries,
@@ -238,6 +239,37 @@ def get_analysis(
             repo.save_analysis(analysis)
             db.commit()
     return analysis
+
+
+@router.get("/{incident_id}/similar", response_model=list[IncidentSummary])
+def similar_incidents(
+    incident_id: str,
+    db: Annotated[Session, Depends(get_db)],
+    scope: Scope,
+    limit: int = Query(default=10, ge=1, le=50),
+) -> list[IncidentSummary]:
+    """Past incidents sharing this one's failure signature.
+
+    Same task, same diagnosed category — the "this happened before"
+    view. Empty for undiagnosed or unknown-category incidents.
+    """
+    repo = IncidentRepository(db)
+    incident = _get_incident_or_404(repo, incident_id, scope)
+    analysis = repo.get_analysis(incident_id)
+    if analysis is None or analysis.failure_category is FailureCategory.UNKNOWN:
+        return []
+    summaries, _total = repo.list_incidents(
+        IncidentFilters(
+            task_name=incident.task_name, facility=scope.facility
+        ),
+        limit=200,
+    )
+    return [
+        summary
+        for summary in summaries
+        if summary.id != incident_id
+        and summary.failure_category == analysis.failure_category
+    ][:limit]
 
 
 @router.get("/{incident_id}/diff/{baseline_id}", response_model=DiffResponse)

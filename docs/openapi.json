@@ -2840,6 +2840,97 @@
         ]
       }
     },
+    "/api/incidents/{incident_id}/similar": {
+      "get": {
+        "description": "Past incidents sharing this one's failure signature.\n\nSame task, same diagnosed category \u2014 the \"this happened before\"\nview. Empty for undiagnosed or unknown-category incidents.",
+        "operationId": "similar_incidents_api_incidents__incident_id__similar_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "incident_id",
+            "required": true,
+            "schema": {
+              "title": "Incident Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 10,
+              "maximum": 50,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-api-key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Api-Key"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/IncidentSummary"
+                  },
+                  "title": "Response Similar Incidents Api Incidents  Incident Id  Similar Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Similar Incidents",
+        "tags": [
+          "incidents"
+        ]
+      }
+    },
     "/api/incidents/{incident_id}/telemetry": {
       "get": {
         "operationId": "get_telemetry_api_incidents__incident_id__telemetry_get",
