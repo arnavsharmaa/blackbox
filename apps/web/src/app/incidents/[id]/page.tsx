@@ -8,6 +8,7 @@ import { useReplayStore } from "@/store/replay";
 import { ErrorState, LoadingState } from "@/components/ui";
 import { IncidentHeader } from "@/components/incident/IncidentHeader";
 import { SummaryCard } from "@/components/incident/SummaryCard";
+import { SimilarIncidents } from "@/components/incident/SimilarIncidents";
 import { ReplayControls } from "@/components/incident/ReplayControls";
 import { Timeline } from "@/components/incident/Timeline";
 import { TelemetryCharts } from "@/components/incident/TelemetryCharts";
@@ -65,6 +66,7 @@ export default function IncidentDetailPage({
             analysis={analysis}
             initialFeedback={detail.data?.feedback ?? null}
           />
+          <SimilarIncidents incidentId={incident.id} />
           <PathMap incident={incident} />
           {analysis && <EvidencePanel analysis={analysis} />}
           <HealthPanel incident={incident} />

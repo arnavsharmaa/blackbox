@@ -9,6 +9,7 @@ import type {
   IncidentDetail,
   IncidentListResponse,
   IncidentReport,
+  IncidentSummary,
   UploadResponse,
 } from "@blackbox/schemas";
 
@@ -124,6 +125,13 @@ export function fetchGithubIssue(
   const suffix = repo ? `?repo=${encodeURIComponent(repo)}` : "";
   return request<GithubIssue>(
     `/api/incidents/${encodeURIComponent(id)}/github-issue${suffix}`,
+  );
+}
+
+/** Past incidents sharing this one's failure signature. */
+export function fetchSimilar(id: string): Promise<IncidentSummary[]> {
+  return request<IncidentSummary[]>(
+    `/api/incidents/${encodeURIComponent(id)}/similar`,
   );
 }
 
