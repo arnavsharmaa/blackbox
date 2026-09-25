@@ -184,6 +184,58 @@ def _cmd_prune(args: argparse.Namespace) -> None:
         print(f"  - {incident_id}")
 
 
+def watch_once(
+    known: set[str], items: list[dict[str, Any]], announce: bool
+) -> list[str]:
+    """Display lines for unseen incidents, oldest first; updates known.
+
+    The first pass (announce=False) just records what already exists so
+    only incidents arriving after the watch started get printed.
+    """
+    lines: list[str] = []
+    for item in reversed(items):  # the list endpoint is newest-first
+        if item["id"] in known:
+            continue
+        known.add(item["id"])
+        if not announce:
+            continue
+        category = item.get("failure_category") or "unanalyzed"
+        confidence = item.get("confidence")
+        confidence_s = (
+            f" ({confidence:.0%})"
+            if isinstance(confidence, (int, float))
+            else ""
+        )
+        lines.append(
+            f"{item['start_time']}  {item['id']}  {item['robot_id']}  "
+            f"{category}{confidence_s}  {item['task_name']}"
+        )
+    return lines
+
+
+def _cmd_watch(args: argparse.Namespace) -> None:
+    import time
+
+    query = f"?limit=50&robot_id={args.robot}" if args.robot else "?limit=50"
+    print(
+        f"watching {args.api} every {args.interval:.0f}s — Ctrl-C to stop",
+        flush=True,
+    )
+    known: set[str] = set()
+    announce = False
+    try:
+        while True:
+            body = _request(
+                "GET", f"{args.api}/api/incidents{query}", token=args.token
+            )
+            for line in watch_once(known, body.get("items", []), announce):
+                print(line, flush=True)
+            announce = True
+            time.sleep(args.interval)
+    except KeyboardInterrupt:
+        return
+
+
 def incident_to_frames(incident: dict[str, Any]) -> list[dict[str, Any]]:
     """Convert a canonical incident into streaming frames, time-ordered.
 
@@ -363,6 +415,13 @@ def build_parser() -> argparse.ArgumentParser:
         "--robot-id", default=None, help="override the incident's robot id"
     )
     replay.set_defaults(func=_cmd_replay)
+
+    watch = sub.add_parser(
+        "watch", help="print new incidents as they arrive (poll loop)"
+    )
+    watch.add_argument("--interval", type=float, default=5.0)
+    watch.add_argument("--robot", default=None)
+    watch.set_defaults(func=_cmd_watch)
     return parser
 
 

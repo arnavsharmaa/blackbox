@@ -176,3 +176,31 @@ def test_incident_to_frames_appends_cut_for_success_runs(
     assert cut["type"] == "cut"
     assert cut["id"] == "INC-2026-0721-BASE"
     assert cut["outcome"] == "success"
+
+
+def test_watch_once_announces_only_new_incidents() -> None:
+    known: set[str] = set()
+    existing = [
+        {
+            "id": "INC-1", "robot_id": "W-1", "start_time": "T1",
+            "task_name": "Task A", "failure_category": "sensor_dropout",
+            "confidence": 0.9,
+        },
+    ]
+    # Baseline pass records without printing.
+    assert cli.watch_once(known, existing, announce=False) == []
+
+    arrived = [
+        {
+            "id": "INC-2", "robot_id": "W-2", "start_time": "T2",
+            "task_name": "Task B", "failure_category": None,
+            "confidence": None,
+        },
+        *existing,
+    ]
+    lines = cli.watch_once(known, arrived, announce=True)
+    assert len(lines) == 1
+    assert "INC-2" in lines[0]
+    assert "unanalyzed" in lines[0]
+    # Nothing new on the next poll.
+    assert cli.watch_once(known, arrived, announce=True) == []
