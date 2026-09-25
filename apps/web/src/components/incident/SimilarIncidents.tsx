@@ -12,7 +12,7 @@ import { formatDateTime } from "@/lib/format";
  */
 export function SimilarIncidents({ incidentId }: { incidentId: string }) {
   const similar = useApi(() => fetchSimilar(incidentId), [incidentId]);
-  const items = similar.data ?? [];
+  const items = Array.isArray(similar.data) ? similar.data : [];
   if (similar.loading || similar.error || items.length === 0) return null;
 
   return (

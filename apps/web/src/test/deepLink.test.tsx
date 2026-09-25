@@ -14,13 +14,15 @@ describe("replay deep links", () => {
   beforeEach(() => {
     vi.stubGlobal(
       "fetch",
-      vi.fn(
-        async () =>
-          new Response(
-            JSON.stringify({ incident: testIncident, analysis: testAnalysis }),
-            { status: 200, headers: { "Content-Type": "application/json" } },
-          ),
-      ),
+      vi.fn(async (input: RequestInfo | URL) => {
+        const body = String(input).endsWith("/similar")
+          ? []
+          : { incident: testIncident, analysis: testAnalysis };
+        return new Response(JSON.stringify(body), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        });
+      }),
     );
   });
 
