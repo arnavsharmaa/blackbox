@@ -1,5 +1,5 @@
 .PHONY: help setup dev api web seed test test-api test-web lint lint-api lint-web \
-        typecheck build demo smoke e2e schema openapi demo-bag clean
+        typecheck build demo smoke e2e schema openapi demo-bag demo-stream clean
 
 .DEFAULT_GOAL := help
 
@@ -88,6 +88,13 @@ openapi:
 ## demo-bag: generate a demo ROS 2 MCAP bag to try the rosbag2 upload path
 demo-bag:
 	$(PY) scripts/make_demo_bag.py
+
+## demo-stream: replay the sample incidents through the live streaming endpoint
+demo-stream:
+	@echo "replaying sample incidents over ws://localhost:8000/api/stream …"
+	@for f in packages/sample-data/incidents/*.json; do \
+		PYTHONPATH=apps/api $(PY) -m blackbox_api.cli replay $$f; \
+	done
 
 ## clean: remove the local database and frontend build output
 clean:

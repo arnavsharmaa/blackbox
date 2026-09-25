@@ -6,6 +6,7 @@ Talks HTTP to a running server (it is not an offline tool):
     blackbox show INC-2026-0728-001
     blackbox upload flight.mcap --metadata '{"id": "INC-1", "robot_id": "W-1"}'
     blackbox replay incident.json --speed 10   # robot simulator over WS
+    blackbox watch --interval 5                # print new incidents live
     blackbox prune --days 90 --yes
 
 Configuration: --api / BLACKBOX_API_URL (default http://localhost:8000)

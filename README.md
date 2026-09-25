@@ -189,6 +189,7 @@ Open **http://localhost:3000**, click into
 | `make e2e` | Playwright browser tests against a running stack |
 | `make schema` | Re-export the JSON Schema from the Pydantic models |
 | `make openapi` | Re-export `docs/openapi.json` from the FastAPI app |
+| `make demo-stream` | Replay the sample incidents through the live WebSocket endpoint |
 
 Copy `.env.example` to `.env` to override defaults (database path, CORS,
 API URL, optional AI key). Database initialization is repeatable: tables are
@@ -254,6 +255,7 @@ blackbox list --robot W-104
 blackbox show INC-2026-0728-001
 blackbox upload flight.mcap --metadata '{"id": "INC-1", "robot_id": "W-1"}'
 blackbox replay incident.json --speed 10   # robot simulator over WebSocket
+blackbox watch --interval 5                # print new incidents as they land
 blackbox prune --days 90 --yes
 ```
 
