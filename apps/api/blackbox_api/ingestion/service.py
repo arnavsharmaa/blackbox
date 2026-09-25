@@ -14,8 +14,8 @@ from blackbox_api.ingestion.json_adapter import JsonIncidentAdapter
 from blackbox_api.ingestion.rosbag2_adapter import Rosbag2Adapter
 from blackbox_api.logging import log
 from blackbox_api.notify import notify_incident
-from blackbox_api.schemas import AnalysisResult, Incident
-from blackbox_api.storage.repository import IncidentRepository
+from blackbox_api.schemas import AnalysisResult, FailureCategory, Incident
+from blackbox_api.storage.repository import IncidentFilters, IncidentRepository
 
 logger = logging.getLogger("blackbox.ingestion")
 
@@ -69,15 +69,41 @@ def ingest_incident(
     return incident, store_incident(session, incident, source=adapter.name)
 
 
+def _occurrence_number(
+    repo: IncidentRepository, incident: Incident, analysis: AnalysisResult
+) -> int:
+    """1 for a first-of-its-kind failure, N for the Nth recurrence.
+
+    A recurrence is the same task diagnosed with the same category in the
+    same facility — the failure-signature definition from analytics.
+    """
+    if analysis.failure_category is FailureCategory.UNKNOWN:
+        return 1
+    summaries, _total = repo.list_incidents(
+        IncidentFilters(
+            task_name=incident.task_name, facility=incident.facility
+        ),
+        limit=200,
+    )
+    prior = sum(
+        1
+        for summary in summaries
+        if summary.id != incident.id
+        and summary.failure_category == analysis.failure_category
+    )
+    return prior + 1
+
+
 def store_incident(
     session: Session, incident: Incident, source: str
 ) -> AnalysisResult:
     """Analyze and persist an already-validated incident."""
     analysis = analyze_incident(incident)
     repo = IncidentRepository(session)
+    occurrence = _occurrence_number(repo, incident, analysis)
     repo.upsert_incident(incident)
     repo.save_analysis(analysis)
-    notify_incident(incident, analysis)
+    notify_incident(incident, analysis, occurrence=occurrence)
     log(
         logger,
         logging.INFO,

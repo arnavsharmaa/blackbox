@@ -26,17 +26,26 @@ logger = logging.getLogger("blackbox.notify")
 _TIMEOUT_S = 3.0
 
 
-def notify_incident(incident: Incident, analysis: AnalysisResult) -> None:
+def notify_incident(
+    incident: Incident, analysis: AnalysisResult, occurrence: int = 1
+) -> None:
     url = get_settings().webhook_url
     if not url:
         return
     category = analysis.failure_category.value
+    recurrence_note = (
+        f" — occurrence #{occurrence} of this failure signature"
+        if occurrence >= 2
+        else ""
+    )
     payload = {
         "text": (
             f"BlackBox: {incident.robot_id} — {incident.task_name} "
             f"({incident.outcome.value}); diagnosed {category} "
             f"at {analysis.confidence:.0%} confidence [{incident.id}]"
+            f"{recurrence_note}"
         ),
+        "occurrence": occurrence,
         "incident_id": incident.id,
         "robot_id": incident.robot_id,
         "facility": incident.facility,

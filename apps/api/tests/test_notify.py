@@ -89,3 +89,24 @@ def test_no_webhook_configured_means_no_call(
     )
     _upload(client, sample_incidents["obstacle"])
     assert calls == []
+
+
+def test_webhook_flags_recurring_signatures(
+    webhook_client: tuple[TestClient, list[Any]],
+    sample_incidents: dict[str, dict[str, Any]],
+) -> None:
+    import copy
+
+    client, calls = webhook_client
+    _upload(client, sample_incidents["obstacle"])
+    first = json.loads(calls[0].data.decode())
+    assert first["occurrence"] == 1
+    assert "occurrence #" not in first["text"]
+
+    repeat = copy.deepcopy(sample_incidents["obstacle"])
+    repeat["id"] = "INC-2026-0804-009"
+    repeat["robot_id"] = "W-207"
+    _upload(client, repeat)
+    second = json.loads(calls[1].data.decode())
+    assert second["occurrence"] == 2
+    assert "occurrence #2 of this failure signature" in second["text"]
