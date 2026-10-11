@@ -9,6 +9,7 @@ from blackbox_api.schemas import (
     AnalysisResult,
     EventType,
     Incident,
+    IncidentSummary,
     Severity,
 )
 
@@ -54,7 +55,11 @@ def _telemetry_extremes(incident: Incident) -> list[dict[str, Any]]:
     return rows
 
 
-def build_report(incident: Incident, analysis: AnalysisResult | None) -> dict[str, Any]:
+def build_report(
+    incident: Incident,
+    analysis: AnalysisResult | None,
+    prior: list[IncidentSummary] | None = None,
+) -> dict[str, Any]:
     key_events = [
         {
             "t": round(event_t(incident, ev), 2),
@@ -124,12 +129,24 @@ def build_report(incident: Incident, analysis: AnalysisResult | None) -> dict[st
             ),
             "replay_url": f"/incidents/{incident.id}",
         },
+        "prior_occurrences": [
+            {
+                "id": item.id,
+                "robot_id": item.robot_id,
+                "start_time": item.start_time.isoformat(),
+            }
+            for item in (prior or [])
+        ],
         "ai_explanation": analysis.ai_explanation if analysis else None,
     }
 
 
-def report_markdown(incident: Incident, analysis: AnalysisResult | None) -> str:
-    r = build_report(incident, analysis)
+def report_markdown(
+    incident: Incident,
+    analysis: AnalysisResult | None,
+    prior: list[IncidentSummary] | None = None,
+) -> str:
+    r = build_report(incident, analysis, prior=prior)
     inc = r["incident"]
     lines: list[str] = []
     add = lines.append
@@ -178,6 +195,17 @@ def report_markdown(incident: Incident, analysis: AnalysisResult | None) -> str:
             if e.get("t_end") is not None:
                 anchor += f"–{e['t_end']:.1f}s"
             add(f"- **[{anchor}]** {e['summary']}")
+    if r["prior_occurrences"]:
+        add("")
+        add("## Prior occurrences of this failure signature")
+        add("")
+        add(
+            "The same task has failed with the same diagnosed category "
+            "before — treat this as systemic, not a one-off:"
+        )
+        add("")
+        for p in r["prior_occurrences"]:
+            add(f"- `{p['id']}` — {p['robot_id']} at {p['start_time']}")
     if r["recommended_actions"]:
         add("")
         add("## Recommended actions")

@@ -241,6 +241,30 @@ def get_analysis(
     return analysis
 
 
+def _similar_summaries(
+    repo: IncidentRepository,
+    incident: Incident,
+    analysis: AnalysisResult | None,
+    scope: TokenScope,
+    limit: int = 10,
+) -> list[IncidentSummary]:
+    """Past incidents sharing the failure signature (task + category)."""
+    if analysis is None or analysis.failure_category is FailureCategory.UNKNOWN:
+        return []
+    summaries, _total = repo.list_incidents(
+        IncidentFilters(
+            task_name=incident.task_name, facility=scope.facility
+        ),
+        limit=200,
+    )
+    return [
+        summary
+        for summary in summaries
+        if summary.id != incident.id
+        and summary.failure_category == analysis.failure_category
+    ][:limit]
+
+
 @router.get("/{incident_id}/similar", response_model=list[IncidentSummary])
 def similar_incidents(
     incident_id: str,
@@ -256,20 +280,7 @@ def similar_incidents(
     repo = IncidentRepository(db)
     incident = _get_incident_or_404(repo, incident_id, scope)
     analysis = repo.get_analysis(incident_id)
-    if analysis is None or analysis.failure_category is FailureCategory.UNKNOWN:
-        return []
-    summaries, _total = repo.list_incidents(
-        IncidentFilters(
-            task_name=incident.task_name, facility=scope.facility
-        ),
-        limit=200,
-    )
-    return [
-        summary
-        for summary in summaries
-        if summary.id != incident_id
-        and summary.failure_category == analysis.failure_category
-    ][:limit]
+    return _similar_summaries(repo, incident, analysis, scope, limit=limit)
 
 
 @router.get("/{incident_id}/diff/{baseline_id}", response_model=DiffResponse)
@@ -430,10 +441,11 @@ def get_report(
     repo = IncidentRepository(db)
     incident = _get_incident_or_404(repo, incident_id, scope)
     analysis = repo.get_analysis(incident_id)
+    prior = _similar_summaries(repo, incident, analysis, scope)
     if format == "markdown":
-        return {"markdown": report_markdown(incident, analysis)}
-    report = build_report(incident, analysis)
-    report["markdown"] = report_markdown(incident, analysis)
+        return {"markdown": report_markdown(incident, analysis, prior=prior)}
+    report = build_report(incident, analysis, prior=prior)
+    report["markdown"] = report_markdown(incident, analysis, prior=prior)
     return report
 
 
@@ -450,7 +462,8 @@ def get_github_issue(
     repo = IncidentRepository(db)
     incident = _get_incident_or_404(repo, incident_id, scope)
     analysis = repo.get_analysis(incident_id)
-    return build_github_issue(incident, analysis, repo=repo_name)
+    prior = _similar_summaries(repo, incident, analysis, scope)
+    return build_github_issue(incident, analysis, repo=repo_name, prior=prior)
 
 
 class UploadResponse(BaseModel):

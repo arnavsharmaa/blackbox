@@ -65,3 +65,34 @@ def test_similar_missing_incident_404(seeded_client: TestClient) -> None:
     assert (
         seeded_client.get("/api/incidents/NOPE/similar").status_code == 404
     )
+
+
+def test_reports_and_issues_cite_prior_occurrences(
+    seeded_client: TestClient,
+) -> None:
+    _upload_repeat(seeded_client)
+
+    report = seeded_client.get(f"/api/incidents/{PRIMARY}/report").json()
+    assert report["prior_occurrences"] == [
+        {
+            "id": "INC-2026-0804-009",
+            "robot_id": "W-207",
+            "start_time": "2026-08-04T09:14:03+00:00",
+        }
+    ]
+    assert "## Prior occurrences of this failure signature" in (
+        report["markdown"]
+    )
+
+    issue = seeded_client.get(
+        f"/api/incidents/{PRIMARY}/github-issue"
+    ).json()
+    assert "## Prior occurrences" in issue["body"]
+    assert "INC-2026-0804-009" in issue["body"]
+
+    # One-offs stay clean: the oscillation incident has no repeats.
+    solo = seeded_client.get(
+        "/api/incidents/INC-2026-0730-003/report"
+    ).json()
+    assert solo["prior_occurrences"] == []
+    assert "Prior occurrences" not in solo["markdown"]

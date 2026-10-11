@@ -7,7 +7,13 @@ from urllib.parse import quote
 
 from blackbox_api.analysis.features import event_t
 from blackbox_api.reports.report import CATEGORY_LABELS
-from blackbox_api.schemas import AnalysisResult, EventType, Incident, Severity
+from blackbox_api.schemas import (
+    AnalysisResult,
+    EventType,
+    Incident,
+    IncidentSummary,
+    Severity,
+)
 
 SEVERITY_LABELS = {
     Severity.INFO: "severity:info",
@@ -18,7 +24,10 @@ SEVERITY_LABELS = {
 
 
 def build_github_issue(
-    incident: Incident, analysis: AnalysisResult | None, repo: str | None = None
+    incident: Incident,
+    analysis: AnalysisResult | None,
+    repo: str | None = None,
+    prior: list[IncidentSummary] | None = None,
 ) -> dict[str, Any]:
     category = analysis.failure_category.value if analysis else "unknown"
     label = CATEGORY_LABELS.get(category, category)
@@ -48,6 +57,20 @@ def build_github_issue(
         add("")
         add(f"> {analysis.explanation}")
     add("")
+    if prior:
+        add("## Prior occurrences")
+        add("")
+        add(
+            "This failure signature (same task, same diagnosed category) "
+            "has happened before:"
+        )
+        add("")
+        for item in prior:
+            add(
+                f"- `{item.id}` — {item.robot_id} at "
+                f"{item.start_time.isoformat()}"
+            )
+        add("")
     add("## Context")
     add("")
     add(f"- **Incident ID:** `{incident.id}`")
