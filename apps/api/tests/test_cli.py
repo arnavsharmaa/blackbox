@@ -204,3 +204,66 @@ def test_watch_once_announces_only_new_incidents() -> None:
     assert "unanalyzed" in lines[0]
     # Nothing new on the next poll.
     assert cli.watch_once(known, arrived, announce=True) == []
+
+
+def test_backup_writes_bundles(
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    tmp_path: Path,
+) -> None:
+    fake = FakeApi({
+        ("GET", "/api/incidents"): {
+            "items": [{"id": "INC-A"}, {"id": "INC-B"}], "total": 2,
+        },
+        ("GET", "/api/incidents/INC-A"): {
+            "incident": {"id": "INC-A"}, "analysis": None, "feedback": None,
+        },
+        ("GET", "/api/incidents/INC-B"): {
+            "incident": {"id": "INC-B"}, "analysis": None, "feedback": None,
+        },
+    })
+    monkeypatch.setattr(cli, "_request", fake)
+
+    assert cli.main(["backup", str(tmp_path / "dump")]) == 0
+    assert "backed up 2 incident(s)" in capsys.readouterr().out
+    import json as jsonlib
+
+    bundle = jsonlib.loads((tmp_path / "dump" / "INC-A.json").read_text())
+    assert bundle["incident"]["id"] == "INC-A"
+
+
+def test_restore_uploads_and_reapplies_feedback(
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    tmp_path: Path,
+) -> None:
+    import json as jsonlib
+
+    dump = tmp_path / "dump"
+    dump.mkdir()
+    (dump / "INC-A.json").write_text(jsonlib.dumps({
+        "incident": {"id": "INC-A"},
+        "analysis": {"failure_category": "sensor_dropout"},
+        "feedback": {
+            "verdict": "corrected", "actual_category": "persistent_obstacle",
+            "note": "operator note",
+        },
+    }))
+    (dump / "junk.json").write_text("{}")
+    fake = FakeApi({
+        ("POST", "/api/incidents/upload"): {"incident_id": "INC-A"},
+        ("POST", "/api/incidents/INC-A/feedback"): {"verdict": "corrected"},
+    })
+    monkeypatch.setattr(cli, "_request", fake)
+
+    assert cli.main(["restore", str(dump)]) == 0
+    captured = capsys.readouterr()
+    assert "restored 1 incident(s)" in captured.out
+    assert "skipping junk.json" in captured.err
+    upload, feedback = fake.calls
+    assert b'"id": "INC-A"' in upload["body"]
+    payload = jsonlib.loads(feedback["body"].decode())
+    assert payload == {
+        "verdict": "corrected", "actual_category": "persistent_obstacle",
+        "note": "operator note",
+    }

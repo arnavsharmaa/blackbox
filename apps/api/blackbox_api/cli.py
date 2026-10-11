@@ -185,6 +185,80 @@ def _cmd_prune(args: argparse.Namespace) -> None:
         print(f"  - {incident_id}")
 
 
+def _cmd_backup(args: argparse.Namespace) -> None:
+    out = Path(args.dir)
+    out.mkdir(parents=True, exist_ok=True)
+    offset, saved = 0, 0
+    while True:
+        body = _request(
+            "GET",
+            f"{args.api}/api/incidents?limit=200&offset={offset}",
+            token=args.token,
+        )
+        items = body.get("items", [])
+        if not items:
+            break
+        for item in items:
+            detail = _request(
+                "GET",
+                f"{args.api}/api/incidents/"
+                + urllib.parse.quote(item["id"]),
+                token=args.token,
+            )
+            (out / f"{item['id']}.json").write_text(
+                json.dumps(detail, indent=2) + "\n"
+            )
+            saved += 1
+        offset += len(items)
+        if offset >= int(body.get("total", offset)):
+            break
+    print(f"backed up {saved} incident(s) to {out}")
+
+
+def _cmd_restore(args: argparse.Namespace) -> None:
+    src_dir = Path(args.dir)
+    if not src_dir.is_dir():
+        raise CliError(f"no such directory: {src_dir}")
+    restored = 0
+    for path in sorted(src_dir.glob("*.json")):
+        bundle = json.loads(path.read_text())
+        incident = bundle.get("incident")
+        if not isinstance(incident, dict) or "id" not in incident:
+            print(
+                f"skipping {path.name}: not an incident bundle",
+                file=sys.stderr,
+            )
+            continue
+        body, content_type = _multipart(
+            f"{incident['id']}.json", json.dumps(incident).encode(), None
+        )
+        _request(
+            "POST",
+            f"{args.api}/api/incidents/upload",
+            token=args.token,
+            body=body,
+            content_type=content_type,
+        )
+        feedback = bundle.get("feedback")
+        if isinstance(feedback, dict) and feedback.get("verdict"):
+            payload: dict[str, Any] = {"verdict": feedback["verdict"]}
+            if feedback.get("actual_category"):
+                payload["actual_category"] = feedback["actual_category"]
+            if feedback.get("note"):
+                payload["note"] = feedback["note"]
+            _request(
+                "POST",
+                f"{args.api}/api/incidents/"
+                + urllib.parse.quote(incident["id"])
+                + "/feedback",
+                token=args.token,
+                body=json.dumps(payload).encode(),
+                content_type="application/json",
+            )
+        restored += 1
+    print(f"restored {restored} incident(s)")
+
+
 def watch_once(
     known: set[str], items: list[dict[str, Any]], announce: bool
 ) -> list[str]:
@@ -423,6 +497,22 @@ def build_parser() -> argparse.ArgumentParser:
     watch.add_argument("--interval", type=float, default=5.0)
     watch.add_argument("--robot", default=None)
     watch.set_defaults(func=_cmd_watch)
+
+    backup = sub.add_parser(
+        "backup",
+        help="download every incident (with analysis and feedback) to a "
+        "directory of JSON bundles",
+    )
+    backup.add_argument("dir")
+    backup.set_defaults(func=_cmd_backup)
+
+    restore = sub.add_parser(
+        "restore",
+        help="re-upload a directory of backup bundles (analyses are "
+        "recomputed deterministically; verdicts are re-applied)",
+    )
+    restore.add_argument("dir")
+    restore.set_defaults(func=_cmd_restore)
     return parser
 
 
