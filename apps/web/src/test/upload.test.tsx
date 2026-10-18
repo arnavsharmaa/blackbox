@@ -93,4 +93,18 @@ describe("upload page", () => {
     expect(within(alert).getByText("robot_id")).toBeTruthy();
     expect(within(alert).getByText("events")).toBeTruthy();
   });
+
+  it("accepts a dropped file", async () => {
+    render(<UploadPage />);
+    const dropzone = screen.getByTestId("upload-dropzone");
+    const dropped = new File(["{}"], "dropped.json", {
+      type: "application/json",
+    });
+    const { fireEvent } = await import("@testing-library/react");
+    fireEvent.drop(dropzone, { dataTransfer: { files: [dropped] } });
+
+    expect(await screen.findByText("Selected: dropped.json")).toBeTruthy();
+    const button = screen.getByRole("button", { name: "Upload and analyze" });
+    expect(button.hasAttribute("disabled")).toBe(false);
+  });
 });

@@ -15,8 +15,16 @@ export default function UploadPage() {
   const [file, setFile] = useState<File | null>(null);
   const [metadata, setMetadata] = useState("");
   const [busy, setBusy] = useState(false);
+  const [dragging, setDragging] = useState(false);
   const [result, setResult] = useState<UploadResponse | null>(null);
   const [error, setError] = useState<ApiError | null>(null);
+
+  const handleDrop = (event: React.DragEvent) => {
+    event.preventDefault();
+    setDragging(false);
+    const dropped = event.dataTransfer.files?.[0];
+    if (dropped) setFile(dropped);
+  };
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -51,16 +59,38 @@ export default function UploadPage() {
 
       <Panel>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <label className="block text-sm">
+          <label
+            className="block text-sm"
+            onDragOver={(event) => {
+              event.preventDefault();
+              setDragging(true);
+            }}
+            onDragLeave={() => setDragging(false)}
+            onDrop={handleDrop}
+            data-testid="upload-dropzone"
+          >
             <span className="mb-1 block text-[11px] font-semibold uppercase tracking-wider text-ink-faint">
               Incident file
             </span>
-            <input
-              type="file"
-              accept=".json,.csv,.mcap"
-              onChange={(event) => setFile(event.target.files?.[0] ?? null)}
-              className="block w-full cursor-pointer rounded border border-edge bg-surface-2 text-sm file:mr-3 file:cursor-pointer file:rounded-l file:border-0 file:bg-surface-0 file:px-3 file:py-2 file:text-sm file:text-ink"
-            />
+            <div
+              className={`rounded border border-dashed p-3 transition-colors ${
+                dragging
+                  ? "border-accent bg-surface-2"
+                  : "border-edge bg-surface-2/50"
+              }`}
+            >
+              <input
+                type="file"
+                accept=".json,.csv,.mcap"
+                onChange={(event) => setFile(event.target.files?.[0] ?? null)}
+                className="block w-full cursor-pointer rounded text-sm file:mr-3 file:cursor-pointer file:rounded file:border-0 file:bg-surface-0 file:px-3 file:py-2 file:text-sm file:text-ink"
+              />
+              <p className="mt-1.5 text-xs text-ink-faint">
+                {file
+                  ? `Selected: ${file.name}`
+                  : "…or drag a .json / .csv / .mcap file here"}
+              </p>
+            </div>
           </label>
           <label className="block text-sm">
             <span className="mb-1 block text-[11px] font-semibold uppercase tracking-wider text-ink-faint">
