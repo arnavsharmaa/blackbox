@@ -173,6 +173,75 @@ test.describe("fleet features", () => {
     await expect(calibrationRow.first()).toBeVisible();
   });
 
+  test("search narrows the incident table", async ({ page }) => {
+    await page.goto("/");
+    await page.getByLabel("Search incidents").fill("charging dock");
+    await expect(
+      page.getByRole("link", { name: "Return to charging dock" }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: "Transfer tote to Outbound Staging" }),
+    ).toBeHidden();
+  });
+
+  test("overview filters are shareable URLs", async ({ page }) => {
+    await page.goto("/?robot_id=W-104");
+    await expect(page.getByLabel("Robot")).toHaveValue("W-104");
+    await expect(
+      page.getByRole("link", { name: "Return to charging dock" }),
+    ).toBeHidden();
+    // Changing a filter mirrors back into the URL.
+    await page.getByLabel("Severity").selectOption("critical");
+    await expect(page).toHaveURL(/robot_id=W-104/);
+    await expect(page).toHaveURL(/severity=critical/);
+  });
+
+  test("an engineer can confirm a diagnosis", async ({ page }) => {
+    await page.goto(`/incidents/${PRIMARY}`);
+    const confirm = page.getByRole("button", { name: /Confirm/ });
+    const change = page.getByRole("button", { name: "Change verdict" });
+    // Wait for the card to settle, then reset a verdict left by a
+    // previous local run (CI reseeds clean).
+    await expect(confirm.or(change)).toBeVisible();
+    if (await change.isVisible()) {
+      await change.click();
+    }
+    await confirm.click();
+    await expect(page.getByText("Confirmed by an engineer")).toBeVisible();
+  });
+
+  test("repeat failures surface the prior-occurrence panel", async ({
+    page,
+    request,
+  }) => {
+    const api = "http://localhost:8000";
+    const detail = await (
+      await request.get(`${api}/api/incidents/${PRIMARY}`)
+    ).json();
+    const repeat = structuredClone(detail.incident);
+    repeat.id = "INC-E2E-REPEAT";
+    repeat.robot_id = "W-E2E";
+    const upload = await request.post(`${api}/api/incidents/upload`, {
+      multipart: {
+        file: {
+          name: "repeat.json",
+          mimeType: "application/json",
+          buffer: Buffer.from(JSON.stringify(repeat)),
+        },
+      },
+    });
+    expect(upload.status()).toBe(201);
+    try {
+      await page.goto(`/incidents/${PRIMARY}`);
+      await expect(page.getByText("This happened before")).toBeVisible();
+      await expect(
+        page.getByRole("link", { name: "INC-E2E-REPEAT" }),
+      ).toBeVisible();
+    } finally {
+      await request.delete(`${api}/api/incidents/INC-E2E-REPEAT`);
+    }
+  });
+
   test("upload page rejects malformed json with field errors", async ({
     page,
   }) => {
