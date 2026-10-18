@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import type { IncidentSummary } from "@blackbox/schemas";
 import { fetchIncidents, incidentsExportUrl } from "@/lib/api";
@@ -46,9 +46,45 @@ const EMPTY_FILTERS: Filters = {
 
 const PAGE_SIZE = 25;
 
+/** Filter state ⇄ URL query, so filtered views are shareable links. */
+function parseFilters(search: string): Filters {
+  const params = new URLSearchParams(search);
+  const next = { ...EMPTY_FILTERS };
+  for (const key of Object.keys(EMPTY_FILTERS) as (keyof Filters)[]) {
+    const value = params.get(key);
+    if (value) next[key] = value;
+  }
+  return next;
+}
+
 export default function OverviewPage() {
   const [filters, setFilters] = useState<Filters>(EMPTY_FILTERS);
   const [searchText, setSearchText] = useState("");
+
+  // Initialize from the URL once, then mirror filter changes back into
+  // it (replaceState: no history spam) so the view can be shared.
+  const syncReady = useRef(false);
+  useEffect(() => {
+    const parsed = parseFilters(window.location.search);
+    setFilters(parsed);
+    setSearchText(parsed.q);
+  }, []);
+  useEffect(() => {
+    if (!syncReady.current) {
+      syncReady.current = true;
+      return;
+    }
+    const params = new URLSearchParams();
+    for (const key of Object.keys(EMPTY_FILTERS) as (keyof Filters)[]) {
+      if (filters[key]) params.set(key, filters[key]);
+    }
+    const query = params.toString();
+    window.history.replaceState(
+      null,
+      "",
+      query ? `?${query}` : window.location.pathname,
+    );
+  }, [filters]);
 
   // Debounce free-text search so we don't refetch per keystroke.
   useEffect(() => {

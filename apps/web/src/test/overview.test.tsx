@@ -29,6 +29,8 @@ function mockFetch() {
 
 describe("incident overview", () => {
   beforeEach(() => {
+    // Filters now sync to the URL; start every test from a clean one.
+    window.history.replaceState(null, "", "/");
     vi.stubGlobal("fetch", mockFetch());
   });
 
@@ -150,6 +152,36 @@ describe("incident overview", () => {
     });
     // Pagination params never leak into the export.
     expect(link().href).not.toContain("limit=");
+  });
+
+  it("reads filters from the URL and mirrors changes back", async () => {
+    window.history.replaceState(null, "", "/?robot_id=W-087");
+    try {
+      const user = userEvent.setup();
+      render(<OverviewPage />);
+      await waitFor(() => {
+        expect(
+          screen.queryByText("Deliver pallet to Loading Bay B"),
+        ).toBeNull();
+      });
+      expect(screen.getByText("Return to charging dock")).toBeTruthy();
+      expect(
+        (screen.getByLabelText("Robot") as HTMLSelectElement).value,
+      ).toBe("W-087");
+
+      await user.selectOptions(screen.getByLabelText("Severity"), "error");
+      await waitFor(() => {
+        expect(window.location.search).toContain("robot_id=W-087");
+      });
+      expect(window.location.search).toContain("severity=error");
+
+      await user.click(screen.getByRole("button", { name: "Clear filters" }));
+      await waitFor(() => {
+        expect(window.location.search).toBe("");
+      });
+    } finally {
+      window.history.replaceState(null, "", "/");
+    }
   });
 
   it("pages through a large incident list", async () => {
