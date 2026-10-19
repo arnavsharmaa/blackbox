@@ -242,6 +242,17 @@ test.describe("fleet features", () => {
     }
   });
 
+  test("robots page links through to a filtered overview", async ({
+    page,
+  }) => {
+    await page.goto("/robots");
+    await page.getByRole("link", { name: "W-104" }).click();
+    await expect(page.getByLabel("Robot")).toHaveValue("W-104");
+    await expect(
+      page.getByRole("link", { name: "Return to charging dock" }),
+    ).toBeHidden();
+  });
+
   test("upload page rejects malformed json with field errors", async ({
     page,
   }) => {
