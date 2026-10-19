@@ -42,6 +42,11 @@ run, with the first sustained divergence pinned per channel:
 
 ![Incident diff against a baseline run](docs/screenshots/incident-diff.png)
 
+**Fleet analytics** — recurring failure signatures, measured diagnosis
+precision from engineer verdicts, blockage hotspots, daily trend:
+
+![Fleet analytics dashboard](docs/screenshots/analytics.png)
+
 > Reproduce locally: `make demo`, open http://localhost:3000, and open the
 > primary incident (`INC-2026-0728-001`) — the demo scenario below.
 
