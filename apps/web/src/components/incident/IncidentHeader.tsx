@@ -98,7 +98,12 @@ export function IncidentHeader({
 
       <dl className="mt-4 grid grid-cols-2 gap-x-6 gap-y-2 text-sm sm:grid-cols-3 lg:grid-cols-5">
         <Meta label="Robot">
-          <span className="font-mono">{incident.robot_id}</span>{" "}
+          <Link
+            href={`/?robot_id=${encodeURIComponent(incident.robot_id)}`}
+            className="font-mono hover:text-accent"
+          >
+            {incident.robot_id}
+          </Link>{" "}
           <span className="text-ink-faint">({incident.robot_model})</span>
         </Meta>
         <Meta label="Started (UTC)">{formatDateTime(incident.start_time)}</Meta>

@@ -483,7 +483,14 @@ function IncidentTable({ items }: { items: IncidentSummary[] }) {
                 </Link>
                 <p className="font-mono text-xs text-ink-faint">{item.id}</p>
               </td>
-              <td className="px-3 py-3 font-mono text-xs">{item.robot_id}</td>
+              <td className="px-3 py-3 font-mono text-xs">
+                <Link
+                  href={`/?robot_id=${encodeURIComponent(item.robot_id)}`}
+                  className="hover:text-accent"
+                >
+                  {item.robot_id}
+                </Link>
+              </td>
               <td className="px-3 py-3">
                 <Badge className={SEVERITY_STYLES[item.severity]}>
                   {item.severity}
@@ -563,7 +570,12 @@ function FleetPanel({
               className="flex items-center justify-between px-4 py-3"
             >
               <div>
-                <p className="font-mono text-sm">{robotId}</p>
+                <Link
+                  href={`/?robot_id=${encodeURIComponent(robotId)}`}
+                  className="font-mono text-sm hover:text-accent"
+                >
+                  {robotId}
+                </Link>
                 <p className="text-xs text-ink-faint">
                   {latest ? latest.robot_model : ""}
                 </p>
