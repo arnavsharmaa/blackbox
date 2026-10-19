@@ -125,7 +125,14 @@ and guarded against drift by
   is stored for the runs that succeed.
 - **Fleet analytics** — a cross-incident dashboard: failure-category and
   outcome mix, per-robot and per-software-version stats, recurring blockage
-  hotspots, and a daily trend.
+  hotspots, and a daily trend with a date-range window.
+- **Recurring-failure intelligence** — the same task failing the same way
+  twice becomes a *signature*: surfaced in analytics, shown as a "this
+  happened before" panel on the incident, cited in reports and GitHub
+  issues, and flagged in webhook alerts with its occurrence number.
+- **Operations toolkit** — a `blackbox` CLI (list, show, upload, replay,
+  watch, backup/restore, prune), CSV export, Slack-compatible webhooks,
+  retention pruning, and full/read-only/facility-scoped API tokens.
 - **Measured confidence** — engineers confirm or correct each diagnosis in
   one click; analytics reports the resulting precision per category, so
   "95% confidence" is checked against how often humans actually agreed.
@@ -466,13 +473,16 @@ Where BlackBox is heading, in the order the work should land.
   (battery sag, wheel slip, motor-current anomalies) with fixture incidents
   proving each rule fires.
 
-Recently shipped: diagnosis feedback with measured per-category precision,
-incident diffing against known-good baseline runs with
-first-divergence detection, shareable replay deep links, fleet analytics
-with blockage hotspots, drag-and-drop upload with field-level errors,
-per-deployment thresholds (`BLACKBOX_RULE_*`), custom analysis rules via
-plug-ins, rosbag2 MCAP ingestion, and a 4-job CI (backend, frontend,
-Docker smoke, Playwright).
+Recently shipped (0.2.0): recurring-failure signatures with a "this
+happened before" panel, prior-occurrence citations in reports and
+GitHub issues, recurrence-aware webhook alerts, a robots roster,
+shareable filter URLs, CSV export, `blackbox`
+backup/restore/watch/replay, retention pruning, facility-scoped
+multi-tenant tokens, Postgres + Alembic migrations with a dedicated CI
+job, chunked telemetry storage, live WebSocket streaming ingestion,
+diagnosis feedback with measured per-category precision, and incident
+diffing with first-divergence detection — all on a 5-job CI (backend
+on SQLite and Postgres, frontend, Docker smoke, Playwright).
 
 ## Contributing
 

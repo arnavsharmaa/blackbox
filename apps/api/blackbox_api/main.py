@@ -33,7 +33,7 @@ def create_app() -> FastAPI:
         title="BlackBox API",
         description="Flight recorder and incident reconstruction for "
         "autonomous robots.",
-        version="0.1.0",
+        version="0.2.0",
         lifespan=lifespan,
     )
     app.add_middleware(

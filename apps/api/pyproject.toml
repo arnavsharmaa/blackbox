@@ -1,6 +1,6 @@
 [project]
 name = "blackbox-api"
-version = "0.1.0"
+version = "0.2.0"
 description = "BlackBox flight recorder and incident reconstruction API"
 license = {text = "MIT"}
 requires-python = ">=3.11"
