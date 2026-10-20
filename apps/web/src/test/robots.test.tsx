@@ -16,6 +16,7 @@ const analytics = {
       critical: 1,
       recovery_attempts: 3,
       top_category: "persistent_obstacle",
+      last_incident: "2026-08-04",
     },
     {
       robot_id: "W-087",
@@ -24,6 +25,7 @@ const analytics = {
       critical: 0,
       recovery_attempts: 1,
       top_category: null,
+      last_incident: "2026-07-29",
     },
   ],
   by_software_version: [],

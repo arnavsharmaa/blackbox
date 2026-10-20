@@ -43,6 +43,7 @@ def test_analytics_aggregates_seeded_fleet(seeded_client: TestClient) -> None:
     assert robots["W-104"]["critical"] == 1
     assert robots["W-104"]["top_category"] == "persistent_obstacle"
     assert robots["W-104"]["recovery_attempts"] == 3
+    assert robots["W-104"]["last_incident"] == "2026-07-28"
 
     versions = body["by_software_version"]
     assert len(versions) == 1

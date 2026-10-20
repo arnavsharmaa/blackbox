@@ -243,6 +243,8 @@ export interface RobotStats {
   critical: number;
   recovery_attempts: number;
   top_category: FailureCategory | null;
+  /** ISO date of the robot's most recent incident. */
+  last_incident: string;
 }
 
 export interface VersionStats {

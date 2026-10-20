@@ -55,7 +55,12 @@ export default function RobotsPage() {
                 <th className="py-1.5 pr-3 text-right font-semibold">
                   Recoveries
                 </th>
-                <th className="py-1.5 font-semibold">Top failure mode</th>
+                <th className="py-1.5 pr-3 font-semibold">
+                  Top failure mode
+                </th>
+                <th className="py-1.5 text-right font-semibold">
+                  Last incident
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -90,7 +95,7 @@ export default function RobotsPage() {
                   <td className="py-2.5 pr-3 text-right tabular-nums">
                     {robot.recovery_attempts}
                   </td>
-                  <td className="py-2.5">
+                  <td className="py-2.5 pr-3">
                     {robot.top_category ? (
                       <span className="inline-flex items-center gap-1.5">
                         <span
@@ -105,6 +110,9 @@ export default function RobotsPage() {
                     ) : (
                       <span className="text-ink-faint">—</span>
                     )}
+                  </td>
+                  <td className="py-2.5 text-right text-xs tabular-nums text-ink-dim">
+                    {robot.last_incident}
                   </td>
                 </tr>
               ))}

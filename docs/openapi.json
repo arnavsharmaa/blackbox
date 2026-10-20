@@ -1129,6 +1129,10 @@
             "title": "Incidents",
             "type": "integer"
           },
+          "last_incident": {
+            "title": "Last Incident",
+            "type": "string"
+          },
           "recovery_attempts": {
             "title": "Recovery Attempts",
             "type": "integer"
@@ -1158,7 +1162,8 @@
           "incidents",
           "critical",
           "recovery_attempts",
-          "top_category"
+          "top_category",
+          "last_incident"
         ],
         "title": "RobotStats",
         "type": "object"

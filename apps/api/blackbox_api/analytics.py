@@ -50,6 +50,8 @@ class RobotStats(BaseModel):
     critical: int
     recovery_attempts: int
     top_category: FailureCategory | None
+    #: ISO date of the robot's most recent incident.
+    last_incident: str
 
 
 class VersionStats(BaseModel):
@@ -269,6 +271,9 @@ def compute_analytics(
             critical=sum(1 for s in items if s.severity.value == "critical"),
             recovery_attempts=sum(s.recovery_attempts for s in items),
             top_category=_top_category(items),
+            last_incident=max(
+                s.start_time for s in items
+            ).date().isoformat(),
         ))
 
     by_version: list[VersionStats] = []
