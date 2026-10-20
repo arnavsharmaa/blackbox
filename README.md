@@ -329,7 +329,8 @@ Deployments can also add **custom rules without forking**: set
 `BLACKBOX_EXTRA_RULES=module:function` (comma-separated) to importable
 functions with the built-in rule signature — they compete with the built-in
 rules on equal footing (see
-[plugins.py](apps/api/blackbox_api/analysis/plugins.py)).
+[plugins.py](apps/api/blackbox_api/analysis/plugins.py)). Working,
+test-covered examples live in [examples/rules](examples/rules).
 
 Every numeric threshold in the table above is configurable per deployment
 via `BLACKBOX_RULE_*` environment variables (see
@@ -468,10 +469,10 @@ Where BlackBox is heading, in the order the work should land.
   appear in fleet analytics. Still open: patterns the per-incident rules
   can't see at all, like the same shelf edge degrading localization
   across dozens of near-misses that never became incidents.
-- [ ] **Community rule registry** — a home for shared
-  [`BLACKBOX_EXTRA_RULES` plug-ins](apps/api/blackbox_api/analysis/plugins.py)
-  (battery sag, wheel slip, motor-current anomalies) with fixture incidents
-  proving each rule fires.
+- [ ] **Community rule registry** — started:
+  [examples/rules](examples/rules) holds working, test-covered
+  `BLACKBOX_EXTRA_RULES` plug-ins to copy from. Still open: a shared
+  home for contributed rules with fixture incidents proving each fires.
 
 Recently shipped (0.2.0): recurring-failure signatures with a "this
 happened before" panel, prior-occurrence citations in reports and
