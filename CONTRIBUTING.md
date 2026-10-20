@@ -52,6 +52,11 @@ against a running stack.
   --autogenerate -m "..."` — `test_migrations.py` fails if migrations and
   models drift, and CI runs the suite on both SQLite and Postgres.
 
+## Changelog
+
+User-visible changes get a line in [CHANGELOG.md](CHANGELOG.md) under an
+Unreleased or the upcoming version's heading.
+
 ## Commit style
 
 Present-tense, imperative subject lines ("Add sensor-dropout rule", not
