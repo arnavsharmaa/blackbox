@@ -57,6 +57,14 @@ against a running stack.
 User-visible changes get a line in [CHANGELOG.md](CHANGELOG.md) under an
 Unreleased or the upcoming version's heading.
 
+## Releases
+
+Bump the version in `apps/api/pyproject.toml` and
+`blackbox_api/main.py`, move the changelog entries under the new
+version heading, then push a `vX.Y.Z` tag — the release workflow runs
+the tests and publishes a GitHub release with that version's changelog
+section, the OpenAPI spec, and the JSON Schema attached.
+
 ## Commit style
 
 Present-tense, imperative subject lines ("Add sensor-dropout rule", not
