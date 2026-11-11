@@ -267,3 +267,41 @@ def test_restore_uploads_and_reapplies_feedback(
         "verdict": "corrected", "actual_category": "persistent_obstacle",
         "note": "operator note",
     }
+
+
+def test_doctor_reports_healthy(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    fake = FakeApi({
+        ("GET", "/health"): {
+            "status": "ok", "version": "0.2.0", "schema_version": "1.0",
+            "engine_version": "1.0.0", "db_revision": "0002",
+            "incidents": 5, "ai_explanations": "disabled",
+        },
+        ("GET", "/api/incidents"): {"items": [], "total": 0},
+    })
+    monkeypatch.setattr(cli, "_request", fake)
+    monkeypatch.setattr(cli, "_local_version", lambda: "0.2.0")
+
+    assert cli.main(["doctor"]) == 0
+    out = capsys.readouterr().out
+    assert "db_revision      0002" in out
+    assert "api access       ok (open instance)" in out
+    assert "all good" in out
+
+
+def test_doctor_flags_auth_and_version_skew(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    def fake(method: str, url: str, **kwargs: Any) -> dict[str, Any]:
+        if "/health" in url:
+            return {"status": "ok", "version": "0.3.0"}
+        raise cli.CliError(f"GET {url} failed (401): missing API token")
+
+    monkeypatch.setattr(cli, "_request", fake)
+    monkeypatch.setattr(cli, "_local_version", lambda: "0.2.0")
+
+    assert cli.main(["doctor"]) == 1
+    err = capsys.readouterr().err
+    assert "version skew" in err
+    assert "requires a token" in err

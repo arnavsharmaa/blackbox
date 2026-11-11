@@ -186,6 +186,63 @@ def _cmd_prune(args: argparse.Namespace) -> None:
         print(f"  - {incident_id}")
 
 
+def _local_version() -> str | None:
+    from importlib.metadata import PackageNotFoundError, version
+
+    try:
+        return version("blackbox-api")
+    except PackageNotFoundError:
+        return None
+
+
+def _cmd_doctor(args: argparse.Namespace) -> None:
+    print(f"checking {args.api} …")
+    try:
+        health = _request("GET", f"{args.api}/health", token=args.token)
+    except CliError as exc:
+        raise CliError(f"health check failed — {exc}") from exc
+    for key in (
+        "status", "version", "schema_version", "engine_version",
+        "db_revision", "incidents", "ai_explanations",
+    ):
+        print(f"  {key:16} {health.get(key)}")
+
+    problems: list[str] = []
+    if health.get("status") != "ok":
+        problems.append("server reports a non-ok status")
+    local = _local_version()
+    server = health.get("version")
+    if local and server not in (local, "unknown", None):
+        problems.append(
+            f"version skew: CLI {local} talking to server {server}"
+        )
+
+    try:
+        _request(
+            "GET", f"{args.api}/api/incidents?limit=1", token=args.token
+        )
+        mode = "token accepted" if args.token else "open instance"
+        print(f"  api access       ok ({mode})")
+    except CliError as exc:
+        if "(401)" in str(exc):
+            problems.append(
+                "the API requires a token"
+                + (
+                    " — the provided token was rejected"
+                    if args.token
+                    else "; pass --token or set BLACKBOX_API_TOKEN"
+                )
+            )
+        else:
+            problems.append(f"incident list failed: {exc}")
+
+    if problems:
+        for problem in problems:
+            print(f"  ✗ {problem}", file=sys.stderr)
+        raise CliError(f"doctor found {len(problems)} problem(s)")
+    print("all good")
+
+
 def _cmd_backup(args: argparse.Namespace) -> None:
     out = Path(args.dir)
     out.mkdir(parents=True, exist_ok=True)
@@ -498,6 +555,11 @@ def build_parser() -> argparse.ArgumentParser:
     watch.add_argument("--interval", type=float, default=5.0)
     watch.add_argument("--robot", default=None)
     watch.set_defaults(func=_cmd_watch)
+
+    doctor = sub.add_parser(
+        "doctor", help="check connectivity, versions, and auth in one go"
+    )
+    doctor.set_defaults(func=_cmd_doctor)
 
     backup = sub.add_parser(
         "backup",
