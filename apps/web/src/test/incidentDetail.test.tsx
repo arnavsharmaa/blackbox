@@ -109,6 +109,43 @@ describe("EventInspector", () => {
   });
 });
 
+describe("IncidentHeader download", () => {
+  it("downloads the canonical incident JSON", async () => {
+    const created: Blob[] = [];
+    vi.stubGlobal("URL", {
+      ...URL,
+      createObjectURL: vi.fn((blob: Blob) => {
+        created.push(blob);
+        return "blob:incident";
+      }),
+      revokeObjectURL: vi.fn(),
+    });
+    // jsdom cannot navigate to blob: URLs; swallow the anchor click.
+    const clickSpy = vi
+      .spyOn(HTMLAnchorElement.prototype, "click")
+      .mockImplementation(() => {});
+
+    const user = userEvent.setup();
+    render(<IncidentHeader incident={testIncident} analysis={testAnalysis} />);
+    await user.click(
+      screen.getByRole("button", { name: "Download incident JSON" }),
+    );
+
+    expect(created).toHaveLength(1);
+    expect(clickSpy).toHaveBeenCalled();
+    const text = await new Promise<string>((resolve) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result));
+      reader.readAsText(created[0]!);
+    });
+    const parsed = JSON.parse(text);
+    expect(parsed.id).toBe("INC-TEST-100");
+    expect(parsed.events.length).toBeGreaterThan(0);
+    clickSpy.mockRestore();
+    vi.unstubAllGlobals();
+  });
+});
+
 describe("IncidentHeader delete", () => {
   it("confirms, calls the API, and navigates home", async () => {
     const fetchMock = vi.fn(async () => new Response(null, { status: 204 }));

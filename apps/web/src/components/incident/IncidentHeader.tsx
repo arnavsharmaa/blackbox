@@ -28,6 +28,20 @@ export function IncidentHeader({
   const [deleting, setDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
 
+  const handleDownload = () => {
+    // The canonical incident JSON: re-uploadable, diffable, and
+    // replayable through the streaming endpoint via `blackbox replay`.
+    const blob = new Blob([JSON.stringify(incident, null, 2)], {
+      type: "application/json",
+    });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = `${incident.id}.json`;
+    anchor.click();
+    URL.revokeObjectURL(url);
+  };
+
   const handleDelete = async () => {
     const confirmed = window.confirm(
       `Delete incident ${incident.id}? This removes its events, telemetry, ` +
@@ -61,6 +75,14 @@ export function IncidentHeader({
           <p className="mt-1 font-mono text-xs text-ink-faint">{incident.id}</p>
         </div>
         <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={handleDownload}
+            aria-label="Download incident JSON"
+            className="rounded border border-edge-strong bg-surface-2 px-3 py-1.5 text-sm hover:border-accent"
+          >
+            JSON
+          </button>
           <Link
             href={`/incidents/${encodeURIComponent(incident.id)}/diff`}
             className="rounded border border-edge-strong bg-surface-2 px-3 py-1.5 text-sm hover:border-accent"
