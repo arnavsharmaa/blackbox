@@ -111,7 +111,10 @@ jobs:
 
   e2e:
     name: Playwright end-to-end
-    runs-on: ubuntu-latest
+    # Pinned: ubuntu-latest rolled to 26.04, which this Playwright
+    # version cannot install Chromium on. Unpin when Playwright is
+    # upgraded past support for it.
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
