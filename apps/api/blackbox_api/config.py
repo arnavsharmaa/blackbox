@@ -27,6 +27,8 @@ class Settings(BaseSettings):
     facility_tokens: str = ""
     #: Rolling pre-failure window kept per streaming robot, in seconds.
     stream_window_s: float = 600.0
+    #: Non-GET requests allowed per client IP per minute; 0 disables.
+    rate_limit_per_minute: int = 0
     #: Optional webhook POSTed for every ingested incident (best-effort).
     webhook_url: str = ""
 

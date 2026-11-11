@@ -37,7 +37,9 @@ Reports most useful right now:
 
 Denial-of-service reports that require uploading very large files to an
 instance with auth disabled are out of scope — that deployment mode is
-documented as trusted-network only.
+documented as trusted-network only. Instances that need it can cap
+writes per client with `BLACKBOX_RATE_LIMIT_PER_MINUTE` (in-process;
+pair with a reverse proxy for real internet exposure).
 
 ## Supported versions
 
