@@ -4,6 +4,32 @@ Notable changes to BlackBox. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions track
 the API/package version in `apps/api/pyproject.toml`.
 
+## [Unreleased]
+
+### Added
+
+- Overview: free-text search, pagination, shareable filter URLs,
+  facility filter, CSV export link, drag-and-drop upload.
+- Robots roster (`/robots`) with per-robot last-incident dates; robot
+  ids link to their filtered history everywhere.
+- Fleet analytics date-range picker and a staged README screenshot.
+- Incident page: canonical-JSON download; branded 404/error pages.
+- Reports and generated GitHub issues cite prior occurrences of the
+  failure signature.
+- CLI: `diff`, `doctor`, `watch`, `backup`/`restore`; `make
+  demo-stream`.
+- Optional per-client write rate limiting
+  (`BLACKBOX_RATE_LIMIT_PER_MINUTE`).
+- `/health` reports app version and database migration revision.
+- A worked example plug-in rule (`examples/rules/recovery_churn.py`),
+  exercised by the test suite.
+- Tag-driven release workflow (CHANGELOG notes + spec/schema assets).
+
+### Changed
+
+- Playwright upgraded to 1.65 (Ubuntu 26.04 runners supported); failed
+  e2e runs keep replayable traces as CI artifacts.
+
 ## [0.2.0] — 2026-10-19
 
 ### Added

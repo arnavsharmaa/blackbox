@@ -268,6 +268,8 @@ blackbox show INC-2026-0728-001
 blackbox upload flight.mcap --metadata '{"id": "INC-1", "robot_id": "W-1"}'
 blackbox replay incident.json --speed 10   # robot simulator over WebSocket
 blackbox watch --interval 5                # print new incidents as they land
+blackbox diff INC-2026-0728-001 INC-2026-0721-BASE
+blackbox doctor                            # connectivity, versions, auth
 blackbox backup ./fleet-dump               # every incident + verdict as JSON
 blackbox restore ./fleet-dump              # migrate or recover an instance
 blackbox prune --days 90 --yes
