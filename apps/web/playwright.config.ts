@@ -12,5 +12,8 @@ export default defineConfig({
   use: {
     baseURL: process.env.E2E_BASE_URL ?? "http://localhost:3000",
     viewport: { width: 1600, height: 900 },
+    // Keep a full trace for any failed test — CI uploads test-results/
+    // as an artifact, so failures come with a replayable trace.
+    trace: "retain-on-failure",
   },
 });
