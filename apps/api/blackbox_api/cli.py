@@ -186,6 +186,46 @@ def _cmd_prune(args: argparse.Namespace) -> None:
         print(f"  - {incident_id}")
 
 
+def _cmd_diff(args: argparse.Namespace) -> None:
+    body = _request(
+        "GET",
+        f"{args.api}/api/incidents/"
+        + urllib.parse.quote(args.id)
+        + "/diff/"
+        + urllib.parse.quote(args.baseline),
+        token=args.token,
+    )
+    incident, baseline = body["incident"], body["baseline"]
+    print(
+        f"{incident['id']} ({incident['outcome']}) vs baseline "
+        f"{baseline['id']} ({baseline['outcome']})"
+    )
+    first_t = body.get("first_divergence_t")
+    if first_t is None:
+        print("no divergence — the runs match for the whole overlap window")
+    else:
+        print(
+            f"first divergence: {first_t:.1f} s in "
+            f"{body['first_divergence_channel']}"
+        )
+    print(f"{'CHANNEL':26} {'DIVERGES':>10}  MAX DELTA")
+    for channel in body.get("channels", []):
+        diverges = (
+            f"{channel['first_divergence_t']:.1f} s"
+            if channel["first_divergence_t"] is not None
+            else "-"
+        )
+        max_delta = (
+            f"{channel['max_abs_delta']:.3f}"
+            if channel.get("max_abs_delta") is not None
+            else "-"
+        )
+        print(f"{channel['channel']:26} {diverges:>10}  {max_delta}")
+    only = body.get("event_types_only_in_incident", [])
+    if only:
+        print("events only in the incident: " + ", ".join(only))
+
+
 def _local_version() -> str | None:
     from importlib.metadata import PackageNotFoundError, version
 
@@ -555,6 +595,13 @@ def build_parser() -> argparse.ArgumentParser:
     watch.add_argument("--interval", type=float, default=5.0)
     watch.add_argument("--robot", default=None)
     watch.set_defaults(func=_cmd_watch)
+
+    diff = sub.add_parser(
+        "diff", help="compare an incident against a baseline run"
+    )
+    diff.add_argument("id")
+    diff.add_argument("baseline")
+    diff.set_defaults(func=_cmd_diff)
 
     doctor = sub.add_parser(
         "doctor", help="check connectivity, versions, and auth in one go"

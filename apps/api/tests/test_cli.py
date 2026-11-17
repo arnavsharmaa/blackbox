@@ -305,3 +305,37 @@ def test_doctor_flags_auth_and_version_skew(
     err = capsys.readouterr().err
     assert "version skew" in err
     assert "requires a token" in err
+
+
+def test_diff_prints_the_divergence_table(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    fake = FakeApi({("GET", "/api/incidents/INC-A/diff/INC-BASE"): {
+        "incident": {"id": "INC-A", "outcome": "timed_out"},
+        "baseline": {"id": "INC-BASE", "outcome": "success"},
+        "first_divergence_t": 20.0,
+        "first_divergence_channel": "obstacle_distance",
+        "channels": [
+            {
+                "channel": "obstacle_distance",
+                "first_divergence_t": 20.0, "max_abs_delta": 4.57,
+            },
+            {
+                "channel": "planner_state",
+                "first_divergence_t": 30.0, "max_abs_delta": None,
+            },
+            {
+                "channel": "battery_pct",
+                "first_divergence_t": None, "max_abs_delta": 0.0,
+            },
+        ],
+        "event_types_only_in_incident": ["recovery_started", "task_failed"],
+    }})
+    monkeypatch.setattr(cli, "_request", fake)
+
+    assert cli.main(["diff", "INC-A", "INC-BASE"]) == 0
+    out = capsys.readouterr().out
+    assert "first divergence: 20.0 s in obstacle_distance" in out
+    assert "planner_state" in out and "30.0 s" in out
+    assert "battery_pct" in out
+    assert "events only in the incident: recovery_started, task_failed" in out
