@@ -73,6 +73,7 @@ def test_show_prints_diagnosis_and_feedback(
         "feedback": {
             "verdict": "corrected", "actual_category": "sensor_dropout",
         },
+        "notes": [{"text": "Checked the dock camera.", "author": "ops"}],
     }})
     monkeypatch.setattr(cli, "_request", fake)
 
@@ -81,6 +82,7 @@ def test_show_prints_diagnosis_and_feedback(
     assert "persistent_obstacle (95% confidence)" in out
     assert "t=31.0s zero-velocity streak" in out
     assert "corrected (actually sensor_dropout)" in out
+    assert "note     Checked the dock camera. — ops" in out
 
 
 def test_upload_sends_multipart(
@@ -248,11 +250,15 @@ def test_restore_uploads_and_reapplies_feedback(
             "verdict": "corrected", "actual_category": "persistent_obstacle",
             "note": "operator note",
         },
+        "notes": [
+            {"text": "Found shrink-wrap on the floor.", "author": "arnav"},
+        ],
     }))
     (dump / "junk.json").write_text("{}")
     fake = FakeApi({
         ("POST", "/api/incidents/upload"): {"incident_id": "INC-A"},
         ("POST", "/api/incidents/INC-A/feedback"): {"verdict": "corrected"},
+        ("POST", "/api/incidents/INC-A/notes"): {"id": 1},
     })
     monkeypatch.setattr(cli, "_request", fake)
 
@@ -260,12 +266,15 @@ def test_restore_uploads_and_reapplies_feedback(
     captured = capsys.readouterr()
     assert "restored 1 incident(s)" in captured.out
     assert "skipping junk.json" in captured.err
-    upload, feedback = fake.calls
+    upload, feedback, note = fake.calls
     assert b'"id": "INC-A"' in upload["body"]
     payload = jsonlib.loads(feedback["body"].decode())
     assert payload == {
         "verdict": "corrected", "actual_category": "persistent_obstacle",
         "note": "operator note",
+    }
+    assert jsonlib.loads(note["body"].decode()) == {
+        "text": "Found shrink-wrap on the floor.", "author": "arnav",
     }
 
 

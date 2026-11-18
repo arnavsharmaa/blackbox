@@ -144,6 +144,9 @@ def _cmd_show(args: argparse.Namespace) -> None:
         actual = feedback.get("actual_category")
         suffix = f" (actually {actual})" if actual else ""
         print(f"  verdict  {verdict}{suffix}")
+    for note in body.get("notes") or []:
+        author = f" — {note['author']}" if note.get("author") else ""
+        print(f"  note     {note['text']}{author}")
 
 
 def _cmd_upload(args: argparse.Namespace) -> None:
@@ -351,6 +354,21 @@ def _cmd_restore(args: argparse.Namespace) -> None:
                 + "/feedback",
                 token=args.token,
                 body=json.dumps(payload).encode(),
+                content_type="application/json",
+            )
+        for note in bundle.get("notes") or []:
+            if not isinstance(note, dict) or not note.get("text"):
+                continue
+            _request(
+                "POST",
+                f"{args.api}/api/incidents/"
+                + urllib.parse.quote(incident["id"])
+                + "/notes",
+                token=args.token,
+                body=json.dumps({
+                    "text": note["text"],
+                    "author": note.get("author", ""),
+                }).encode(),
                 content_type="application/json",
             )
         restored += 1
