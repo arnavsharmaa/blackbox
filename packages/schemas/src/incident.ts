@@ -158,10 +158,20 @@ export interface DiagnosisFeedback {
   created_at: string;
 }
 
+/** A free-text investigation note attached to an incident. */
+export interface IncidentNote {
+  id: number;
+  incident_id: string;
+  text: string;
+  author: string;
+  created_at: string;
+}
+
 export interface IncidentDetail {
   incident: Incident;
   analysis: AnalysisResult | null;
   feedback: DiagnosisFeedback | null;
+  notes: IncidentNote[];
 }
 
 export interface IncidentListResponse {

@@ -8,6 +8,7 @@ import type {
   GithubIssue,
   IncidentDetail,
   IncidentListResponse,
+  IncidentNote,
   IncidentReport,
   IncidentSummary,
   UploadResponse,
@@ -126,6 +127,45 @@ export function fetchGithubIssue(
   return request<GithubIssue>(
     `/api/incidents/${encodeURIComponent(id)}/github-issue${suffix}`,
   );
+}
+
+export async function addNote(
+  id: string,
+  body: { text: string; author?: string },
+): Promise<IncidentNote> {
+  let response: Response;
+  try {
+    response = await fetch(
+      `${API_BASE}/api/incidents/${encodeURIComponent(id)}/notes`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json", ...authHeaders() },
+        body: JSON.stringify(body),
+      },
+    );
+  } catch {
+    throw new ApiError(
+      `Cannot reach the BlackBox API at ${API_BASE}. Is the backend running?`,
+      0,
+    );
+  }
+  if (!response.ok) {
+    throw new ApiError(`Note rejected (${response.status})`, response.status);
+  }
+  return (await response.json()) as IncidentNote;
+}
+
+export async function deleteNote(id: string, noteId: number): Promise<void> {
+  const response = await fetch(
+    `${API_BASE}/api/incidents/${encodeURIComponent(id)}/notes/${noteId}`,
+    { method: "DELETE", headers: authHeaders() },
+  );
+  if (!response.ok) {
+    throw new ApiError(
+      `Note delete failed (${response.status})`,
+      response.status,
+    );
+  }
 }
 
 /** Past incidents sharing this one's failure signature. */

@@ -9,6 +9,7 @@ import { ErrorState, LoadingState } from "@/components/ui";
 import { IncidentHeader } from "@/components/incident/IncidentHeader";
 import { SummaryCard } from "@/components/incident/SummaryCard";
 import { SimilarIncidents } from "@/components/incident/SimilarIncidents";
+import { NotesPanel } from "@/components/incident/NotesPanel";
 import { ReplayControls } from "@/components/incident/ReplayControls";
 import { Timeline } from "@/components/incident/Timeline";
 import { TelemetryCharts } from "@/components/incident/TelemetryCharts";
@@ -71,6 +72,11 @@ export default function IncidentDetailPage({
           {analysis && <EvidencePanel analysis={analysis} />}
           <HealthPanel incident={incident} />
           <EventInspector incident={incident} />
+          <NotesPanel
+            key={incident.id}
+            incidentId={incident.id}
+            initialNotes={detail.data?.notes ?? []}
+          />
         </div>
       </div>
     </div>
