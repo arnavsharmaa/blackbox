@@ -8,6 +8,10 @@ the API/package version in `apps/api/pyproject.toml`.
 
 ### Added
 
+- Incident notes: a free-text investigation scratchpad per incident
+  (API + panel on the incident page), carried through `blackbox show`,
+  backup, and restore.
+
 - Overview: free-text search, pagination, shareable filter URLs,
   facility filter, CSV export link, drag-and-drop upload.
 - Robots roster (`/robots`) with per-robot last-incident dates; robot

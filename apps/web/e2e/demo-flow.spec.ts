@@ -253,6 +253,39 @@ test.describe("fleet features", () => {
     ).toBeHidden();
   });
 
+  test("investigation notes persist on the incident", async ({
+    page,
+    request,
+  }) => {
+    await page.goto(`/incidents/${PRIMARY}`);
+    await page
+      .getByLabel("New note")
+      .fill("e2e: operator confirmed the pallet was moved.");
+    await page.getByRole("button", { name: "Add note" }).click();
+    await expect(
+      page.getByText("e2e: operator confirmed the pallet was moved."),
+    ).toBeVisible();
+
+    // Survives a reload — it's stored, not local state.
+    await page.reload();
+    await expect(
+      page.getByText("e2e: operator confirmed the pallet was moved."),
+    ).toBeVisible();
+
+    // Clean up for idempotent local reruns.
+    const api = "http://localhost:8000";
+    const notes = await (
+      await request.get(`${api}/api/incidents/${PRIMARY}/notes`)
+    ).json();
+    for (const note of notes) {
+      if (String(note.text).startsWith("e2e:")) {
+        await request.delete(
+          `${api}/api/incidents/${PRIMARY}/notes/${note.id}`,
+        );
+      }
+    }
+  });
+
   test("upload page rejects malformed json with field errors", async ({
     page,
   }) => {
