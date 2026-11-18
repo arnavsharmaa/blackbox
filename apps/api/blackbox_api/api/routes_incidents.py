@@ -7,7 +7,7 @@ from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends, Form, HTTPException, Query, UploadFile
 from fastapi.responses import PlainTextResponse
-from pydantic import BaseModel, ConfigDict, ValidationError
+from pydantic import BaseModel, ConfigDict, Field, ValidationError
 from sqlalchemy.orm import Session
 
 from blackbox_api.ai.explain import ai_available, generate_ai_explanation
@@ -32,6 +32,7 @@ from blackbox_api.schemas import (
     IncidentDetail,
     IncidentEvent,
     IncidentListResponse,
+    IncidentNote,
     IncidentSummary,
     Outcome,
     Severity,
@@ -181,6 +182,7 @@ def get_incident(
         incident=incident,
         analysis=repo.get_analysis(incident_id),
         feedback=repo.get_feedback(incident_id),
+        notes=repo.list_notes(incident_id),
     )
 
 
@@ -341,6 +343,64 @@ def delete_incident(
     repo.delete_incident(incident_id)
     db.commit()
     log(logger, logging.INFO, "incident deleted", incident_id=incident_id)
+
+
+class NoteRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    text: str = Field(min_length=1, max_length=4000)
+    author: str = Field(default="", max_length=120)
+
+
+@router.get("/{incident_id}/notes", response_model=list[IncidentNote])
+def list_notes(
+    incident_id: str,
+    db: Annotated[Session, Depends(get_db)],
+    scope: Scope,
+) -> list[IncidentNote]:
+    repo = IncidentRepository(db)
+    _get_incident_or_404(repo, incident_id, scope)
+    return repo.list_notes(incident_id)
+
+
+@router.post(
+    "/{incident_id}/notes", response_model=IncidentNote, status_code=201
+)
+def add_note(
+    incident_id: str,
+    body: NoteRequest,
+    db: Annotated[Session, Depends(get_db)],
+    scope: Scope,
+) -> IncidentNote:
+    """Attach a free-text investigation note to an incident."""
+    repo = IncidentRepository(db)
+    _get_incident_or_404(repo, incident_id, scope)
+    note = repo.add_note(incident_id, text=body.text, author=body.author)
+    db.commit()
+    log(
+        logger,
+        logging.INFO,
+        "note added",
+        incident_id=incident_id,
+        note_id=note.id,
+    )
+    return note
+
+
+@router.delete("/{incident_id}/notes/{note_id}", status_code=204)
+def delete_note(
+    incident_id: str,
+    note_id: int,
+    db: Annotated[Session, Depends(get_db)],
+    scope: Scope,
+) -> None:
+    repo = IncidentRepository(db)
+    _get_incident_or_404(repo, incident_id, scope)
+    if not repo.delete_note(incident_id, note_id):
+        raise HTTPException(
+            status_code=404, detail=f"note {note_id} not found"
+        )
+    db.commit()
 
 
 class FeedbackRequest(BaseModel):

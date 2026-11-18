@@ -14,8 +14,13 @@ def test_health(client: TestClient) -> None:
     assert body["status"] == "ok"
     assert body["incidents"] == 0
     assert "engine_version" in body
-    # The migration revision the database is actually at.
-    assert body["db_revision"] == "0002"
+    # The database sits at the latest migration, whatever that is.
+    from alembic.script import ScriptDirectory
+
+    from blackbox_api.storage.db import MIGRATIONS_DIR
+
+    head = ScriptDirectory(str(MIGRATIONS_DIR)).get_current_head()
+    assert body["db_revision"] == head
     assert body["version"]
 
 

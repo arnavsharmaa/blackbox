@@ -56,6 +56,11 @@ class IncidentRow(Base):
     feedback: Mapped[FeedbackRow | None] = relationship(
         back_populates="incident", cascade="all, delete-orphan"
     )
+    notes: Mapped[list[NoteRow]] = relationship(
+        back_populates="incident",
+        cascade="all, delete-orphan",
+        order_by="NoteRow.id",
+    )
 
 
 class EventRow(Base):
@@ -116,6 +121,22 @@ class AnalysisRow(Base):
     analyzed_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
 
     incident: Mapped[IncidentRow] = relationship(back_populates="analysis")
+
+
+class NoteRow(Base):
+    __tablename__ = "incident_notes"
+
+    id: Mapped[int] = mapped_column(
+        Integer, primary_key=True, autoincrement=True
+    )
+    incident_id: Mapped[str] = mapped_column(
+        ForeignKey("incidents.id", ondelete="CASCADE"), index=True
+    )
+    text: Mapped[str] = mapped_column(Text)
+    author: Mapped[str] = mapped_column(String(120), default="")
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+    incident: Mapped[IncidentRow] = relationship(back_populates="notes")
 
 
 class FeedbackRow(Base):

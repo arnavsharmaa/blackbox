@@ -296,12 +296,30 @@ class IncidentSummary(BaseModel):
     confidence: float | None = None
 
 
+class IncidentNote(BaseModel):
+    """A free-text investigation note attached to an incident.
+
+    The unstructured companion to DiagnosisFeedback: what the operator
+    said, what was found on the floor, links to tickets — anything worth
+    keeping with the incident that isn't a verdict.
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    id: int
+    incident_id: str
+    text: str = Field(min_length=1, max_length=4000)
+    author: str = Field(default="", max_length=120)
+    created_at: datetime
+
+
 class IncidentDetail(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     incident: Incident
     analysis: AnalysisResult | None = None
     feedback: DiagnosisFeedback | None = None
+    notes: list[IncidentNote] = Field(default_factory=list)
 
 
 class IncidentListResponse(BaseModel):

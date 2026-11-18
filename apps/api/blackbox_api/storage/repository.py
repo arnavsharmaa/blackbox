@@ -12,6 +12,7 @@ from blackbox_api.schemas import (
     FailureCategory,
     Incident,
     IncidentEvent,
+    IncidentNote,
     IncidentSummary,
     Outcome,
     Severity,
@@ -23,6 +24,7 @@ from blackbox_api.storage.models import (
     EventRow,
     FeedbackRow,
     IncidentRow,
+    NoteRow,
     TelemetrySeriesRow,
 )
 
@@ -186,6 +188,43 @@ class IncidentRepository:
         if row is None:
             return None
         return AnalysisResult.model_validate_json(row.result_json)
+
+    def add_note(
+        self, incident_id: str, text: str, author: str = ""
+    ) -> IncidentNote:
+        row = NoteRow(
+            incident_id=incident_id,
+            text=text,
+            author=author,
+            created_at=datetime.now(UTC),
+        )
+        self.session.add(row)
+        self.session.flush()  # assign the autoincrement id
+        return self._row_to_note(row)
+
+    def delete_note(self, incident_id: str, note_id: int) -> bool:
+        row = self.session.get(NoteRow, note_id)
+        if row is None or row.incident_id != incident_id:
+            return False
+        self.session.delete(row)
+        return True
+
+    def list_notes(self, incident_id: str) -> list[IncidentNote]:
+        rows = self.session.scalars(
+            select(NoteRow)
+            .where(NoteRow.incident_id == incident_id)
+            .order_by(NoteRow.id)
+        ).all()
+        return [self._row_to_note(row) for row in rows]
+
+    def _row_to_note(self, row: NoteRow) -> IncidentNote:
+        return IncidentNote(
+            id=row.id,
+            incident_id=row.incident_id,
+            text=row.text,
+            author=row.author,
+            created_at=_utc(row.created_at),
+        )
 
     def get_feedback(self, incident_id: str) -> DiagnosisFeedback | None:
         row = self.session.get(FeedbackRow, incident_id)
