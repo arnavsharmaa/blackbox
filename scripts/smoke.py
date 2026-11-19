@@ -97,6 +97,26 @@ def main() -> int:
         and diff["first_divergence_t"] is not None,
     )
 
+    note_request = urllib.request.Request(
+        f"{API}/api/incidents/{PRIMARY}/notes",
+        data=json.dumps({"text": "smoke: note round-trip"}).encode(),
+        headers={"Content-Type": "application/json"},
+        method="POST",
+    )
+    with urllib.request.urlopen(note_request, timeout=15) as response:
+        note = json.loads(response.read())
+    notes = get(f"{API}/api/incidents/{PRIMARY}/notes")
+    assert isinstance(notes, list)
+    check(
+        "note round-trips",
+        any(n["id"] == note["id"] for n in notes),
+    )
+    delete_request = urllib.request.Request(
+        f"{API}/api/incidents/{PRIMARY}/notes/{note['id']}", method="DELETE"
+    )
+    with urllib.request.urlopen(delete_request, timeout=15):
+        pass
+
     report = get(f"{API}/api/incidents/{PRIMARY}/report")
     assert isinstance(report, dict)
     check("report has markdown", "# Incident Report" in report["markdown"])

@@ -10,7 +10,8 @@ the API/package version in `apps/api/pyproject.toml`.
 
 - Incident notes: a free-text investigation scratchpad per incident
   (API + panel on the incident page), carried through `blackbox show`,
-  backup, and restore.
+  backup, and restore; cited in the incident report and manageable
+  from the terminal with `blackbox notes`.
 
 - Overview: free-text search, pagination, shareable filter URLs,
   facility filter, CSV export link, drag-and-drop upload.
