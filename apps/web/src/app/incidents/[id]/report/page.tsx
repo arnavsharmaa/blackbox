@@ -167,6 +167,22 @@ export default function ReportPage({
         </Panel>
       )}
 
+      {(data.investigation_notes ?? []).length > 0 && (
+        <Panel title="Investigation notes">
+          <ul className="space-y-2 text-sm">
+            {(data.investigation_notes ?? []).map((note) => (
+              <li key={`${note.created_at}-${note.text.slice(0, 20)}`}>
+                <p className="whitespace-pre-wrap">{note.text}</p>
+                <p className="mt-0.5 text-xs text-ink-faint">
+                  {note.author && <span>{note.author} · </span>}
+                  {note.created_at}
+                </p>
+              </li>
+            ))}
+          </ul>
+        </Panel>
+      )}
+
       {data.recommended_actions.length > 0 && (
         <Panel title="Recommended actions">
           <ol className="list-decimal space-y-1.5 pl-5 text-sm">

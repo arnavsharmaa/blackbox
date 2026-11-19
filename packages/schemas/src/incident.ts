@@ -230,6 +230,7 @@ export interface IncidentReport {
     last: number;
     samples: number;
   }[];
+  investigation_notes: { text: string; author: string; created_at: string }[];
   reproduction: { notes: string; replay_url: string };
   ai_explanation: string | null;
   markdown: string;

@@ -49,6 +49,13 @@ const report: IncidentReport = {
   telemetry_summary: [
     { channel: "obstacle_distance", unit: "m", min: 0.42, max: 5, last: 0.42, samples: 3 },
   ],
+  investigation_notes: [
+    {
+      text: "Pallet moved by night shift.",
+      author: "arnav",
+      created_at: "2026-07-28T12:00:00+00:00",
+    },
+  ],
   reproduction: {
     notes: "Replay incident INC-TEST-100 in BlackBox.",
     replay_url: "/incidents/INC-TEST-100",
@@ -99,6 +106,8 @@ describe("Report page", () => {
       screen.getByText(/Replay incident INC-TEST-100 in BlackBox/),
     ).toBeTruthy();
     expect(screen.getByRole("button", { name: "Copy Markdown" })).toBeTruthy();
+    expect(screen.getByText("Investigation notes")).toBeTruthy();
+    expect(screen.getByText("Pallet moved by night shift.")).toBeTruthy();
     expect(screen.getByRole("button", { name: "Download JSON" })).toBeTruthy();
     expect(screen.getByRole("button", { name: "Print view" })).toBeTruthy();
   });
