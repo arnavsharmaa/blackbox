@@ -502,10 +502,17 @@ def get_report(
     incident = _get_incident_or_404(repo, incident_id, scope)
     analysis = repo.get_analysis(incident_id)
     prior = _similar_summaries(repo, incident, analysis, scope)
+    notes = repo.list_notes(incident_id)
     if format == "markdown":
-        return {"markdown": report_markdown(incident, analysis, prior=prior)}
-    report = build_report(incident, analysis, prior=prior)
-    report["markdown"] = report_markdown(incident, analysis, prior=prior)
+        return {
+            "markdown": report_markdown(
+                incident, analysis, prior=prior, notes=notes
+            )
+        }
+    report = build_report(incident, analysis, prior=prior, notes=notes)
+    report["markdown"] = report_markdown(
+        incident, analysis, prior=prior, notes=notes
+    )
     return report
 
 

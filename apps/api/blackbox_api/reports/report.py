@@ -9,6 +9,7 @@ from blackbox_api.schemas import (
     AnalysisResult,
     EventType,
     Incident,
+    IncidentNote,
     IncidentSummary,
     Severity,
 )
@@ -59,6 +60,7 @@ def build_report(
     incident: Incident,
     analysis: AnalysisResult | None,
     prior: list[IncidentSummary] | None = None,
+    notes: list[IncidentNote] | None = None,
 ) -> dict[str, Any]:
     key_events = [
         {
@@ -129,6 +131,14 @@ def build_report(
             ),
             "replay_url": f"/incidents/{incident.id}",
         },
+        "investigation_notes": [
+            {
+                "text": note.text,
+                "author": note.author,
+                "created_at": note.created_at.isoformat(),
+            }
+            for note in (notes or [])
+        ],
         "prior_occurrences": [
             {
                 "id": item.id,
@@ -145,8 +155,9 @@ def report_markdown(
     incident: Incident,
     analysis: AnalysisResult | None,
     prior: list[IncidentSummary] | None = None,
+    notes: list[IncidentNote] | None = None,
 ) -> str:
-    r = build_report(incident, analysis, prior=prior)
+    r = build_report(incident, analysis, prior=prior, notes=notes)
     inc = r["incident"]
     lines: list[str] = []
     add = lines.append
@@ -195,6 +206,13 @@ def report_markdown(
             if e.get("t_end") is not None:
                 anchor += f"–{e['t_end']:.1f}s"
             add(f"- **[{anchor}]** {e['summary']}")
+    if r["investigation_notes"]:
+        add("")
+        add("## Investigation notes")
+        add("")
+        for note in r["investigation_notes"]:
+            author = f" — {note['author']}" if note["author"] else ""
+            add(f"- {note['text']}{author} ({note['created_at']})")
     if r["prior_occurrences"]:
         add("")
         add("## Prior occurrences of this failure signature")

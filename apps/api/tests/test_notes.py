@@ -79,3 +79,27 @@ def test_note_cannot_be_deleted_through_another_incident(
         ).status_code
         == 404
     )
+
+
+def test_notes_appear_in_the_report(seeded_client: TestClient) -> None:
+    seeded_client.post(
+        f"/api/incidents/{PRIMARY}/notes",
+        json={"text": "Pallet moved by night shift.", "author": "arnav"},
+    )
+    report = seeded_client.get(f"/api/incidents/{PRIMARY}/report").json()
+    assert report["investigation_notes"] == [
+        {
+            "text": "Pallet moved by night shift.",
+            "author": "arnav",
+            "created_at": report["investigation_notes"][0]["created_at"],
+        }
+    ]
+    assert "## Investigation notes" in report["markdown"]
+    assert "Pallet moved by night shift. — arnav" in report["markdown"]
+
+    # Incidents without notes keep a clean report.
+    clean = seeded_client.get(
+        "/api/incidents/INC-2026-0730-003/report"
+    ).json()
+    assert clean["investigation_notes"] == []
+    assert "Investigation notes" not in clean["markdown"]
