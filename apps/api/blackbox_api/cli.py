@@ -7,6 +7,7 @@ Talks HTTP to a running server (it is not an offline tool):
     blackbox upload flight.mcap --metadata '{"id": "INC-1", "robot_id": "W-1"}'
     blackbox replay incident.json --speed 10   # robot simulator over WS
     blackbox watch --interval 5                # print new incidents live
+    blackbox notes INC-1 "pallet moved" --author arnav
     blackbox backup ./dump && blackbox restore ./dump
     blackbox prune --days 90 --yes
 
@@ -187,6 +188,35 @@ def _cmd_prune(args: argparse.Namespace) -> None:
     print(f"deleted {result['deleted']} incident(s)")
     for incident_id in result.get("incident_ids", []):
         print(f"  - {incident_id}")
+
+
+def _cmd_notes(args: argparse.Namespace) -> None:
+    base = (
+        f"{args.api}/api/incidents/"
+        + urllib.parse.quote(args.id)
+        + "/notes"
+    )
+    if args.text:
+        note = _request(
+            "POST",
+            base,
+            token=args.token,
+            body=json.dumps({
+                "text": args.text,
+                "author": args.author or "",
+            }).encode(),
+            content_type="application/json",
+        )
+        print(f"added note {note['id']} to {args.id}")
+        return
+    body = _request("GET", base, token=args.token)
+    notes = body.get("items", body) if isinstance(body, dict) else body
+    if not notes:
+        print("no notes")
+        return
+    for note in notes:
+        author = f" — {note['author']}" if note.get("author") else ""
+        print(f"[{note['created_at']}] {note['text']}{author}")
 
 
 def _cmd_diff(args: argparse.Namespace) -> None:
@@ -613,6 +643,14 @@ def build_parser() -> argparse.ArgumentParser:
     watch.add_argument("--interval", type=float, default=5.0)
     watch.add_argument("--robot", default=None)
     watch.set_defaults(func=_cmd_watch)
+
+    notes = sub.add_parser(
+        "notes", help="list an incident's notes, or add one with TEXT"
+    )
+    notes.add_argument("id")
+    notes.add_argument("text", nargs="?", default=None)
+    notes.add_argument("--author", default=None)
+    notes.set_defaults(func=_cmd_notes)
 
     diff = sub.add_parser(
         "diff", help="compare an incident against a baseline run"

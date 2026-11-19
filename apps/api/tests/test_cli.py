@@ -348,3 +348,31 @@ def test_diff_prints_the_divergence_table(
     assert "planner_state" in out and "30.0 s" in out
     assert "battery_pct" in out
     assert "events only in the incident: recovery_started, task_failed" in out
+
+
+def test_notes_add_and_list(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    import json as jsonlib
+
+    fake = FakeApi({
+        ("POST", "/api/incidents/INC-1/notes"): {"id": 7},
+        ("GET", "/api/incidents/INC-1/notes"): {"items": [
+            {
+                "text": "Pallet moved.", "author": "arnav",
+                "created_at": "2026-11-19T10:00:00+00:00",
+            },
+        ]},
+    })
+    monkeypatch.setattr(cli, "_request", fake)
+
+    assert cli.main([
+        "notes", "INC-1", "Pallet moved.", "--author", "arnav"
+    ]) == 0
+    assert "added note 7 to INC-1" in capsys.readouterr().out
+    payload = jsonlib.loads(fake.calls[0]["body"].decode())
+    assert payload == {"text": "Pallet moved.", "author": "arnav"}
+
+    assert cli.main(["notes", "INC-1"]) == 0
+    out = capsys.readouterr().out
+    assert "[2026-11-19T10:00:00+00:00] Pallet moved. — arnav" in out
