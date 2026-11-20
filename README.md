@@ -203,9 +203,18 @@ Open **http://localhost:3000**, click into
 | `make openapi` | Re-export `docs/openapi.json` from the FastAPI app |
 | `make demo-stream` | Replay the sample incidents through the live WebSocket endpoint |
 
-Copy `.env.example` to `.env` to override defaults (database path, CORS,
-API URL, optional AI key). Database initialization is repeatable: tables are
-created on startup and `make seed` upserts the sample incidents.
+Copy `.env.example` to `.env` to override defaults — the complete
+environment-variable reference (kept in sync by a test) is
+[docs/configuration.md](docs/configuration.md). Database initialization
+is repeatable: migrations run on startup and `make seed` upserts the
+sample incidents.
+
+## Deploying
+
+[docs/deployment.md](docs/deployment.md) covers the path from
+`make demo` to production: Postgres, the three API-token tiers,
+internet-exposure posture, and day-2 operations (backups, retention,
+alerting, upgrades).
 
 ## Docker setup
 
