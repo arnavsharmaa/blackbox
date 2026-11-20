@@ -29,6 +29,8 @@ the API/package version in `apps/api/pyproject.toml`.
 - A worked example plug-in rule (`examples/rules/recovery_churn.py`),
   exercised by the test suite.
 - Tag-driven release workflow (CHANGELOG notes + spec/schema assets).
+- Docs: a complete configuration reference (drift-guarded by a test)
+  and a production deployment guide.
 
 ### Changed
 
