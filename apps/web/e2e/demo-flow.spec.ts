@@ -286,6 +286,31 @@ test.describe("fleet features", () => {
     }
   });
 
+  test("triage moves an incident and the overview filter finds it", async ({
+    page,
+  }) => {
+    await page.goto(`/incidents/${PRIMARY}`);
+    await page.getByRole("button", { name: "Investigating" }).click();
+    await expect(
+      page.getByRole("button", { name: "Investigating" }),
+    ).toHaveAttribute("aria-pressed", "true");
+
+    await page.goto("/?triage=investigating");
+    await expect(
+      page.getByRole("link", { name: "Deliver pallet to Loading Bay B" }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("table").getByText("Investigating"),
+    ).toBeVisible();
+
+    // Reset for idempotent local reruns (CI reseeds clean).
+    await page.goto(`/incidents/${PRIMARY}`);
+    await page.getByRole("button", { name: "Open", exact: true }).click();
+    await expect(
+      page.getByRole("button", { name: "Open", exact: true }),
+    ).toHaveAttribute("aria-pressed", "true");
+  });
+
   test("upload page rejects malformed json with field errors", async ({
     page,
   }) => {

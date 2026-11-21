@@ -8,6 +8,9 @@ the API/package version in `apps/api/pyproject.toml`.
 
 ### Added
 
+- Incident triage: every incident moves through open → investigating →
+  resolved from the incident header, with an overview filter and
+  badges; existing databases come up all-open.
 - Incident notes: a free-text investigation scratchpad per incident
   (API + panel on the incident page), carried through `blackbox show`,
   backup, and restore; cited in the incident report and manageable
