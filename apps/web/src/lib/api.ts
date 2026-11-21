@@ -11,6 +11,7 @@ import type {
   IncidentNote,
   IncidentReport,
   IncidentSummary,
+  TriageState,
   UploadResponse,
 } from "@blackbox/schemas";
 
@@ -75,6 +76,7 @@ export interface IncidentListParams {
   start_after?: string;
   start_before?: string;
   q?: string;
+  triage?: string;
   limit?: number;
   offset?: number;
 }
@@ -127,6 +129,26 @@ export function fetchGithubIssue(
   return request<GithubIssue>(
     `/api/incidents/${encodeURIComponent(id)}/github-issue${suffix}`,
   );
+}
+
+export async function setTriage(
+  id: string,
+  state: TriageState,
+): Promise<void> {
+  const response = await fetch(
+    `${API_BASE}/api/incidents/${encodeURIComponent(id)}/triage`,
+    {
+      method: "PUT",
+      headers: { "Content-Type": "application/json", ...authHeaders() },
+      body: JSON.stringify({ state }),
+    },
+  );
+  if (!response.ok) {
+    throw new ApiError(
+      `Triage update failed (${response.status})`,
+      response.status,
+    );
+  }
 }
 
 export async function addNote(

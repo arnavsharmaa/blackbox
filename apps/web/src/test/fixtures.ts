@@ -176,6 +176,7 @@ export const testSummaries: IncidentSummary[] = [
     recovery_attempts: 3,
     failure_category: "persistent_obstacle",
     confidence: 0.95,
+    triage_state: "open",
   },
   {
     id: "INC-TEST-101",
@@ -194,6 +195,7 @@ export const testSummaries: IncidentSummary[] = [
     recovery_attempts: 1,
     failure_category: "localization_failure",
     confidence: 0.9,
+    triage_state: "investigating",
   },
 ];
 

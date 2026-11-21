@@ -3,6 +3,7 @@ import type {
   FailureCategory,
   Outcome,
   Severity,
+  TriageState,
 } from "@blackbox/schemas";
 
 export function formatDuration(seconds: number): string {
@@ -68,6 +69,18 @@ export const CATEGORY_COLORS: Record<FailureCategory, string> = {
   controller_oscillation: "#38bdf8",
   sensor_dropout: "#fb7185",
   unknown: "#8d99a8",
+};
+
+export const TRIAGE_LABELS: Record<TriageState, string> = {
+  open: "Open",
+  investigating: "Investigating",
+  resolved: "Resolved",
+};
+
+export const TRIAGE_STYLES: Record<TriageState, string> = {
+  open: "border-amber-500/40 bg-amber-950/30 text-amber-300",
+  investigating: "border-sky-500/40 bg-sky-950/30 text-sky-300",
+  resolved: "border-emerald-500/40 bg-emerald-950/30 text-emerald-300",
 };
 
 export type EventCategory =

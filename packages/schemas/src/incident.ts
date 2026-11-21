@@ -144,7 +144,10 @@ export interface IncidentSummary {
   recovery_attempts: number;
   failure_category: FailureCategory | null;
   confidence: number | null;
+  triage_state: TriageState;
 }
+
+export type TriageState = "open" | "investigating" | "resolved";
 
 export type FeedbackVerdict = "confirmed" | "corrected";
 
@@ -172,6 +175,7 @@ export interface IncidentDetail {
   analysis: AnalysisResult | null;
   feedback: DiagnosisFeedback | null;
   notes: IncidentNote[];
+  triage_state: TriageState;
 }
 
 export interface IncidentListResponse {

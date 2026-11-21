@@ -8,6 +8,8 @@ import { useApi } from "@/lib/useApi";
 import {
   CATEGORY_COLORS,
   CATEGORY_LABELS,
+  TRIAGE_LABELS,
+  TRIAGE_STYLES,
   OUTCOME_LABELS,
   OUTCOME_STYLES,
   SEVERITY_STYLES,
@@ -30,6 +32,7 @@ interface Filters {
   severity: string;
   failure_category: string;
   outcome: string;
+  triage: string;
   start_after: string;
   q: string;
 }
@@ -40,6 +43,7 @@ const EMPTY_FILTERS: Filters = {
   severity: "",
   failure_category: "",
   outcome: "",
+  triage: "",
   start_after: "",
   q: "",
 };
@@ -89,7 +93,14 @@ export default function OverviewPage() {
   // Debounce free-text search so we don't refetch per keystroke.
   useEffect(() => {
     const handle = setTimeout(
-      () => setFilters((current) => ({ ...current, q: searchText.trim() })),
+      () =>
+        setFilters((current) =>
+          // Same value → same object, so no spurious refetch or
+          // pagination reset cascades from the debounce tick.
+          current.q === searchText.trim()
+            ? current
+            : { ...current, q: searchText.trim() },
+        ),
       300,
     );
     return () => clearTimeout(handle);
@@ -106,6 +117,7 @@ export default function OverviewPage() {
       severity: filters.severity || undefined,
       failure_category: filters.failure_category || undefined,
       outcome: filters.outcome || undefined,
+      triage: filters.triage || undefined,
       start_after: filters.start_after
         ? new Date(filters.start_after).toISOString()
         : undefined,
@@ -428,6 +440,22 @@ function FilterBar({
           </option>
         ))}
       </select>
+      <label className="sr-only" htmlFor="filter-triage">
+        Triage
+      </label>
+      <select
+        id="filter-triage"
+        className={selectClass}
+        value={filters.triage}
+        onChange={(e) => set({ triage: e.target.value })}
+      >
+        <option value="">All states</option>
+        {Object.entries(TRIAGE_LABELS).map(([value, label]) => (
+          <option key={value} value={value}>
+            {label}
+          </option>
+        ))}
+      </select>
       <label className="sr-only" htmlFor="filter-after">
         Started after
       </label>
@@ -481,7 +509,16 @@ function IncidentTable({ items }: { items: IncidentSummary[] }) {
                 >
                   {item.task_name}
                 </Link>
-                <p className="font-mono text-xs text-ink-faint">{item.id}</p>
+                <p className="font-mono text-xs text-ink-faint">
+                  {item.id}
+                  {item.triage_state !== "open" && (
+                    <Badge
+                      className={`ml-2 ${TRIAGE_STYLES[item.triage_state]}`}
+                    >
+                      {TRIAGE_LABELS[item.triage_state]}
+                    </Badge>
+                  )}
+                </p>
               </td>
               <td className="px-3 py-3 font-mono text-xs">
                 <Link
