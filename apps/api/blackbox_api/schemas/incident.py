@@ -17,6 +17,14 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator, model_valida
 SCHEMA_VERSION = "1.0"
 
 
+class TriageState(StrEnum):
+    """App-side investigation state; the recording itself never changes."""
+
+    OPEN = "open"
+    INVESTIGATING = "investigating"
+    RESOLVED = "resolved"
+
+
 class Severity(StrEnum):
     INFO = "info"
     WARNING = "warning"
@@ -294,6 +302,7 @@ class IncidentSummary(BaseModel):
     recovery_attempts: int
     failure_category: FailureCategory | None = None
     confidence: float | None = None
+    triage_state: TriageState = TriageState.OPEN
 
 
 class IncidentNote(BaseModel):
@@ -320,6 +329,7 @@ class IncidentDetail(BaseModel):
     analysis: AnalysisResult | None = None
     feedback: DiagnosisFeedback | None = None
     notes: list[IncidentNote] = Field(default_factory=list)
+    triage_state: TriageState = TriageState.OPEN
 
 
 class IncidentListResponse(BaseModel):

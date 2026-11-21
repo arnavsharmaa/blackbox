@@ -860,6 +860,10 @@
             },
             "title": "Notes",
             "type": "array"
+          },
+          "triage_state": {
+            "$ref": "#/components/schemas/TriageState",
+            "default": "open"
           }
         },
         "required": [
@@ -1075,6 +1079,10 @@
           "task_name": {
             "title": "Task Name",
             "type": "string"
+          },
+          "triage_state": {
+            "$ref": "#/components/schemas/TriageState",
+            "default": "open"
           }
         },
         "required": [
@@ -1362,6 +1370,47 @@
         ],
         "title": "TelemetrySeries",
         "type": "object"
+      },
+      "TriageRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "state": {
+            "$ref": "#/components/schemas/TriageState"
+          }
+        },
+        "required": [
+          "state"
+        ],
+        "title": "TriageRequest",
+        "type": "object"
+      },
+      "TriageResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "incident_id": {
+            "title": "Incident Id",
+            "type": "string"
+          },
+          "triage_state": {
+            "$ref": "#/components/schemas/TriageState"
+          }
+        },
+        "required": [
+          "incident_id",
+          "triage_state"
+        ],
+        "title": "TriageResponse",
+        "type": "object"
+      },
+      "TriageState": {
+        "description": "App-side investigation state; the recording itself never changes.",
+        "enum": [
+          "open",
+          "investigating",
+          "resolved"
+        ],
+        "title": "TriageState",
+        "type": "string"
       },
       "UploadResponse": {
         "additionalProperties": false,
@@ -1746,6 +1795,22 @@
                 }
               ],
               "title": "Failure Category"
+            }
+          },
+          {
+            "in": "query",
+            "name": "triage",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/TriageState"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Triage"
             }
           },
           {
@@ -3330,6 +3395,91 @@
           }
         },
         "summary": "Get Telemetry",
+        "tags": [
+          "incidents"
+        ]
+      }
+    },
+    "/api/incidents/{incident_id}/triage": {
+      "put": {
+        "description": "Move an incident through open \u2192 investigating \u2192 resolved.",
+        "operationId": "set_triage_api_incidents__incident_id__triage_put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "incident_id",
+            "required": true,
+            "schema": {
+              "title": "Incident Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-api-key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Api-Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TriageRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TriageResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Set Triage",
         "tags": [
           "incidents"
         ]

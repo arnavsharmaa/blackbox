@@ -39,6 +39,10 @@ class IncidentRow(Base):
     map_version: Mapped[str] = mapped_column(String(64))
     environment: Mapped[str] = mapped_column(String(256))
     summary: Mapped[str] = mapped_column(Text)
+    #: App-side investigation state (open/investigating/resolved).
+    triage_state: Mapped[str] = mapped_column(
+        String(16), default="open", server_default="open", index=True
+    )
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
 
     events: Mapped[list[EventRow]] = relationship(

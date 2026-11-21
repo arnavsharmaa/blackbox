@@ -18,6 +18,7 @@ from blackbox_api.schemas import (
     Severity,
     TelemetrySample,
     TelemetrySeries,
+    TriageState,
 )
 from blackbox_api.storage.models import (
     AnalysisRow,
@@ -41,6 +42,7 @@ class IncidentFilters:
         q: str | None = None,
         facility: str | None = None,
         task_name: str | None = None,
+        triage: TriageState | None = None,
     ) -> None:
         self.robot_id = robot_id
         self.severity = severity
@@ -51,6 +53,7 @@ class IncidentFilters:
         self.q = q
         self.facility = facility
         self.task_name = task_name
+        self.triage = triage
 
 
 class IncidentRepository:
@@ -161,6 +164,23 @@ class IncidentRepository:
             self.session.delete(row)
         return [row.id for row in rows]
 
+    def get_triage(self, incident_id: str) -> TriageState:
+        row = self.session.get(IncidentRow, incident_id)
+        return (
+            TriageState(row.triage_state)
+            if row is not None
+            else TriageState.OPEN
+        )
+
+    def set_triage(
+        self, incident_id: str, state: TriageState
+    ) -> bool:
+        row = self.session.get(IncidentRow, incident_id)
+        if row is None:
+            return False
+        row.triage_state = state.value
+        return True
+
     def delete_incident(self, incident_id: str) -> bool:
         row = self.session.get(IncidentRow, incident_id)
         if row is None:
@@ -266,6 +286,10 @@ class IncidentRepository:
             conditions.append(IncidentRow.facility == filters.facility)
         if filters.task_name:
             conditions.append(IncidentRow.task_name == filters.task_name)
+        if filters.triage:
+            conditions.append(
+                IncidentRow.triage_state == filters.triage.value
+            )
         if filters.severity:
             conditions.append(IncidentRow.severity == filters.severity.value)
         if filters.outcome:
@@ -341,6 +365,7 @@ class IncidentRepository:
                     recovery_attempts=recovery_attempts or 0,
                     failure_category=analysis.failure_category if analysis else None,
                     confidence=analysis.confidence if analysis else None,
+                    triage_state=TriageState(row.triage_state),
                 )
             )
         return summaries, total

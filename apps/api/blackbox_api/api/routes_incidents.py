@@ -37,6 +37,7 @@ from blackbox_api.schemas import (
     Outcome,
     Severity,
     TelemetrySeries,
+    TriageState,
 )
 from blackbox_api.storage.db import get_db
 from blackbox_api.storage.repository import IncidentFilters, IncidentRepository
@@ -73,6 +74,7 @@ def list_incidents(
     severity: Severity | None = None,
     outcome: Outcome | None = None,
     failure_category: FailureCategory | None = None,
+    triage: TriageState | None = None,
     start_after: datetime | None = None,
     start_before: datetime | None = None,
     q: Annotated[
@@ -97,6 +99,7 @@ def list_incidents(
             start_before=start_before,
             q=q,
             facility=scope.facility or facility,
+            triage=triage,
         ),
         limit=limit,
         offset=offset,
@@ -183,6 +186,7 @@ def get_incident(
         analysis=repo.get_analysis(incident_id),
         feedback=repo.get_feedback(incident_id),
         notes=repo.list_notes(incident_id),
+        triage_state=repo.get_triage(incident_id),
     )
 
 
@@ -343,6 +347,41 @@ def delete_incident(
     repo.delete_incident(incident_id)
     db.commit()
     log(logger, logging.INFO, "incident deleted", incident_id=incident_id)
+
+
+class TriageRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    state: TriageState
+
+
+class TriageResponse(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    incident_id: str
+    triage_state: TriageState
+
+
+@router.put("/{incident_id}/triage", response_model=TriageResponse)
+def set_triage(
+    incident_id: str,
+    body: TriageRequest,
+    db: Annotated[Session, Depends(get_db)],
+    scope: Scope,
+) -> TriageResponse:
+    """Move an incident through open → investigating → resolved."""
+    repo = IncidentRepository(db)
+    _get_incident_or_404(repo, incident_id, scope)
+    repo.set_triage(incident_id, body.state)
+    db.commit()
+    log(
+        logger,
+        logging.INFO,
+        "triage updated",
+        incident_id=incident_id,
+        state=body.state.value,
+    )
+    return TriageResponse(incident_id=incident_id, triage_state=body.state)
 
 
 class NoteRequest(BaseModel):

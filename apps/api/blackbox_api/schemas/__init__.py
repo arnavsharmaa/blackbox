@@ -20,6 +20,7 @@ from blackbox_api.schemas.incident import (
     TelemetryChannel,
     TelemetrySample,
     TelemetrySeries,
+    TriageState,
 )
 
 __all__ = [
@@ -42,6 +43,7 @@ __all__ = [
     "Severity",
     "Subsystem",
     "TelemetryChannel",
+    "TriageState",
     "TelemetrySample",
     "TelemetrySeries",
 ]
