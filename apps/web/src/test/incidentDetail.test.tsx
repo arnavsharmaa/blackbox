@@ -109,6 +109,51 @@ describe("EventInspector", () => {
   });
 });
 
+describe("IncidentHeader triage", () => {
+  it("moves the incident to investigating and reverts on failure", async () => {
+    const fetchMock = vi.fn(async () => new Response(null, { status: 200 }));
+    vi.stubGlobal("fetch", fetchMock);
+
+    const user = userEvent.setup();
+    render(<IncidentHeader incident={testIncident} analysis={testAnalysis} />);
+    const investigating = screen.getByRole("button", {
+      name: "Investigating",
+    });
+    expect(investigating.getAttribute("aria-pressed")).toBe("false");
+
+    await user.click(investigating);
+    await waitFor(() => {
+      expect(investigating.getAttribute("aria-pressed")).toBe("true");
+    });
+    const [url, init] = fetchMock.mock.calls[0] as unknown as [
+      string,
+      RequestInit,
+    ];
+    expect(url).toContain("/api/incidents/INC-TEST-100/triage");
+    expect(init.method).toBe("PUT");
+    expect(JSON.parse(String(init.body))).toEqual({
+      state: "investigating",
+    });
+
+    // A failed update reverts the control and surfaces the error.
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => new Response(null, { status: 500 })),
+    );
+    await user.click(screen.getByRole("button", { name: "Resolved" }));
+    await waitFor(() => {
+      expect(screen.getByRole("alert")).toBeTruthy();
+    });
+    expect(
+      screen
+        .getByRole("button", { name: "Resolved" })
+        .getAttribute("aria-pressed"),
+    ).toBe("false");
+    expect(investigating.getAttribute("aria-pressed")).toBe("true");
+    vi.unstubAllGlobals();
+  });
+});
+
 describe("IncidentHeader download", () => {
   it("downloads the canonical incident JSON", async () => {
     const created: Blob[] = [];

@@ -3,12 +3,18 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import type { AnalysisResult, Incident } from "@blackbox/schemas";
-import { deleteIncident } from "@/lib/api";
+import type {
+  AnalysisResult,
+  Incident,
+  TriageState,
+} from "@blackbox/schemas";
+import { deleteIncident, setTriage } from "@/lib/api";
 import {
   CATEGORY_COLORS,
   CATEGORY_LABELS,
   OUTCOME_LABELS,
+  TRIAGE_LABELS,
+  TRIAGE_STYLES,
   OUTCOME_STYLES,
   SEVERITY_STYLES,
   confidencePct,
@@ -20,13 +26,32 @@ import { Badge } from "@/components/ui";
 export function IncidentHeader({
   incident,
   analysis,
+  initialTriage = "open",
 }: {
   incident: Incident;
   analysis: AnalysisResult | null;
+  initialTriage?: TriageState;
 }) {
   const router = useRouter();
   const [deleting, setDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [triage, setTriageState] = useState<TriageState>(initialTriage);
+  const [triageError, setTriageError] = useState<string | null>(null);
+
+  const handleTriage = async (state: TriageState) => {
+    if (state === triage) return;
+    const previous = triage;
+    setTriageState(state);
+    setTriageError(null);
+    try {
+      await setTriage(incident.id, state);
+    } catch (error) {
+      setTriageState(previous);
+      setTriageError(
+        error instanceof Error ? error.message : String(error),
+      );
+    }
+  };
 
   const handleDownload = () => {
     // The canonical incident JSON: re-uploadable, diffable, and
@@ -71,6 +96,27 @@ export function IncidentHeader({
             <Badge className={OUTCOME_STYLES[incident.outcome]}>
               {OUTCOME_LABELS[incident.outcome]}
             </Badge>
+            <div
+              className="ml-1 flex items-center rounded border border-edge-strong bg-surface-2 p-0.5"
+              role="group"
+              aria-label="Triage state"
+            >
+              {(Object.keys(TRIAGE_LABELS) as TriageState[]).map((state) => (
+                <button
+                  key={state}
+                  type="button"
+                  onClick={() => handleTriage(state)}
+                  aria-pressed={triage === state}
+                  className={`rounded px-2 py-0.5 text-[11px] ${
+                    triage === state
+                      ? TRIAGE_STYLES[state]
+                      : "text-ink-faint hover:text-ink"
+                  }`}
+                >
+                  {TRIAGE_LABELS[state]}
+                </button>
+              ))}
+            </div>
           </div>
           <p className="mt-1 font-mono text-xs text-ink-faint">{incident.id}</p>
         </div>
@@ -112,6 +158,11 @@ export function IncidentHeader({
           </button>
         </div>
       </div>
+      {triageError && (
+        <p role="alert" className="mt-2 text-sm text-red-300">
+          {triageError}
+        </p>
+      )}
       {deleteError && (
         <p role="alert" className="mt-2 text-sm text-red-300">
           {deleteError}

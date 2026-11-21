@@ -53,7 +53,11 @@ export default function IncidentDetailPage({
 
   return (
     <div className="space-y-4">
-      <IncidentHeader incident={incident} analysis={analysis} />
+      <IncidentHeader
+        incident={incident}
+        analysis={analysis}
+        initialTriage={detail.data?.triage_state ?? "open"}
+      />
 
       <div className="grid gap-4 xl:grid-cols-[1fr_380px]">
         <div className="space-y-4">
