@@ -20,6 +20,7 @@ from blackbox_api.schemas import (
     FeedbackVerdict,
     IncidentSummary,
     Outcome,
+    TriageState,
 )
 from blackbox_api.storage.repository import IncidentFilters, IncidentRepository
 
@@ -38,6 +39,13 @@ class OutcomeCount(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     outcome: Outcome
+    count: int
+
+
+class TriageCount(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    state: TriageState
     count: int
 
 
@@ -113,6 +121,8 @@ class AnalyticsResponse(BaseModel):
     total_recovery_attempts: int
     categories: list[CategoryCount]
     outcomes: list[OutcomeCount]
+    #: Backlog by lifecycle state, always all three states in order.
+    triage: list[TriageCount]
     by_robot: list[RobotStats]
     by_software_version: list[VersionStats]
     blockage_hotspots: list[BlockageHotspot]
@@ -257,6 +267,7 @@ def compute_analytics(
         s.failure_category for s in summaries if s.failure_category
     )
     outcome_counts = Counter(s.outcome for s in summaries)
+    triage_counts = Counter(s.triage_state for s in summaries)
 
     by_robot: list[RobotStats] = []
     robots: dict[str, list[IncidentSummary]] = defaultdict(list)
@@ -319,6 +330,10 @@ def compute_analytics(
             for outcome, count in sorted(
                 outcome_counts.items(), key=lambda kv: -kv[1]
             )
+        ],
+        triage=[
+            TriageCount(state=state, count=triage_counts.get(state, 0))
+            for state in TriageState
         ],
         by_robot=by_robot,
         by_software_version=by_version,

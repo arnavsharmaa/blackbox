@@ -16,6 +16,11 @@ const analytics: AnalyticsResponse = {
     { outcome: "failed", count: 2 },
     { outcome: "timed_out", count: 1 },
   ],
+  triage: [
+    { state: "open", count: 2 },
+    { state: "investigating", count: 1 },
+    { state: "resolved", count: 1 },
+  ],
   by_robot: [
     {
       robot_id: "W-104",

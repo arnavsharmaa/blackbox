@@ -9,6 +9,32 @@ def test_analytics_empty_database(client: TestClient) -> None:
     assert body["categories"] == []
     assert body["by_robot"] == []
     assert body["blockage_hotspots"] == []
+    # The triage backlog always carries all three states, in order.
+    assert body["triage"] == [
+        {"state": "open", "count": 0},
+        {"state": "investigating", "count": 0},
+        {"state": "resolved", "count": 0},
+    ]
+
+
+def test_analytics_counts_the_triage_backlog(
+    seeded_client: TestClient,
+) -> None:
+    items = seeded_client.get("/api/incidents").json()["items"]
+    seeded_client.put(
+        f"/api/incidents/{items[0]['id']}/triage",
+        json={"state": "investigating"},
+    )
+    seeded_client.put(
+        f"/api/incidents/{items[1]['id']}/triage", json={"state": "resolved"}
+    )
+
+    body = seeded_client.get("/api/analytics").json()
+    assert body["triage"] == [
+        {"state": "open", "count": 3},
+        {"state": "investigating", "count": 1},
+        {"state": "resolved", "count": 1},
+    ]
 
 
 def test_analytics_aggregates_seeded_fleet(seeded_client: TestClient) -> None:

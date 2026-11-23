@@ -181,6 +181,13 @@
           "total_recovery_attempts": {
             "title": "Total Recovery Attempts",
             "type": "integer"
+          },
+          "triage": {
+            "items": {
+              "$ref": "#/components/schemas/TriageCount"
+            },
+            "title": "Triage",
+            "type": "array"
           }
         },
         "required": [
@@ -189,6 +196,7 @@
           "total_recovery_attempts",
           "categories",
           "outcomes",
+          "triage",
           "by_robot",
           "by_software_version",
           "blockage_hotspots",
@@ -1369,6 +1377,24 @@
           "samples"
         ],
         "title": "TelemetrySeries",
+        "type": "object"
+      },
+      "TriageCount": {
+        "additionalProperties": false,
+        "properties": {
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          },
+          "state": {
+            "$ref": "#/components/schemas/TriageState"
+          }
+        },
+        "required": [
+          "state",
+          "count"
+        ],
+        "title": "TriageCount",
         "type": "object"
       },
       "TriageRequest": {
