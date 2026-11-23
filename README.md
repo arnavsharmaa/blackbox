@@ -272,8 +272,10 @@ to a running instance (`--api` / `BLACKBOX_API_URL`, `--token` /
 `BLACKBOX_API_TOKEN`):
 
 ```bash
-blackbox list --robot W-104
+blackbox list --robot W-104 --triage open
 blackbox show INC-2026-0728-001
+blackbox triage INC-2026-0728-001 investigating
+blackbox notes INC-2026-0728-001 "Pallet moved by forklift" --author arnav
 blackbox upload flight.mcap --metadata '{"id": "INC-1", "robot_id": "W-1"}'
 blackbox replay incident.json --speed 10   # robot simulator over WebSocket
 blackbox watch --interval 5                # print new incidents as they land

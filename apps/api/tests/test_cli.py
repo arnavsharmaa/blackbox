@@ -54,6 +54,45 @@ def test_list_renders_a_table(
     assert "robot_id=W-104" in fake.calls[0]["url"]
 
 
+def test_list_filters_by_triage(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    fake = FakeApi({("GET", "/api/incidents"): {
+        "items": [{
+            "id": "INC-1", "robot_id": "W-104", "outcome": "timed_out",
+            "failure_category": "persistent_obstacle", "confidence": 0.95,
+            "task_name": "Deliver pallet to Loading Bay B",
+            "triage_state": "investigating",
+        }],
+        "total": 1,
+    }})
+    monkeypatch.setattr(cli, "_request", fake)
+
+    assert cli.main(["list", "--triage", "investigating"]) == 0
+    out = capsys.readouterr().out
+    assert "TRIAGE" in out
+    assert "investigating" in out
+    assert "triage=investigating" in fake.calls[0]["url"]
+
+
+def test_triage_moves_an_incident(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    import json as jsonlib
+
+    fake = FakeApi({("PUT", "/api/incidents/INC-1/triage"): {
+        "incident_id": "INC-1", "triage_state": "resolved",
+    }})
+    monkeypatch.setattr(cli, "_request", fake)
+
+    assert cli.main(["triage", "INC-1", "resolved"]) == 0
+    assert "INC-1 → resolved" in capsys.readouterr().out
+    call = fake.calls[0]
+    assert call["method"] == "PUT"
+    assert call["content_type"] == "application/json"
+    assert jsonlib.loads(call["body"].decode()) == {"state": "resolved"}
+
+
 def test_show_prints_diagnosis_and_feedback(
     monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
 ) -> None:

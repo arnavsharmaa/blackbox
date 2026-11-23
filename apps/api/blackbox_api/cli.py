@@ -92,6 +92,8 @@ def _cmd_list(args: argparse.Namespace) -> None:
     query: dict[str, str] = {"limit": str(args.limit)}
     if args.robot:
         query["robot_id"] = args.robot
+    if args.triage:
+        query["triage"] = args.triage
     body = _request(
         "GET",
         f"{args.api}/api/incidents?{urllib.parse.urlencode(query)}",
@@ -101,13 +103,17 @@ def _cmd_list(args: argparse.Namespace) -> None:
     if not rows:
         print("no incidents")
         return
-    print(f"{'ID':28} {'ROBOT':8} {'OUTCOME':10} {'CAUSE':24} CONF  TASK")
+    print(
+        f"{'ID':28} {'ROBOT':8} {'OUTCOME':10} {'TRIAGE':13} "
+        f"{'CAUSE':24} CONF  TASK"
+    )
     for item in rows:
         category = item.get("failure_category") or "-"
         confidence = item.get("confidence")
         conf = f"{confidence:.0%}" if confidence is not None else "-"
         print(
             f"{item['id']:28} {item['robot_id']:8} {item['outcome']:10} "
+            f"{item.get('triage_state', 'open'):13} "
             f"{category:24} {conf:5} {item['task_name'][:40]}"
         )
     print(f"({len(rows)} of {body.get('total', len(rows))} incidents)")
@@ -130,6 +136,8 @@ def _cmd_show(args: argparse.Namespace) -> None:
         f"  window   {incident['start_time']} → {incident['end_time']} "
         f"({incident['outcome']}, {incident['severity']})"
     )
+    if body.get("triage_state"):
+        print(f"  triage   {body['triage_state']}")
     print(f"  summary  {incident['summary']}")
     if analysis:
         print(
@@ -217,6 +225,17 @@ def _cmd_notes(args: argparse.Namespace) -> None:
     for note in notes:
         author = f" — {note['author']}" if note.get("author") else ""
         print(f"[{note['created_at']}] {note['text']}{author}")
+
+
+def _cmd_triage(args: argparse.Namespace) -> None:
+    result = _request(
+        "PUT",
+        f"{args.api}/api/incidents/{urllib.parse.quote(args.id)}/triage",
+        token=args.token,
+        body=json.dumps({"state": args.state}).encode(),
+        content_type="application/json",
+    )
+    print(f"{result['incident_id']} → {result['triage_state']}")
 
 
 def _cmd_diff(args: argparse.Namespace) -> None:
@@ -598,6 +617,12 @@ def build_parser() -> argparse.ArgumentParser:
 
     list_cmd = sub.add_parser("list", help="list incidents")
     list_cmd.add_argument("--robot", default=None)
+    list_cmd.add_argument(
+        "--triage",
+        default=None,
+        choices=["open", "investigating", "resolved"],
+        help="only incidents in this triage state",
+    )
     list_cmd.add_argument("--limit", type=int, default=20)
     list_cmd.set_defaults(func=_cmd_list)
 
@@ -651,6 +676,15 @@ def build_parser() -> argparse.ArgumentParser:
     notes.add_argument("text", nargs="?", default=None)
     notes.add_argument("--author", default=None)
     notes.set_defaults(func=_cmd_notes)
+
+    triage = sub.add_parser(
+        "triage", help="move an incident through its triage lifecycle"
+    )
+    triage.add_argument("id")
+    triage.add_argument(
+        "state", choices=["open", "investigating", "resolved"]
+    )
+    triage.set_defaults(func=_cmd_triage)
 
     diff = sub.add_parser(
         "diff", help="compare an incident against a baseline run"
