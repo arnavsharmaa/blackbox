@@ -104,6 +104,9 @@ describe("analytics page", () => {
     render(<AnalyticsPage />);
     expect(await screen.findByText("Fleet analytics")).toBeTruthy();
     expect(screen.getByText("Total incidents")).toBeTruthy();
+    // Triage backlog: 2 open + 1 investigating from the fixture.
+    expect(screen.getByText("Unresolved")).toBeTruthy();
+    expect(screen.getByText("2 open · 1 investigating")).toBeTruthy();
     expect(screen.getByText("W-104")).toBeTruthy();
     expect(screen.getByText("W-087")).toBeTruthy();
     expect(screen.getByText("nav-stack 2.14.1")).toBeTruthy();

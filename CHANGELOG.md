@@ -10,7 +10,10 @@ the API/package version in `apps/api/pyproject.toml`.
 
 - Incident triage: every incident moves through open → investigating →
   resolved from the incident header, with an overview filter and
-  badges; existing databases come up all-open.
+  badges; existing databases come up all-open. The state carries
+  through the CSV export (column + filter), the CLI (`blackbox
+  triage`, a `list --triage` filter and TRIAGE column), and fleet
+  analytics, where an Unresolved card counts the open backlog.
 - Incident notes: a free-text investigation scratchpad per incident
   (API + panel on the incident page), carried through `blackbox show`,
   backup, and restore; cited in the incident report and manageable

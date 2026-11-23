@@ -29,6 +29,19 @@ import {
 
 const ALL_CATEGORIES = Object.keys(CATEGORY_LABELS) as FailureCategory[];
 
+/** Incidents not yet resolved: the open + investigating backlog. */
+function unresolved(data: AnalyticsResponse): number {
+  return data.triage
+    .filter((entry) => entry.state !== "resolved")
+    .reduce((sum, entry) => sum + entry.count, 0);
+}
+
+function triageBreakdown(data: AnalyticsResponse): string {
+  const count = (state: string) =>
+    data.triage.find((entry) => entry.state === state)?.count ?? 0;
+  return `${count("open")} open · ${count("investigating")} investigating`;
+}
+
 export default function AnalyticsPage() {
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
@@ -104,7 +117,7 @@ export default function AnalyticsPage() {
         />
       ) : (
         <>
-          <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+          <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
             <StatCard label="Total incidents" value={data.total_incidents} />
             <StatCard
               label="Critical incidents"
@@ -119,6 +132,12 @@ export default function AnalyticsPage() {
             <StatCard
               label="Robots with incidents"
               value={data.by_robot.length}
+            />
+            <StatCard
+              label="Unresolved"
+              value={unresolved(data)}
+              accent={unresolved(data) > 0}
+              sub={triageBreakdown(data)}
             />
           </div>
 
