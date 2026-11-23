@@ -390,3 +390,22 @@ def test_export_csv(seeded_client: TestClient) -> None:
         "/api/incidents/export.csv", params={"q": "charging dock"}
     )
     assert len(filtered.text.strip().splitlines()) == 2
+
+
+def test_export_csv_carries_triage(seeded_client: TestClient) -> None:
+    header = seeded_client.get("/api/incidents/export.csv").text.splitlines()[0]
+    assert "triage_state" in header.split(",")
+
+    first = seeded_client.get("/api/incidents").json()["items"][0]["id"]
+    response = seeded_client.put(
+        f"/api/incidents/{first}/triage", json={"state": "investigating"}
+    )
+    assert response.status_code == 200
+
+    exported = seeded_client.get(
+        "/api/incidents/export.csv", params={"triage": "investigating"}
+    )
+    lines = exported.text.strip().splitlines()
+    assert len(lines) == 2  # header + the one investigated incident
+    assert first in lines[1]
+    assert "investigating" in lines[1]

@@ -109,9 +109,9 @@ def list_incidents(
 
 _CSV_COLUMNS = (
     "id", "robot_id", "robot_model", "facility", "task_name", "start_time",
-    "end_time", "duration_s", "outcome", "severity", "software_version",
-    "failure_category", "confidence", "event_count", "recovery_attempts",
-    "summary",
+    "end_time", "duration_s", "outcome", "severity", "triage_state",
+    "software_version", "failure_category", "confidence", "event_count",
+    "recovery_attempts", "summary",
 )
 
 
@@ -131,6 +131,7 @@ def export_incidents_csv(
     start_after: datetime | None = None,
     start_before: datetime | None = None,
     q: Annotated[str | None, Query(max_length=200)] = None,
+    triage: TriageState | None = None,
 ) -> PlainTextResponse:
     """The incident list as CSV, honoring the same filters as the list.
 
@@ -149,6 +150,7 @@ def export_incidents_csv(
             start_after=start_after,
             start_before=start_before,
             q=q,
+            triage=triage,
             facility=scope.facility or facility,
         ),
         limit=10_000,
@@ -161,7 +163,8 @@ def export_incidents_csv(
             item.id, item.robot_id, item.robot_model, item.facility,
             item.task_name, item.start_time.isoformat(),
             item.end_time.isoformat(), item.duration_s, item.outcome.value,
-            item.severity.value, item.software_version,
+            item.severity.value, item.triage_state.value,
+            item.software_version,
             item.failure_category.value if item.failure_category else "",
             item.confidence if item.confidence is not None else "",
             item.event_count, item.recovery_attempts, item.summary,

@@ -2087,6 +2087,22 @@
             }
           },
           {
+            "in": "query",
+            "name": "triage",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/TriageState"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Triage"
+            }
+          },
+          {
             "in": "header",
             "name": "authorization",
             "required": false,
