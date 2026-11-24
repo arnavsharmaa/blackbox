@@ -11,6 +11,7 @@ from __future__ import annotations
 
 from collections import Counter, defaultdict
 from datetime import datetime
+from statistics import mean, median
 
 from pydantic import BaseModel, ConfigDict
 
@@ -47,6 +48,21 @@ class TriageCount(BaseModel):
 
     state: TriageState
     count: int
+
+
+class ResolutionStats(BaseModel):
+    """How fast resolved incidents get closed out (ingest → resolved).
+
+    Counts only resolutions that carry a transition timestamp, so a
+    database upgraded from before triage timestamps may report fewer
+    resolved here than in the triage backlog list.
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    resolved: int
+    mean_hours: float | None
+    median_hours: float | None
 
 
 class RobotStats(BaseModel):
@@ -123,12 +139,21 @@ class AnalyticsResponse(BaseModel):
     outcomes: list[OutcomeCount]
     #: Backlog by lifecycle state, always all three states in order.
     triage: list[TriageCount]
+    resolution: ResolutionStats
     by_robot: list[RobotStats]
     by_software_version: list[VersionStats]
     blockage_hotspots: list[BlockageHotspot]
     daily: list[DailyCount]
     calibration: list[CategoryCalibration]
     failure_signatures: list[FailureSignature]
+
+
+def _resolution_stats(hours: list[float]) -> ResolutionStats:
+    return ResolutionStats(
+        resolved=len(hours),
+        mean_hours=round(mean(hours), 2) if hours else None,
+        median_hours=round(median(hours), 2) if hours else None,
+    )
 
 
 def _top_category(
@@ -335,6 +360,9 @@ def compute_analytics(
             TriageCount(state=state, count=triage_counts.get(state, 0))
             for state in TriageState
         ],
+        resolution=_resolution_stats(
+            repo.resolution_hours(facility, start_after, start_before)
+        ),
         by_robot=by_robot,
         by_software_version=by_version,
         blockage_hotspots=_blockage_hotspots(repo, summaries),

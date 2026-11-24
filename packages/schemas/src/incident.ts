@@ -308,6 +308,13 @@ export interface TriageCount {
   count: number;
 }
 
+/** How fast resolved incidents get closed out (ingest → resolved). */
+export interface ResolutionStats {
+  resolved: number;
+  mean_hours: number | null;
+  median_hours: number | null;
+}
+
 export interface AnalyticsResponse {
   total_incidents: number;
   critical_incidents: number;
@@ -316,6 +323,7 @@ export interface AnalyticsResponse {
   outcomes: OutcomeCount[];
   /** Backlog by lifecycle state, always all three states in order. */
   triage: TriageCount[];
+  resolution: ResolutionStats;
   by_robot: RobotStats[];
   by_software_version: VersionStats[];
   blockage_hotspots: BlockageHotspot[];

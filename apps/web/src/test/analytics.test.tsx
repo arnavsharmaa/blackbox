@@ -21,6 +21,7 @@ const analytics: AnalyticsResponse = {
     { state: "investigating", count: 1 },
     { state: "resolved", count: 1 },
   ],
+  resolution: { resolved: 1, mean_hours: 6.5, median_hours: 6.5 },
   by_robot: [
     {
       robot_id: "W-104",

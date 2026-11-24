@@ -172,6 +172,35 @@ class IncidentRepository:
             else TriageState.OPEN
         )
 
+    def resolution_hours(
+        self,
+        facility: str | None = None,
+        start_after: datetime | None = None,
+        start_before: datetime | None = None,
+    ) -> list[float]:
+        """Hours from ingest to resolution, one per resolved incident.
+
+        Incidents resolved before transitions were timestamped
+        (pre-0005 databases) have no duration and are skipped.
+        """
+        stmt = select(
+            IncidentRow.created_at, IncidentRow.triage_updated_at
+        ).where(
+            IncidentRow.triage_state == TriageState.RESOLVED.value,
+            IncidentRow.triage_updated_at.is_not(None),
+        )
+        if facility:
+            stmt = stmt.where(IncidentRow.facility == facility)
+        if start_after:
+            stmt = stmt.where(IncidentRow.start_time >= start_after)
+        if start_before:
+            stmt = stmt.where(IncidentRow.start_time <= start_before)
+        hours: list[float] = []
+        for created, resolved in self.session.execute(stmt):
+            delta = (_utc(resolved) - _utc(created)).total_seconds() / 3600
+            hours.append(max(0.0, round(delta, 2)))
+        return hours
+
     def get_created_at(self, incident_id: str) -> datetime | None:
         """When the incident was ingested (None for a missing id)."""
         row = self.session.get(IncidentRow, incident_id)

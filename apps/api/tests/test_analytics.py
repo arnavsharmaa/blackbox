@@ -15,6 +15,11 @@ def test_analytics_empty_database(client: TestClient) -> None:
         {"state": "investigating", "count": 0},
         {"state": "resolved", "count": 0},
     ]
+    assert body["resolution"] == {
+        "resolved": 0,
+        "mean_hours": None,
+        "median_hours": None,
+    }
 
 
 def test_analytics_counts_the_triage_backlog(
@@ -35,6 +40,14 @@ def test_analytics_counts_the_triage_backlog(
         {"state": "investigating", "count": 1},
         {"state": "resolved", "count": 1},
     ]
+
+    # The one resolved incident was ingested moments ago by the test
+    # fixture, so its ingest → resolved duration is near zero.
+    resolution = body["resolution"]
+    assert resolution["resolved"] == 1
+    assert resolution["mean_hours"] is not None
+    assert resolution["mean_hours"] < 1
+    assert resolution["median_hours"] == resolution["mean_hours"]
 
 
 def test_analytics_aggregates_seeded_fleet(seeded_client: TestClient) -> None:

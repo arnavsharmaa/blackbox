@@ -174,6 +174,9 @@
             "title": "Outcomes",
             "type": "array"
           },
+          "resolution": {
+            "$ref": "#/components/schemas/ResolutionStats"
+          },
           "total_incidents": {
             "title": "Total Incidents",
             "type": "integer"
@@ -197,6 +200,7 @@
           "categories",
           "outcomes",
           "triage",
+          "resolution",
           "by_robot",
           "by_software_version",
           "blockage_hotspots",
@@ -1212,6 +1216,45 @@
           "analysis"
         ],
         "title": "ReanalyzeResponse",
+        "type": "object"
+      },
+      "ResolutionStats": {
+        "additionalProperties": false,
+        "description": "How fast resolved incidents get closed out (ingest \u2192 resolved).\n\nCounts only resolutions that carry a transition timestamp, so a\ndatabase upgraded from before triage timestamps may report fewer\nresolved here than in the triage backlog list.",
+        "properties": {
+          "mean_hours": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mean Hours"
+          },
+          "median_hours": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Median Hours"
+          },
+          "resolved": {
+            "title": "Resolved",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "resolved",
+          "mean_hours",
+          "median_hours"
+        ],
+        "title": "ResolutionStats",
         "type": "object"
       },
       "RobotStats": {
