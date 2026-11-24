@@ -20,6 +20,7 @@ from blackbox_api.ingestion.service import (
     ingest_incident,
 )
 from blackbox_api.logging import log
+from blackbox_api.notify import notify_resolved
 from blackbox_api.reports.github_issue import build_github_issue
 from blackbox_api.reports.report import build_report, report_markdown
 from blackbox_api.schemas import (
@@ -377,7 +378,8 @@ def set_triage(
 ) -> TriageResponse:
     """Move an incident through open → investigating → resolved."""
     repo = IncidentRepository(db)
-    _get_incident_or_404(repo, incident_id, scope)
+    incident = _get_incident_or_404(repo, incident_id, scope)
+    previous = repo.get_triage(incident_id)
     updated_at = repo.set_triage(incident_id, body.state)
     db.commit()
     log(
@@ -387,6 +389,17 @@ def set_triage(
         incident_id=incident_id,
         state=body.state.value,
     )
+    if (
+        body.state is TriageState.RESOLVED
+        and previous is not TriageState.RESOLVED
+    ):
+        created_at = repo.get_created_at(incident_id)
+        hours_open = (
+            round((updated_at - created_at).total_seconds() / 3600, 2)
+            if updated_at is not None and created_at is not None
+            else None
+        )
+        notify_resolved(incident, hours_open)
     return TriageResponse(
         incident_id=incident_id,
         triage_state=body.state,

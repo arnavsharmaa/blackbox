@@ -110,3 +110,36 @@ def test_webhook_flags_recurring_signatures(
     second = json.loads(calls[1].data.decode())
     assert second["occurrence"] == 2
     assert "occurrence #2 of this failure signature" in second["text"]
+
+
+def test_webhook_fires_when_an_incident_resolves(
+    webhook_client: tuple[TestClient, list[Any]],
+    sample_incidents: dict[str, dict[str, Any]],
+) -> None:
+    client, calls = webhook_client
+    _upload(client, sample_incidents["obstacle"])
+    incident_id = json.loads(calls[0].data.decode())["incident_id"]
+
+    # Moving to investigating is quiet; only resolution announces.
+    client.put(
+        f"/api/incidents/{incident_id}/triage",
+        json={"state": "investigating"},
+    )
+    assert len(calls) == 1
+
+    client.put(
+        f"/api/incidents/{incident_id}/triage", json={"state": "resolved"}
+    )
+    assert len(calls) == 2
+    payload = json.loads(calls[1].data.decode())
+    assert payload["event"] == "incident_resolved"
+    assert payload["incident_id"] == incident_id
+    assert payload["hours_open"] is not None
+    assert payload["hours_open"] < 1  # just ingested in this test
+    assert "resolved after" in payload["text"]
+
+    # Re-asserting resolved does not spam the channel.
+    client.put(
+        f"/api/incidents/{incident_id}/triage", json={"state": "resolved"}
+    )
+    assert len(calls) == 2

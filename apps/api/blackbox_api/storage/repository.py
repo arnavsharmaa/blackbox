@@ -172,6 +172,11 @@ class IncidentRepository:
             else TriageState.OPEN
         )
 
+    def get_created_at(self, incident_id: str) -> datetime | None:
+        """When the incident was ingested (None for a missing id)."""
+        row = self.session.get(IncidentRow, incident_id)
+        return _utc(row.created_at) if row is not None else None
+
     def get_triage_info(
         self, incident_id: str
     ) -> tuple[TriageState, datetime | None]:
