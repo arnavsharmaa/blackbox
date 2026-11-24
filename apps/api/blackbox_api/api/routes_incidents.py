@@ -184,12 +184,14 @@ def get_incident(
 ) -> IncidentDetail:
     repo = IncidentRepository(db)
     incident = _get_incident_or_404(repo, incident_id, scope)
+    triage_state, triage_updated_at = repo.get_triage_info(incident_id)
     return IncidentDetail(
         incident=incident,
         analysis=repo.get_analysis(incident_id),
         feedback=repo.get_feedback(incident_id),
         notes=repo.list_notes(incident_id),
-        triage_state=repo.get_triage(incident_id),
+        triage_state=triage_state,
+        triage_updated_at=triage_updated_at,
     )
 
 
@@ -363,6 +365,7 @@ class TriageResponse(BaseModel):
 
     incident_id: str
     triage_state: TriageState
+    triage_updated_at: datetime | None = None
 
 
 @router.put("/{incident_id}/triage", response_model=TriageResponse)
@@ -375,7 +378,7 @@ def set_triage(
     """Move an incident through open → investigating → resolved."""
     repo = IncidentRepository(db)
     _get_incident_or_404(repo, incident_id, scope)
-    repo.set_triage(incident_id, body.state)
+    updated_at = repo.set_triage(incident_id, body.state)
     db.commit()
     log(
         logger,
@@ -384,7 +387,11 @@ def set_triage(
         incident_id=incident_id,
         state=body.state.value,
     )
-    return TriageResponse(incident_id=incident_id, triage_state=body.state)
+    return TriageResponse(
+        incident_id=incident_id,
+        triage_state=body.state,
+        triage_updated_at=updated_at,
+    )
 
 
 class NoteRequest(BaseModel):

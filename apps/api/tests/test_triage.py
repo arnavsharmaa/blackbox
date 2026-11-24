@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from datetime import UTC, datetime
+
 from fastapi.testclient import TestClient
 
 PRIMARY = "INC-2026-0728-001"
@@ -8,6 +10,8 @@ PRIMARY = "INC-2026-0728-001"
 def test_incidents_start_open(seeded_client: TestClient) -> None:
     detail = seeded_client.get(f"/api/incidents/{PRIMARY}").json()
     assert detail["triage_state"] == "open"
+    # Untouched incidents have no transition timestamp.
+    assert detail["triage_updated_at"] is None
     items = seeded_client.get("/api/incidents").json()["items"]
     assert {i["triage_state"] for i in items} == {"open"}
 
@@ -18,10 +22,12 @@ def test_triage_transitions_and_filtering(seeded_client: TestClient) -> None:
         json={"state": "investigating"},
     )
     assert response.status_code == 200
-    assert response.json() == {
-        "incident_id": PRIMARY,
-        "triage_state": "investigating",
-    }
+    body = response.json()
+    assert body["incident_id"] == PRIMARY
+    assert body["triage_state"] == "investigating"
+    # Every transition is timestamped with a recent UTC instant.
+    first_touch = datetime.fromisoformat(body["triage_updated_at"])
+    assert abs((datetime.now(UTC) - first_touch).total_seconds()) < 60
 
     investigating = seeded_client.get(
         "/api/incidents", params={"triage": "investigating"}
@@ -39,6 +45,8 @@ def test_triage_transitions_and_filtering(seeded_client: TestClient) -> None:
     )
     detail = seeded_client.get(f"/api/incidents/{PRIMARY}").json()
     assert detail["triage_state"] == "resolved"
+    resolved_at = datetime.fromisoformat(detail["triage_updated_at"])
+    assert resolved_at >= first_touch
 
 
 def test_triage_validation_and_404(seeded_client: TestClient) -> None:

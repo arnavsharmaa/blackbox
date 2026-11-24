@@ -330,6 +330,8 @@ class IncidentDetail(BaseModel):
     feedback: DiagnosisFeedback | None = None
     notes: list[IncidentNote] = Field(default_factory=list)
     triage_state: TriageState = TriageState.OPEN
+    #: When triage last changed; null until someone touches the incident.
+    triage_updated_at: datetime | None = None
 
 
 class IncidentListResponse(BaseModel):

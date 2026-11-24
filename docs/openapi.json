@@ -872,6 +872,18 @@
           "triage_state": {
             "$ref": "#/components/schemas/TriageState",
             "default": "open"
+          },
+          "triage_updated_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Triage Updated At"
           }
         },
         "required": [
@@ -1419,6 +1431,18 @@
           },
           "triage_state": {
             "$ref": "#/components/schemas/TriageState"
+          },
+          "triage_updated_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Triage Updated At"
           }
         },
         "required": [

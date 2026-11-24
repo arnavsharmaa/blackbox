@@ -43,6 +43,10 @@ class IncidentRow(Base):
     triage_state: Mapped[str] = mapped_column(
         String(16), default="open", server_default="open", index=True
     )
+    #: When triage last changed; null until someone touches the incident.
+    triage_updated_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
 
     events: Mapped[list[EventRow]] = relationship(

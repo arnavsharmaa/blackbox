@@ -172,14 +172,28 @@ class IncidentRepository:
             else TriageState.OPEN
         )
 
-    def set_triage(
-        self, incident_id: str, state: TriageState
-    ) -> bool:
+    def get_triage_info(
+        self, incident_id: str
+    ) -> tuple[TriageState, datetime | None]:
+        """Current triage state and when it last changed (None if never)."""
         row = self.session.get(IncidentRow, incident_id)
         if row is None:
-            return False
+            return TriageState.OPEN, None
+        updated = (
+            _utc(row.triage_updated_at) if row.triage_updated_at else None
+        )
+        return TriageState(row.triage_state), updated
+
+    def set_triage(
+        self, incident_id: str, state: TriageState
+    ) -> datetime | None:
+        """Set the state; returns the transition timestamp (None = 404)."""
+        row = self.session.get(IncidentRow, incident_id)
+        if row is None:
+            return None
         row.triage_state = state.value
-        return True
+        row.triage_updated_at = datetime.now(UTC)
+        return row.triage_updated_at
 
     def delete_incident(self, incident_id: str) -> bool:
         row = self.session.get(IncidentRow, incident_id)

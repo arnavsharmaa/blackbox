@@ -176,6 +176,8 @@ export interface IncidentDetail {
   feedback: DiagnosisFeedback | null;
   notes: IncidentNote[];
   triage_state: TriageState;
+  /** When triage last changed (ISO); null until someone touches it. */
+  triage_updated_at: string | null;
 }
 
 export interface IncidentListResponse {
