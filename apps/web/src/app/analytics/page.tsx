@@ -42,6 +42,12 @@ function triageBreakdown(data: AnalyticsResponse): string {
   return `${count("open")} open · ${count("investigating")} investigating`;
 }
 
+function formatHours(hours: number): string {
+  if (hours < 1) return `${Math.round(hours * 60)} min`;
+  if (hours >= 48) return `${(hours / 24).toFixed(1)} d`;
+  return `${hours.toFixed(1)} h`;
+}
+
 export default function AnalyticsPage() {
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
@@ -117,7 +123,7 @@ export default function AnalyticsPage() {
         />
       ) : (
         <>
-          <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
+          <div className="grid grid-cols-2 gap-3 lg:grid-cols-3 xl:grid-cols-6">
             <StatCard label="Total incidents" value={data.total_incidents} />
             <StatCard
               label="Critical incidents"
@@ -138,6 +144,21 @@ export default function AnalyticsPage() {
               value={unresolved(data)}
               accent={unresolved(data) > 0}
               sub={triageBreakdown(data)}
+            />
+            <StatCard
+              label="Mean time to resolve"
+              value={
+                data.resolution.mean_hours !== null
+                  ? formatHours(data.resolution.mean_hours)
+                  : "—"
+              }
+              sub={
+                data.resolution.resolved > 0 &&
+                data.resolution.median_hours !== null
+                  ? `${data.resolution.resolved} resolved · median ` +
+                    formatHours(data.resolution.median_hours)
+                  : "no timed resolutions yet"
+              }
             />
           </div>
 

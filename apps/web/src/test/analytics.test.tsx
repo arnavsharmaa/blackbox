@@ -108,6 +108,10 @@ describe("analytics page", () => {
     // Triage backlog: 2 open + 1 investigating from the fixture.
     expect(screen.getByText("Unresolved")).toBeTruthy();
     expect(screen.getByText("2 open · 1 investigating")).toBeTruthy();
+    // Resolution speed from the fixture's resolution block.
+    expect(screen.getByText("Mean time to resolve")).toBeTruthy();
+    expect(screen.getByText("6.5 h")).toBeTruthy();
+    expect(screen.getByText("1 resolved · median 6.5 h")).toBeTruthy();
     expect(screen.getByText("W-104")).toBeTruthy();
     expect(screen.getByText("W-087")).toBeTruthy();
     expect(screen.getByText("nav-stack 2.14.1")).toBeTruthy();
