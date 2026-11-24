@@ -197,6 +197,8 @@ class IncidentRepository:
             stmt = stmt.where(IncidentRow.start_time <= start_before)
         hours: list[float] = []
         for created, resolved in self.session.execute(stmt):
+            if resolved is None:  # excluded in SQL; narrows the type
+                continue
             delta = (_utc(resolved) - _utc(created)).total_seconds() / 3600
             hours.append(max(0.0, round(delta, 2)))
         return hours
