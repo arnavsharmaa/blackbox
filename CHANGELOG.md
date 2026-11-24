@@ -14,6 +14,13 @@ the API/package version in `apps/api/pyproject.toml`.
   through the CSV export (column + filter), the CLI (`blackbox
   triage`, a `list --triage` filter and TRIAGE column), and fleet
   analytics, where an Unresolved card counts the open backlog.
+- Resolution tracking: every triage transition is timestamped
+  (migration 0005), shown as "Investigating since …" in the incident
+  header and `blackbox show`; the first move to resolved posts an
+  `incident_resolved` webhook event carrying the hours the incident
+  was open, and analytics reports the count plus mean/median time to
+  resolution on a new stat card. Webhook payloads now carry an
+  `event` field (`incident_ingested` / `incident_resolved`).
 - Incident notes: a free-text investigation scratchpad per incident
   (API + panel on the incident page), carried through `blackbox show`,
   backup, and restore; cited in the incident report and manageable

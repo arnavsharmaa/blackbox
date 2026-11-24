@@ -294,6 +294,8 @@ test.describe("fleet features", () => {
     await expect(
       page.getByRole("button", { name: "Investigating" }),
     ).toHaveAttribute("aria-pressed", "true");
+    // The transition is server-timestamped and shown immediately.
+    await expect(page.getByText(/Investigating since/)).toBeVisible();
 
     await page.goto("/?triage=investigating");
     await expect(
@@ -302,6 +304,14 @@ test.describe("fleet features", () => {
     await expect(
       page.getByRole("table").getByText("Investigating"),
     ).toBeVisible();
+
+    // Resolving feeds the time-to-resolution analytics.
+    await page.goto(`/incidents/${PRIMARY}`);
+    await page.getByRole("button", { name: "Resolved" }).click();
+    await expect(page.getByText(/Resolved since/)).toBeVisible();
+    await page.goto("/analytics");
+    await expect(page.getByText("Mean time to resolve")).toBeVisible();
+    await expect(page.getByText(/1 resolved · median/)).toBeVisible();
 
     // Reset for idempotent local reruns (CI reseeds clean).
     await page.goto(`/incidents/${PRIMARY}`);
