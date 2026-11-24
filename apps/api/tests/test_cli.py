@@ -113,6 +113,8 @@ def test_show_prints_diagnosis_and_feedback(
             "verdict": "corrected", "actual_category": "sensor_dropout",
         },
         "notes": [{"text": "Checked the dock camera.", "author": "ops"}],
+        "triage_state": "investigating",
+        "triage_updated_at": "2026-11-23T10:00:00+00:00",
     }})
     monkeypatch.setattr(cli, "_request", fake)
 
@@ -122,6 +124,7 @@ def test_show_prints_diagnosis_and_feedback(
     assert "t=31.0s zero-velocity streak" in out
     assert "corrected (actually sensor_dropout)" in out
     assert "note     Checked the dock camera. — ops" in out
+    assert "triage   investigating (since 2026-11-23T10:00:00+00:00)" in out
 
 
 def test_upload_sends_multipart(

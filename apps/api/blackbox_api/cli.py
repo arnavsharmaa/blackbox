@@ -137,7 +137,9 @@ def _cmd_show(args: argparse.Namespace) -> None:
         f"({incident['outcome']}, {incident['severity']})"
     )
     if body.get("triage_state"):
-        print(f"  triage   {body['triage_state']}")
+        since = body.get("triage_updated_at")
+        suffix = f" (since {since})" if since else ""
+        print(f"  triage   {body['triage_state']}{suffix}")
     print(f"  summary  {incident['summary']}")
     if analysis:
         print(

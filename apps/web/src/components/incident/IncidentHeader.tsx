@@ -27,15 +27,20 @@ export function IncidentHeader({
   incident,
   analysis,
   initialTriage = "open",
+  initialTriageUpdatedAt = null,
 }: {
   incident: Incident;
   analysis: AnalysisResult | null;
   initialTriage?: TriageState;
+  initialTriageUpdatedAt?: string | null;
 }) {
   const router = useRouter();
   const [deleting, setDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [triage, setTriageState] = useState<TriageState>(initialTriage);
+  const [triageUpdatedAt, setTriageUpdatedAt] = useState<string | null>(
+    initialTriageUpdatedAt,
+  );
   const [triageError, setTriageError] = useState<string | null>(null);
 
   const handleTriage = async (state: TriageState) => {
@@ -44,7 +49,8 @@ export function IncidentHeader({
     setTriageState(state);
     setTriageError(null);
     try {
-      await setTriage(incident.id, state);
+      const updatedAt = await setTriage(incident.id, state);
+      if (updatedAt) setTriageUpdatedAt(updatedAt);
     } catch (error) {
       setTriageState(previous);
       setTriageError(
@@ -117,6 +123,12 @@ export function IncidentHeader({
                 </button>
               ))}
             </div>
+            {triageUpdatedAt && (
+              <span className="text-[11px] text-ink-faint">
+                {TRIAGE_LABELS[triage]} since{" "}
+                {formatDateTime(triageUpdatedAt)}
+              </span>
+            )}
           </div>
           <p className="mt-1 font-mono text-xs text-ink-faint">{incident.id}</p>
         </div>

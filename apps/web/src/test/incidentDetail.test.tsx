@@ -111,7 +111,17 @@ describe("EventInspector", () => {
 
 describe("IncidentHeader triage", () => {
   it("moves the incident to investigating and reverts on failure", async () => {
-    const fetchMock = vi.fn(async () => new Response(null, { status: 200 }));
+    const fetchMock = vi.fn(
+      async () =>
+        new Response(
+          JSON.stringify({
+            incident_id: "INC-TEST-100",
+            triage_state: "investigating",
+            triage_updated_at: "2026-11-23T10:00:00+00:00",
+          }),
+          { status: 200 },
+        ),
+    );
     vi.stubGlobal("fetch", fetchMock);
 
     const user = userEvent.setup();
@@ -124,6 +134,10 @@ describe("IncidentHeader triage", () => {
     await user.click(investigating);
     await waitFor(() => {
       expect(investigating.getAttribute("aria-pressed")).toBe("true");
+    });
+    // The server-stamped transition time shows next to the control.
+    await waitFor(() => {
+      expect(screen.getByText(/Investigating since/)).toBeTruthy();
     });
     const [url, init] = fetchMock.mock.calls[0] as unknown as [
       string,

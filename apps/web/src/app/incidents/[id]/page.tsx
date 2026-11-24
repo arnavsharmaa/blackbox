@@ -57,6 +57,7 @@ export default function IncidentDetailPage({
         incident={incident}
         analysis={analysis}
         initialTriage={detail.data?.triage_state ?? "open"}
+        initialTriageUpdatedAt={detail.data?.triage_updated_at ?? null}
       />
 
       <div className="grid gap-4 xl:grid-cols-[1fr_380px]">

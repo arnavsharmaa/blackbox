@@ -131,10 +131,14 @@ export function fetchGithubIssue(
   );
 }
 
+/**
+ * Move an incident's triage state; resolves to the server-stamped
+ * transition time (null if the server did not report one).
+ */
 export async function setTriage(
   id: string,
   state: TriageState,
-): Promise<void> {
+): Promise<string | null> {
   const response = await fetch(
     `${API_BASE}/api/incidents/${encodeURIComponent(id)}/triage`,
     {
@@ -148,6 +152,14 @@ export async function setTriage(
       `Triage update failed (${response.status})`,
       response.status,
     );
+  }
+  try {
+    const body = (await response.json()) as {
+      triage_updated_at: string | null;
+    };
+    return body.triage_updated_at;
+  } catch {
+    return null;
   }
 }
 
