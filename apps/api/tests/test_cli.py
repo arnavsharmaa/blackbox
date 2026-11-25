@@ -418,3 +418,41 @@ def test_notes_add_and_list(
     assert cli.main(["notes", "INC-1"]) == 0
     out = capsys.readouterr().out
     assert "[2026-11-19T10:00:00+00:00] Pallet moved. — arnav" in out
+
+
+def test_rules_lists_builtins_and_plugins(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    fake = FakeApi({("GET", "/api/rules"): {
+        "engine_version": "1.0.0",
+        "diagnosis_threshold": 0.5,
+        "confidence_ceiling": 0.95,
+        "rules": [
+            {
+                "rule_id": "sensor_dropout", "category": "sensor_dropout",
+                "builtin": True,
+                "source": "blackbox_api.analysis.rules:rule_sensor_dropout",
+                "description": "The obstacle sensor went quiet.",
+                "explanation": "…",
+                "recommended_actions": ["Check lidar power"],
+            },
+            {
+                "rule_id": "acme_battery_sag", "category": "unknown",
+                "builtin": False,
+                "source": "acme_rules:battery_sag",
+                "description": "",
+                "explanation": "",
+                "recommended_actions": [],
+            },
+        ],
+    }})
+    monkeypatch.setattr(cli, "_request", fake)
+
+    assert cli.main(["rules", "--verbose"]) == 0
+    out = capsys.readouterr().out
+    assert "engine 1.0.0 — diagnosis threshold 50%" in out
+    assert "sensor_dropout" in out
+    assert "builtin" in out
+    assert "plugin acme_rules:battery_sag" in out
+    assert "The obstacle sensor went quiet." in out
+    assert "- Check lidar power" in out

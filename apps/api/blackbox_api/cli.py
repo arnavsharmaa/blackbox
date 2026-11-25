@@ -229,6 +229,28 @@ def _cmd_notes(args: argparse.Namespace) -> None:
         print(f"[{note['created_at']}] {note['text']}{author}")
 
 
+def _cmd_rules(args: argparse.Namespace) -> None:
+    body = _request("GET", f"{args.api}/api/rules", token=args.token)
+    print(
+        f"engine {body['engine_version']} — diagnosis threshold "
+        f"{body['diagnosis_threshold']:.0%}, confidence ceiling "
+        f"{body['confidence_ceiling']:.0%}"
+    )
+    for rule in body.get("rules", []):
+        origin = (
+            "builtin" if rule["builtin"] else f"plugin {rule['source']}"
+        )
+        print(
+            f"{rule['rule_id']:30} {rule.get('category') or '-':24} {origin}"
+        )
+        if args.verbose:
+            description = " ".join((rule.get("description") or "").split())
+            if description:
+                print(f"    {description}")
+            for action in rule.get("recommended_actions", []):
+                print(f"    - {action}")
+
+
 def _cmd_triage(args: argparse.Namespace) -> None:
     result = _request(
         "PUT",
@@ -678,6 +700,15 @@ def build_parser() -> argparse.ArgumentParser:
     notes.add_argument("text", nargs="?", default=None)
     notes.add_argument("--author", default=None)
     notes.set_defaults(func=_cmd_notes)
+
+    rules = sub.add_parser(
+        "rules", help="list the analysis rules the server runs"
+    )
+    rules.add_argument(
+        "-v", "--verbose", action="store_true",
+        help="include each rule's description and runbook",
+    )
+    rules.set_defaults(func=_cmd_rules)
 
     triage = sub.add_parser(
         "triage", help="move an incident through its triage lifecycle"

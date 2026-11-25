@@ -281,6 +281,7 @@ blackbox replay incident.json --speed 10   # robot simulator over WebSocket
 blackbox watch --interval 5                # print new incidents as they land
 blackbox diff INC-2026-0728-001 INC-2026-0721-BASE
 blackbox doctor                            # connectivity, versions, auth
+blackbox rules --verbose                   # every loaded diagnosis rule
 blackbox backup ./fleet-dump               # every incident + verdict as JSON
 blackbox restore ./fleet-dump              # migrate or recover an instance
 blackbox prune --days 90 --yes
