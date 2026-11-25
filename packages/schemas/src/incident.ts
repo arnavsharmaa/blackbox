@@ -332,6 +332,29 @@ export interface AnalyticsResponse {
   failure_signatures: FailureSignature[];
 }
 
+/** One loaded analysis rule, from GET /api/rules. */
+export interface RuleInfo {
+  rule_id: string;
+  /** null only for a plug-in that failed the metadata probe. */
+  category: FailureCategory | null;
+  builtin: boolean;
+  /** Importable location, e.g. "blackbox_api.analysis.rules:rule_sensor_dropout". */
+  source: string;
+  description: string;
+  explanation: string;
+  recommended_actions: string[];
+}
+
+/** Body of GET /api/rules. */
+export interface RulesResponse {
+  engine_version: string;
+  /** A rule must reach this score to be claimed as the root cause. */
+  diagnosis_threshold: number;
+  /** Reported confidence never exceeds this: rules are heuristics. */
+  confidence_ceiling: number;
+  rules: RuleInfo[];
+}
+
 /** Body of GET /api/incidents/{id}/diff/{baseline_id}. */
 export interface RunRef {
   id: string;

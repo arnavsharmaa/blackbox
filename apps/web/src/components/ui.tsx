@@ -6,7 +6,7 @@ export function Panel({
   children,
   className = "",
 }: {
-  title?: string;
+  title?: ReactNode;
   actions?: ReactNode;
   children: ReactNode;
   className?: string;

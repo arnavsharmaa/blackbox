@@ -38,6 +38,9 @@ export default function RootLayout({
               <Link href="/analytics" className="hover:text-ink">
                 Analytics
               </Link>
+              <Link href="/rules" className="hover:text-ink">
+                Rules
+              </Link>
               <Link href="/upload" className="hover:text-ink">
                 Upload
               </Link>

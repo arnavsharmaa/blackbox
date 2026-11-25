@@ -11,6 +11,7 @@ import type {
   IncidentNote,
   IncidentReport,
   IncidentSummary,
+  RulesResponse,
   TriageState,
   UploadResponse,
 } from "@blackbox/schemas";
@@ -218,6 +219,11 @@ export function fetchAnalytics(window?: {
   if (window?.start_before) query.set("start_before", window.start_before);
   const suffix = query.toString() ? `?${query.toString()}` : "";
   return request<AnalyticsResponse>(`/api/analytics${suffix}`);
+}
+
+/** Every analysis rule the server runs, built-in and plug-in alike. */
+export function fetchRules(): Promise<RulesResponse> {
+  return request<RulesResponse>("/api/rules");
 }
 
 export function fetchDiff(
