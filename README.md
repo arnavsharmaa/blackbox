@@ -344,7 +344,11 @@ Deployments can also add **custom rules without forking**: set
 functions with the built-in rule signature — they compete with the built-in
 rules on equal footing (see
 [plugins.py](apps/api/blackbox_api/analysis/plugins.py)). Working,
-test-covered examples live in [examples/rules](examples/rules).
+test-covered examples live in [examples/rules](examples/rules), and
+[docs/writing-rules.md](docs/writing-rules.md) is the full authoring
+guide: the feature catalog, scoring semantics, evidence conventions,
+and deployment. Loaded rules are auditable at runtime via
+`GET /api/rules`, `blackbox rules`, and the web UI's Rules page.
 
 Every numeric threshold in the table above is configurable per deployment
 via `BLACKBOX_RULE_*` environment variables (see

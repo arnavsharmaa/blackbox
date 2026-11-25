@@ -21,3 +21,7 @@ open an issue.
 
 These examples are exercised by the test suite
 (`apps/api/tests/test_example_rules.py`), so they cannot rot.
+
+The full authoring guide — feature catalog, scoring semantics,
+evidence conventions, deployment, and how to verify a rule loaded —
+is [docs/writing-rules.md](../../docs/writing-rules.md).
