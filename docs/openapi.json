@@ -1307,6 +1307,91 @@
         "title": "RobotStats",
         "type": "object"
       },
+      "RuleInfo": {
+        "additionalProperties": false,
+        "properties": {
+          "builtin": {
+            "title": "Builtin",
+            "type": "boolean"
+          },
+          "category": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/FailureCategory"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "explanation": {
+            "title": "Explanation",
+            "type": "string"
+          },
+          "recommended_actions": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Recommended Actions",
+            "type": "array"
+          },
+          "rule_id": {
+            "title": "Rule Id",
+            "type": "string"
+          },
+          "source": {
+            "title": "Source",
+            "type": "string"
+          }
+        },
+        "required": [
+          "rule_id",
+          "category",
+          "builtin",
+          "source",
+          "description",
+          "explanation",
+          "recommended_actions"
+        ],
+        "title": "RuleInfo",
+        "type": "object"
+      },
+      "RulesResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "confidence_ceiling": {
+            "title": "Confidence Ceiling",
+            "type": "number"
+          },
+          "diagnosis_threshold": {
+            "title": "Diagnosis Threshold",
+            "type": "number"
+          },
+          "engine_version": {
+            "title": "Engine Version",
+            "type": "string"
+          },
+          "rules": {
+            "items": {
+              "$ref": "#/components/schemas/RuleInfo"
+            },
+            "title": "Rules",
+            "type": "array"
+          }
+        },
+        "required": [
+          "engine_version",
+          "diagnosis_threshold",
+          "confidence_ceiling",
+          "rules"
+        ],
+        "title": "RulesResponse",
+        "type": "object"
+      },
       "RunRef": {
         "additionalProperties": false,
         "properties": {
@@ -3591,6 +3676,72 @@
         "summary": "Set Triage",
         "tags": [
           "incidents"
+        ]
+      }
+    },
+    "/api/rules": {
+      "get": {
+        "description": "Every rule the engine runs, built-in and plug-in alike.",
+        "operationId": "get_rules_api_rules_get",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-api-key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Api-Key"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RulesResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Rules",
+        "tags": [
+          "rules"
         ]
       }
     },

@@ -97,6 +97,9 @@ class _Scorer:
 def rule_persistent_obstacle(
     f: IncidentFeatures, th: AnalysisThresholds
 ) -> RuleResult:
+    """A physical blockage the robot could not plan around: clearance
+    pinned below the safety threshold while the controller held zero
+    velocity and recovery behaviors produced no displacement."""
     s = _Scorer("persistent-obstacle")
     low = f.obstacle_low_interval
     s.condition(
@@ -219,6 +222,9 @@ def rule_persistent_obstacle(
 def rule_localization_failure(
     f: IncidentFeatures, th: AnalysisThresholds
 ) -> RuleResult:
+    """The pose estimate became untrustworthy: localization confidence
+    collapsed or the estimated pose jumped discontinuously, and the
+    planner suspended navigation rather than act on it."""
     s = _Scorer("localization-failure")
     s.condition(
         f.loc_conf_min is not None and f.loc_conf_min < th.loc_conf_fault,
@@ -309,6 +315,9 @@ def rule_localization_failure(
 def rule_controller_oscillation(
     f: IncidentFeatures, th: AnalysisThresholds
 ) -> RuleResult:
+    """A tuning mismatch in constricted space: angular velocity commands
+    flipped sign rapidly with little forward progress while the planner
+    re-planned through the same gap."""
     s = _Scorer("controller-oscillation")
     window = f.angular_flip_window
     s.condition(
@@ -404,6 +413,9 @@ def rule_controller_oscillation(
 def rule_sensor_dropout(
     f: IncidentFeatures, th: AnalysisThresholds
 ) -> RuleResult:
+    """The obstacle sensor went quiet: update gaps far beyond the normal
+    cadence, stale-sensor diagnostics, and a planner degraded to a
+    conservative mode."""
     s = _Scorer("sensor-dropout")
     median = f.obstacle_median_gap
     dropout = (
