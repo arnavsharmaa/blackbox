@@ -8,6 +8,15 @@ the API/package version in `apps/api/pyproject.toml`.
 
 ### Added
 
+- Rules transparency: `GET /api/rules`, `blackbox rules --verbose`,
+  and a web UI Rules page list every loaded diagnosis rule — id,
+  category, source, description, and runbook — with plug-ins from
+  `BLACKBOX_EXTRA_RULES` badged apart from built-ins and each rule
+  linking to the incidents it diagnosed. A new authoring guide
+  (`docs/writing-rules.md`, drift-guarded feature catalog included)
+  and a second shipped example rule (`sensor_flap`) cover writing
+  custom rules end to end.
+
 - Incident triage: every incident moves through open → investigating →
   resolved from the incident header, with an overview filter and
   badges; existing databases come up all-open. The state carries

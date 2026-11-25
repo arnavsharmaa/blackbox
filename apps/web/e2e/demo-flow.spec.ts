@@ -321,6 +321,35 @@ test.describe("fleet features", () => {
     ).toHaveAttribute("aria-pressed", "true");
   });
 
+  test("rules page documents the loaded diagnosis rules", async ({
+    page,
+  }) => {
+    await page.goto("/rules");
+    await expect(
+      page.getByRole("heading", { name: "Analysis rules" }),
+    ).toBeVisible();
+    // All four built-ins render with their importable sources.
+    for (const rule of [
+      "rule_persistent_obstacle",
+      "rule_localization_failure",
+      "rule_controller_oscillation",
+      "rule_sensor_dropout",
+    ]) {
+      await expect(
+        page.getByText(`blackbox_api.analysis.rules:${rule}`),
+      ).toBeVisible();
+    }
+    // Each rule deep-links to the incidents it diagnosed.
+    await page
+      .getByRole("link", { name: "Incidents with this diagnosis →" })
+      .first()
+      .click();
+    await expect(page).toHaveURL(/failure_category=persistent_obstacle/);
+    await expect(
+      page.getByRole("link", { name: "Deliver pallet to Loading Bay B" }),
+    ).toBeVisible();
+  });
+
   test("upload page rejects malformed json with field errors", async ({
     page,
   }) => {
