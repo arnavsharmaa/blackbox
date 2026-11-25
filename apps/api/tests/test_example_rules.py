@@ -51,3 +51,35 @@ def test_example_rule_loads_through_the_plugin_registry(
     # competed and is reported alongside it.
     assert analysis.failure_category.value == "persistent_obstacle"
     assert "recovery_churn" in analysis.rules_triggered
+
+
+def test_sensor_flap_scores_the_flapping_run(
+    parsed_incidents: dict[str, Incident],
+) -> None:
+    from sensor_flap import sensor_flap
+
+    from blackbox_api.analysis.thresholds import get_thresholds
+
+    # The dropout sample flaps (4 warnings) but also has a hard gap,
+    # so the no-sustained-dropout condition deliberately fails: the
+    # built-in dropout rule outscores this one there.
+    features = compute_features(parsed_incidents["sensor_dropout"])
+    result = sensor_flap(features, get_thresholds())
+    assert result.score == 0.7
+    assert "stale_warnings>=3" in result.conditions_met
+    assert "no_sustained_dropout" not in result.conditions_met
+    assert result.category.value == "sensor_dropout"
+
+    quiet = compute_features(parsed_incidents["baseline"])
+    assert sensor_flap(quiet, get_thresholds()).score == 0.0
+
+
+def test_sensor_flap_never_outscores_the_builtin_on_a_hard_dropout(
+    parsed_incidents: dict[str, Incident],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("BLACKBOX_EXTRA_RULES", "sensor_flap:sensor_flap")
+    reset_rules_cache()
+    analysis = analyze_incident(parsed_incidents["sensor_dropout"])
+    assert analysis.failure_category.value == "sensor_dropout"
+    assert "sensor_dropout" in analysis.rules_triggered

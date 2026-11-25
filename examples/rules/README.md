@@ -7,6 +7,7 @@ that competes with the built-in rules on equal footing.
 | Rule | Fires when | Category |
 | --- | --- | --- |
 | [`recovery_churn`](./recovery_churn.py) | ≥3 recovery behaviors with <0.5 m total displacement on an unfinished task | persistent_obstacle |
+| [`sensor_flap`](./sensor_flap.py) | ≥3 stale-sensor warnings while updates keep flowing — the intermittent-connection pattern that precedes a hard dropout | sensor_dropout |
 
 Run BlackBox with an example enabled:
 
